@@ -1,12 +1,12 @@
 -- See current buffers at the top of the editor
 return {
-	{
-		"akinsho/bufferline.nvim",
-		version = "v3.*",
-		dependencies = "nvim-tree/nvim-web-devicons",
-		opts = {
-				-- separator_style = "padded_slant",
-		},
+	-- {
+	-- 	"akinsho/bufferline.nvim",
+	-- 	version = "v3.*",
+	-- 	dependencies = "nvim-tree/nvim-web-devicons",
+	-- 	opts = {
+	-- 			-- separator_style = "padded_slant",
+	-- 	},
 		-- config = function()
 		-- 	require("bufferline").setup({
 		-- 		separator_style = "padded_slant"
@@ -24,5 +24,5 @@ return {
 		-- 		-- 	]])
 		-- 	})
 		-- end
-	},
+	-- },
 }

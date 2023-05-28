@@ -76,21 +76,21 @@ return {
 			pcall(require("telescope").load_extension, "fzf")
 
 			local map = require("helpers.keys").map
-			map("n", "<leader>f", require("telescope.builtin").oldfiles, "Recently opened")
-			map("n", "<leader><space>", require("telescope.builtin").buffers, "Open buffers")
+
 			map("n", "<leader>/", function()
 				-- You can pass additional configuration to telescope to change theme, layout, etc.
-				require("telescope.builtin").current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
-					winblend = 10,
-					previewer = false,
-				}))
+				require("telescope.builtin").current_buffer_fuzzy_find(
+					require("telescope.themes").get_dropdown({ winblend = 10, previewer = false })
+				)
 			end, "Search in current buffer")
 
-			map("n", "<leader>sf", require("telescope.builtin").find_files, "Files")
-			map("n", "<leader>sh", require("telescope.builtin").help_tags, "Help")
-			map("n", "<leader>sw", require("telescope.builtin").grep_string, "Current word")
-			map("n", "<leader>sg", require("telescope.builtin").live_grep, "Grep")
-			map("n", "<leader>sd", require("telescope.builtin").diagnostics, "Diagnostics")
+			map("n", "<leader>tr", require("telescope.builtin").oldfiles, "Recently opened")
+			map("n", "<leader><space>", require("telescope.builtin").buffers, "Open buffers")
+			map("n", "<leader>tf", require("telescope.builtin").find_files, "Files")
+			map("n", "<leader>th", require("telescope.builtin").help_tags, "Help")
+			map("n", "<leader>tw", require("telescope.builtin").grep_string, "Current word")
+			map("n", "<leader>tg", require("telescope.builtin").live_grep, "Grep")
+			map("n", "<leader>td", require("telescope.builtin").diagnostics, "Diagnostics")
 
 			map("n", "<C-p>", require("telescope.builtin").keymaps, "Search keymaps")
 		end,
@@ -108,12 +108,12 @@ return {
 		},
 		opts = {
 			keymaps = {
-				["?"] = "actions.show_help"
+				["?"] = "actions.show_help",
 			},
 			view_options = {
-				show_hidden = true
-			}
-		}
+				show_hidden = true,
+			},
+		},
 		-- config = function()
 		-- 	require("oil").setup({})
 		-- end,
@@ -163,21 +163,19 @@ return {
 		config = function()
 			local wk = require("which-key")
 			wk.setup()
-			wk.register(
-				{
-					["<leader>"] = {
-						f = { name = "File" },
-						d = { name = "Delete/Close" },
-						q = { name = "Quit" },
-						s = { name = "Search" },
-						l = { name = "LSP" },
-						u = { name = "UI" },
-						b = { name = "Debugging" },
-						g = { name = "Git" },
-					}
-				}
-			)
-		end
+			wk.register({
+				["<leader>"] = {
+					f = { name = "File" },
+					d = { name = "Delete/Close" },
+					q = { name = "Quit" },
+					s = { name = "Search" },
+					l = { name = "LSP" },
+					u = { name = "UI" },
+					b = { name = "Debugging" },
+					g = { name = "Git" },
+				},
+			})
+		end,
 	},
 	{
 		"echasnovski/mini.pairs",

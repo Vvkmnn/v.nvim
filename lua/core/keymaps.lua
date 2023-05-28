@@ -1,7 +1,8 @@
 local map = require("helpers.keys").map
 
--- Blazingly fast way out of insert mode
-map("i", "jk", "<esc>")
+-- Escape via jj or jk in insert mode
+-- map("i", "jj", "<ESC>")
+-- map("i", "jk", "<esc>")
 
 -- Quick access to some common actions
 map("n", "<leader>fw", "<cmd>w<cr>", "Write")
@@ -42,8 +43,10 @@ map("n", "<leader>do", buffers.delete_others, "Other buffers")
 map("n", "<leader>da", buffers.delete_all, "All buffers")
 
 -- Navigate buffers
-map("n", "<S-l>", ":bnext<CR>")
-map("n", "<S-h>", ":bprevious<CR>")
+-- map("n", "<S-l>", ":bnext<CR>")
+-- map("n", "<S-h>", ":bprevious<CR>")
+map("n", "<S-j>", ":bnext<CR>")
+map("n", "<S-k>", ":bprevious<CR>")
 
 -- Stay in indent mode
 map("v", "<", "<gv")
@@ -62,10 +65,6 @@ end, "Toggle between light and dark themes")
 map("n", "<leader>ur", "<cmd>nohl<cr>", "Clear highlights")
 
 
--- Custom --
-
--- Escape via jj in insert mode
--- map("i", "jj", "<ESC>")
 
 -- Ctrl+S to Save
 map('n', '<C-S>', ':update<CR>')
