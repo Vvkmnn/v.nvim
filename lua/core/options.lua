@@ -4,6 +4,7 @@ local opts = {
 	expandtab = true,
 	wrap = false,
 	termguicolors = true,
+	-- termguicolors = false,
 	number = true,
 	relativenumber = true,
 }
