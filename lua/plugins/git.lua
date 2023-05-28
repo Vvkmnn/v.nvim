@@ -38,6 +38,7 @@ return {
 		},
 		config = function()
 			require("neogit").setup({
+			    disable_builtin_notifications = true,
 				use_magit_keybindings = true,
 				integrations = { diffview = true }
 
