@@ -7,6 +7,8 @@ local opts = {
 	-- termguicolors = false,
 	number = true,
 	relativenumber = true,
+	-- loaded_netrw =1,
+	-- loaded_netrwPlugin=1
 }
 
 -- Set options from table

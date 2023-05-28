@@ -29,7 +29,39 @@ return {
 	-- 	-- 	end
 	-- 	-- end,
 	-- },
-	{ "tpope/vim-repeat", event = "VeryLazy" },
+	{
+		"notjedi/nvim-rooter.lua",
+		config = function()
+			require("nvim-rooter").setup({})
+		end,
+	},
+	-- {
+	-- 	"nvim-tree/nvim-tree.lua",
+	-- 	config = function()
+	-- 		require("nvim-tree").setup({
+	-- 			sort_by = "case_sensitive",
+	-- 			-- view = { width = 30, },
+	-- 			-- renderer = { group_empty = true, },
+	-- 			filters = { dotfiles = true },
+	--
+	-- 			update_cwd = true,
+	-- 			update_focused_file = {
+	-- 				enable = true,
+	-- 				update_cwd = true,
+	-- 			},
+	-- 		})
+	-- 	end,
+	-- },
+	{
+		"prichrd/netrw.nvim",
+		dependencies = {
+			"nvim-tree/nvim-web-devicons",
+		},
+	},
+	{
+		"tpope/vim-repeat",
+		event = "VeryLazy",
+	},
 	{
 		"folke/todo-comments.nvim",
 		dependencies = { "nvim-lua/plenary.nvim" },
@@ -39,14 +71,21 @@ return {
 		-- stylua: ignore
 		keys = {
 			{ "]t",         function() require("todo-comments").jump_next() end, desc = "Next todo comment" },
-			{ "[t",         function() require("todo-comments").jump_prev() end,
-				                                                                     desc =
-				"Previous todo comment" },
+			{
+				"[t",
+				function() require("todo-comments").jump_prev() end,
+				desc =
+				"Previous todo comment"
+			},
 			{ "<leader>xt", "<cmd>TodoTrouble<cr>",                              desc = "Todo (Trouble)" },
-			{ "<leader>xT", "<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>",      desc =
-			"Todo/Fix/Fixme (Trouble)" },
-			{ "<leader>st", "<cmd>TodoTelescope<cr>",                            desc = "Todo" },
-			{ "<eader>sT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>",    desc = "Todo/Fix/Fixme" },
+			{
+				"<leader>xT",
+				"<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>",
+				desc =
+				"Todo/Fix/Fixme (Trouble)"
+			},
+			{ "<leader>st", "<cmd>TodoTelescope<cr>",                         desc = "Todo" },
+			{ "<eader>sT",  "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>", desc = "Todo/Fix/Fixme" },
 		},
 	},
 	{

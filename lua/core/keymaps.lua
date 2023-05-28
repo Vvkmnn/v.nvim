@@ -60,3 +60,41 @@ end, "Toggle between light and dark themes")
 
 -- Clear after search
 map("n", "<leader>ur", "<cmd>nohl<cr>", "Clear highlights")
+
+
+-- Custom --
+
+-- Escape via jj in insert mode
+-- map("i", "jj", "<ESC>")
+
+-- Ctrl+S to Save
+map('n', '<C-S>', ':update<CR>')
+map('v', '<C-S>', '<C-C>:update<CR>')
+map('i', '<C-S>', '<C-O>:update<CR>')
+
+-- Ctrl+Q to Quit
+map("n", "<C-Q>", ":exit<CR>")
+map("v", "<C-Q>", "<C-C>:exit<CR>")
+map("i", "<C-Q>", "<C-O>:exit<CR>")
+
+-- Ctrl Arrow Buffer Navigation
+-- map('n', '<C-Right>', '<c-w>l')
+-- map('n', '<C-Left>', '<c-w>h')
+-- map('n', '<C-Up>', '<c-w>k')
+-- map('n', '<C-Down>', '<c-w>j')
+
+-- Ctrl HJKL Split Navigation
+-- map('n', '<C-H>', '<C-W><C-H>')
+-- map('n', '<C-J>', '<C-W><C-J>')
+-- map('n', '<C-K>', '<C-W><C-K>')
+-- map('n', '<C-L>', '<C-W><C-L>')
+
+-- Sort in Visual Mode
+map("v", "<Leader>s", ":sort<CR>")
+
+-- Fix for Vim on WSL
+-- https://stackoverflow.com/questions/51388353/vim-changes-into-replace-mode-on-startup
+map("n", "<esc>^[", "<esc>^[")
+
+-- W for sudo :w
+vim.cmd("command W execute ':silent w !sudo tee % > /dev/null' | edit!")
