@@ -10,6 +10,10 @@ return {
 			transparent = true,
 		},
 	},
+	-- {"w0ng/vim-hybrid",
+	-- 	lazy = false, 
+	-- 	priority = 1000,
+	-- },
 	-- {
 	--     "catppuccin/nvim",
 	--     name = "catppuccin",
