@@ -9,7 +9,12 @@ return {
 			"MunifTanjim/nui.nvim",
 		},
 		config = function()
-			require("neo-tree").setup()
+			require("neo-tree").setup({
+				filesystem = {
+					hijack_netrw_behavior = "open_current",
+					-- hijack_netrw_behavior = "disabled",
+				},
+			})
 			require("helpers.keys").map(
 				{ "n", "v" },
 				"<leader>e",
