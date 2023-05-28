@@ -7,7 +7,7 @@ return {
 	-- 	-- 		function()
 	-- 	-- 			require("notify").dismiss({ silent = true, pending = true })
 	-- 	-- 		end,
-	-- 	-- 		desc = "Dismiss all Notifications",
+	-- 	-- 		desc = "dismiss all notifications",
 	-- 	-- 	},
 	-- 	-- },
 	-- 	opts = {
@@ -20,10 +20,10 @@ return {
 	-- 		end,
 	-- 	},
 	-- 	-- init = function()
-	-- 	-- 	-- when noice is not enabled, install notify on VeryLazy
-	-- 	-- 	local Util = require("lazyvim.util")
-	-- 	-- 	if not Util.has("noice.nvim") then
-	-- 	-- 		Util.on_very_lazy(function()
+	-- 	-- 	-- when noice is not enabled, install notify on verylazy
+	-- 	-- 	local util = require("lazyvim.util")
+	-- 	-- 	if not util.has("noice.nvim") then
+	-- 	-- 		util.on_very_lazy(function()
 	-- 	-- 			vim.notify = require("notify")
 	-- 	-- 		end)
 	-- 	-- 	end
@@ -53,11 +53,72 @@ return {
 	-- 	end,
 	-- },
 	{
-		"prichrd/netrw.nvim",
+		"nvim-telescope/telescope.nvim",
+		branch = "0.1.x",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			-- fuzzy finder algorithm which requires local dependencies to be built. only load if `make` is available
+			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make", cond = vim.fn.executable("make") == 1 },
+		},
+		config = function()
+			require("telescope").setup({
+				defaults = {
+					mappings = {
+						i = {
+							["<c-u>"] = false,
+							["<c-d>"] = false,
+						},
+					},
+				},
+			})
+
+			-- Enable telescope fzf native, if installed
+			pcall(require("telescope").load_extension, "fzf")
+
+			local map = require("helpers.keys").map
+			map("n", "<leader>f", require("telescope.builtin").oldfiles, "Recently opened")
+			map("n", "<leader><space>", require("telescope.builtin").buffers, "Open buffers")
+			map("n", "<leader>/", function()
+				-- You can pass additional configuration to telescope to change theme, layout, etc.
+				require("telescope.builtin").current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
+					winblend = 10,
+					previewer = false,
+				}))
+			end, "Search in current buffer")
+
+			map("n", "<leader>sf", require("telescope.builtin").find_files, "Files")
+			map("n", "<leader>sh", require("telescope.builtin").help_tags, "Help")
+			map("n", "<leader>sw", require("telescope.builtin").grep_string, "Current word")
+			map("n", "<leader>sg", require("telescope.builtin").live_grep, "Grep")
+			map("n", "<leader>sd", require("telescope.builtin").diagnostics, "Diagnostics")
+
+			map("n", "<C-p>", require("telescope.builtin").keymaps, "Search keymaps")
+		end,
+	},
+	-- {
+	-- 	"prichrd/netrw.nvim",
+	-- 	dependencies = {
+	-- 		"nvim-tree/nvim-web-devicons",
+	-- 	},
+	-- },
+	{
+		"stevearc/oil.nvim",
 		dependencies = {
 			"nvim-tree/nvim-web-devicons",
 		},
+		opts = {
+			keymaps = {
+				["?"] = "actions.show_help"
+			},
+			view_options = {
+				show_hidden = true
+			}
+		}
+		-- config = function()
+		-- 	require("oil").setup({})
+		-- end,
 	},
+
 	{
 		"tpope/vim-repeat",
 		event = "VeryLazy",
@@ -98,6 +159,27 @@ return {
 		},
 	},
 	{
+		"folke/which-key.nvim",
+		config = function()
+			local wk = require("which-key")
+			wk.setup()
+			wk.register(
+				{
+					["<leader>"] = {
+						f = { name = "File" },
+						d = { name = "Delete/Close" },
+						q = { name = "Quit" },
+						s = { name = "Search" },
+						l = { name = "LSP" },
+						u = { name = "UI" },
+						b = { name = "Debugging" },
+						g = { name = "Git" },
+					}
+				}
+			)
+		end
+	},
+	{
 		"echasnovski/mini.pairs",
 		event = "VeryLazy",
 		opts = {},
@@ -134,4 +216,27 @@ return {
 	--     },
 	--   },
 	-- }
+	-- {
+	-- 	"nvim-neo-tree/neo-tree.nvim",
+	-- 	branch = "v2.x",
+	-- 	dependencies = {
+	-- 		"nvim-lua/plenary.nvim",
+	-- 		"nvim-tree/nvim-web-devicons",
+	-- 		"MunifTanjim/nui.nvim",
+	-- 	},
+	-- 	config = function()
+	-- 		require("neo-tree").setup({
+	-- 			filesystem = {
+	-- 				hijack_netrw_behavior = "open_current",
+	-- 				-- hijack_netrw_behavior = "disabled",
+	-- 			},
+	-- 		})
+	-- 		require("helpers.keys").map(
+	-- 			{ "n", "v" },
+	-- 			"<leader>e",
+	-- 			"<cmd>NeoTreeRevealToggle<cr>",
+	-- 			"Toggle file explorer"
+	-- 		)
+	-- 	end,
+	-- },
 }
