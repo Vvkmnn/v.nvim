@@ -34,10 +34,13 @@ return {
 		"TimUntersberger/neogit",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
+			"sindrets/diffview.nvim",
 		},
 		config = function()
 			require("neogit").setup({
 				use_magit_keybindings = true,
+				integrations = { diffview = true }
+
 			})
 
 			local map = require("helpers.keys").map
