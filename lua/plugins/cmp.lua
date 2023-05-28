@@ -7,14 +7,19 @@ return {
 			"hrsh7th/cmp-nvim-lua",
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-path",
-			"L3MON4D3/LuaSnip",
+			"L3MON4D3/LuaSnip", -- NOTE very slow
 			"saadparwaiz1/cmp_luasnip",
 			"rafamadriz/friendly-snippets",
 		},
+
+		build = (not jit.os:find("Windows"))
+			and "echo 'NOTE: jsregexp is optional, so not a big deal if it fails to build'; make install_jsregexp"
+			or nil,
+
 		config = function()
 			local cmp = require("cmp")
-			local luasnip = require("luasnip")
 
+			local luasnip = require("luasnip")
 			require("luasnip/loaders/from_vscode").lazy_load()
 
 			local kind_icons = {
@@ -95,7 +100,7 @@ return {
 				},
 				sources = {
 					{ name = "nvim_lsp" },
-					{ name = "luasnip" },
+					{ name = "luasnip", option = { show_autosnippets = true } },
 					{ name = "buffer" },
 					{ name = "path" },
 				},
