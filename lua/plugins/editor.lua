@@ -80,7 +80,8 @@ return {
 			})
 
 			-- Enable telescope fzf native, if installed
-			pcall(require("telescope").load_extension, "fzf")
+			-- pcall(require("telescope").load_extension, "fzf")
+			pcall(require("telescope").load_extension, "fzf_native")
 
 			local map = require("helpers.keys").map
 
@@ -94,7 +95,7 @@ return {
 			-- TODO do you use this enough?
 			map("n", "<leader><space>", require("telescope.builtin").buffers, "Open buffers")
 			map("n", "<leader><c-r>", require("telescope.builtin").oldfiles, "Recently opened")
-			map("n", "<leader><c-f>", require("telescope.builtin").find_files, "Files")
+			map("n", "<leader><c-f>", require("telescope.builtin").find_files, "Files") -- ({ hidden = true}) causes crash
 			map("n", "<leader><c-h>", require("telescope.builtin").help_tags, "Help")
 			map("n", "<leader><c-w>", require("telescope.builtin").grep_string, "Current word")
 			map("n", "<leader><c-g>", require("telescope.builtin").live_grep, "Grep")

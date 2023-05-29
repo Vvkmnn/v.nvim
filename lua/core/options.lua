@@ -7,7 +7,8 @@ local opts = {
 	-- termguicolors = false,
 	number = true,
 	relativenumber = true,
-	-- scrolloff = 999, -- center editor
+	scrolloff = 7, -- +- 7 lines
+	-- scrolloff = 999, -- center line
 	-- loaded_netrw =1,
 	-- loaded_netrwPlugin=1
 }
