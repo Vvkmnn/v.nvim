@@ -8,6 +8,7 @@ local opts = {
 	number = true,
 	relativenumber = true,
 	scrolloff = 7, -- +- 7 lines
+	autochdir = true,
 	-- scrolloff = 999, -- center line
 	-- loaded_netrw =1,
 	-- loaded_netrwPlugin=1
