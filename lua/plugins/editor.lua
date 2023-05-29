@@ -36,6 +36,13 @@ return {
 		end,
 	},
 	-- {
+	-- -- TODO doesn't do much?
+	-- 	"declancm/cinnamon.nvim",
+	-- 	config = function()
+	-- 		require("cinnamon").setup()
+	-- 	end,
+	-- },
+	-- {
 	-- 	"nvim-tree/nvim-tree.lua",
 	-- 	config = function()
 	-- 		require("nvim-tree").setup({
@@ -84,13 +91,14 @@ return {
 				)
 			end, "Search in current buffer")
 
-			map("n", "<leader>tr", require("telescope.builtin").oldfiles, "Recently opened")
+			-- TODO do you use this enough?
 			map("n", "<leader><space>", require("telescope.builtin").buffers, "Open buffers")
-			map("n", "<leader>tf", require("telescope.builtin").find_files, "Files")
-			map("n", "<leader>th", require("telescope.builtin").help_tags, "Help")
-			map("n", "<leader>tw", require("telescope.builtin").grep_string, "Current word")
-			map("n", "<leader>tg", require("telescope.builtin").live_grep, "Grep")
-			map("n", "<leader>td", require("telescope.builtin").diagnostics, "Diagnostics")
+			map("n", "<leader><c-r>", require("telescope.builtin").oldfiles, "Recently opened")
+			map("n", "<leader><c-f>", require("telescope.builtin").find_files, "Files")
+			map("n", "<leader><c-h>", require("telescope.builtin").help_tags, "Help")
+			map("n", "<leader><c-w>", require("telescope.builtin").grep_string, "Current word")
+			map("n", "<leader><c-g>", require("telescope.builtin").live_grep, "Grep")
+			map("n", "<leader><c-d>", require("telescope.builtin").diagnostics, "Diagnostics")
 
 			map("n", "<C-p>", require("telescope.builtin").keymaps, "Search keymaps")
 		end,
@@ -123,32 +131,46 @@ return {
 		"tpope/vim-repeat",
 		event = "VeryLazy",
 	},
-	{
-		"folke/todo-comments.nvim",
-		dependencies = { "nvim-lua/plenary.nvim" },
-		cmd = { "TodoTrouble", "TodoTelescope" },
-		event = { "BufReadPost", "BufNewFile" },
-		-- config = true,
-		-- stylua: ignore
-		keys = {
-			{ "]t",         function() require("todo-comments").jump_next() end, desc = "Next todo comment" },
-			{
-				"[t",
-				function() require("todo-comments").jump_prev() end,
-				desc =
-				"Previous todo comment"
-			},
-			{ "<leader>xt", "<cmd>TodoTrouble<cr>",                              desc = "Todo (Trouble)" },
-			{
-				"<leader>xT",
-				"<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>",
-				desc =
-				"Todo/Fix/Fixme (Trouble)"
-			},
-			{ "<leader>st", "<cmd>TodoTelescope<cr>",                         desc = "Todo" },
-			{ "<eader>sT",  "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>", desc = "Todo/Fix/Fixme" },
-		},
-	},
+
+	-- PERF
+	-- NOTE
+	-- FIXME
+	-- TODO Neither does any higlighting
+	-- {
+	--   "folke/todo-comments.nvim",
+	--   dependencies = { "nvim-lua/plenary.nvim" },
+	--   opts = {
+	--     -- your configuration comes here
+	--     -- or leave it empty to use the default settings
+	--     -- refer to the configuration section below
+	--   }
+	-- },
+	-- {
+	-- 	"folke/todo-comments.nvim",
+	-- 	dependencies = { "nvim-lua/plenary.nvim" },
+	-- 	cmd = { "TodoTrouble", "TodoTelescope" },
+	-- 	event = { "BufReadPost", "BufNewFile" },
+	-- 	-- config = true,
+	-- 	-- stylua: ignore
+	-- 	keys = {
+	-- 		{ "]t",         function() require("todo-comments").jump_next() end, desc = "Next todo comment" },
+	-- 		{
+	-- 			"[t",
+	-- 			function() require("todo-comments").jump_prev() end,
+	-- 			desc =
+	-- 			"Previous todo comment"
+	-- 		},
+	-- 		{ "<leader>xt", "<cmd>TodoTrouble<cr>",                              desc = "Todo (Trouble)" },
+	-- 		{
+	-- 			"<leader>xT",
+	-- 			"<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>",
+	-- 			desc =
+	-- 			"Todo/Fix/Fixme (Trouble)"
+	-- 		},
+	-- 		{ "<leader>st", "<cmd>TodoTelescope<cr>",                         desc = "Todo" },
+	-- 		{ "<eader>sT",  "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>", desc = "Todo/Fix/Fixme" },
+	-- 	},
+	-- },
 	{
 		"folke/trouble.nvim",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
