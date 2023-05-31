@@ -43,10 +43,10 @@ map("n", "<leader>do", buffers.delete_others, "Other buffers")
 map("n", "<leader>da", buffers.delete_all, "All buffers")
 
 -- Navigate buffers
--- map("n", "<S-l>", ":bnext<CR>")
--- map("n", "<S-h>", ":bprevious<CR>")
-map("n", "<S-j>", ":bnext<CR>")
-map("n", "<S-k>", ":bprevious<CR>")
+map("n", "<S-l>", ":bnext<CR>")
+map("n", "<S-h>", ":bprevious<CR>")
+-- map("n", "<S-j>", ":bnext<CR>")
+-- map("n", "<S-k>", ":bprevious<CR>")
 
 -- Stay in indent mode
 map("v", "<", "<gv")
