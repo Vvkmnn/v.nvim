@@ -571,6 +571,13 @@ return {
 			preserve_window_layout = { "this", "nameless" },
 		},
 	},
+	{
+		-- Vimscript to hold window at specific line - usually center
+		"vim-scripts/scrollfix",
+		config = function ()
+			vim.g["scrollfix"] = 50
+		end,
+    }, 
 	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
 	"tpope/vim-surround", -- Surround stuff with the ys-, cs-, ds- commands
 }
