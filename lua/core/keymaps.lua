@@ -75,9 +75,9 @@ map('i', '<C-S>', '<C-O>:update!<CR>')
 -- map("n", "<C-Q>", ":exit<CR>")
 -- map("v", "<C-Q>", "<C-C>:exit<CR>")
 -- map("i", "<C-Q>", "<C-O>:exit<CR>")
-map("n", "<C-Q>", ":q<CR>")
-map("v", "<C-Q>", "<C-C>:q<CR>")
-map("i", "<C-Q>", "<C-O>:q<CR>")
+map("n", "<C-Q>", ":q!<CR>")
+map("v", "<C-Q>", "<C-C>:q!<CR>")
+map("i", "<C-Q>", "<C-O>:q!<CR>")
 
 -- Ctrl Arrow Buffer Navigation
 -- map('n', '<C-Right>', '<c-w>l')
