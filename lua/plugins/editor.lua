@@ -29,12 +29,6 @@ return {
 	-- 	-- 	end
 	-- 	-- end,
 	-- },
-	{
-		"notjedi/nvim-rooter.lua",
-		config = function()
-			require("nvim-rooter").setup({})
-		end,
-	},
 	-- {
 	-- -- TODO doesn't do much?
 	-- 	"declancm/cinnamon.nvim",
@@ -60,7 +54,6 @@ return {
 	-- 	end,
 	-- },
 	-- {
-	-- 	"ahmedkhalf/project.nvim",
 	-- 	dependencies = {
 	-- 		"nvim-telescope/telescope.nvim"
 	-- 	},
@@ -69,49 +62,60 @@ return {
 	-- 		require('telescope').load_extension('projects')
 	-- 	end,
 	-- },
+	-- {
+	-- 	"notjedi/nvim-rooter.lua",
+	-- 	config = function()
+	-- 		require("nvim-rooter").setup({})
+	-- 	end,
+	-- },
+
 	{
-		"nvim-telescope/telescope.nvim",
-		branch = "0.1.x",
+		-- line numbers git
+		"lewis6991/gitsigns.nvim",
+		opts = {},
+	},
+	{
+		-- Resolve conflicts with cX, jump with ]x
+		"akinsho/git-conflict.nvim",
+		commit = "2957f74",
+		config = function()
+			require("git-conflict").setup({
+				-- default_mappings = {
+				-- 	ours = "co",
+				-- 	theirs = "ct",
+				-- 	none = "c0",
+				-- 	both = "cb",
+				-- 	next = "cn",
+				-- 	prev = "cp",
+				-- },
+			})
+		end,
+	},
+	-- {
+	-- 	"tpope/vim-fugitive",
+	-- 	config = function()
+	-- 		local map = require("helpers.keys").map
+	-- 		map("n", "<leader>ga", "<cmd>Git add %<cr>", "Stage the current file")
+	-- 		map("n", "<leader>gb", "<cmd>Git blame<cr>", "Show the blame")
+	-- 	end,
+	-- },
+	{
+		-- Magit for Vim
+		"TimUntersberger/neogit",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
-			-- fuzzy finder algorithm which requires local dependencies to be built. only load if `make` is available
-			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make", cond = vim.fn.executable("make") == 1 },
+			"sindrets/diffview.nvim",
 		},
 		config = function()
-			require("telescope").setup({
-				defaults = {
-					mappings = {
-						i = {
-							["<c-u>"] = false,
-							["<c-d>"] = false,
-						},
-					},
-				},
+			require("neogit").setup({
+			    disable_builtin_notifications = true,
+				use_magit_keybindings = true,
+				integrations = { diffview = true }
+
 			})
 
-			-- Enable telescope fzf native, if installed
-			-- pcall(require("telescope").load_extension, "fzf")
-			pcall(require("telescope").load_extension, "fzf_native")
-
 			local map = require("helpers.keys").map
-
-			map("n", "<leader>/", function()
-				-- You can pass additional configuration to telescope to change theme, layout, etc.
-				require("telescope.builtin").current_buffer_fuzzy_find(
-					require("telescope.themes").get_dropdown({ winblend = 10, previewer = false })
-				)
-			end, "Search in current buffer")
-
-			-- TODO do you use this enough?
-			map("n", "<leader><space>", require("telescope.builtin").buffers, "Open buffers")
-			map("n", "<leader><c-r>", require("telescope.builtin").oldfiles, "Recently opened")
-			map("n", "<leader><c-f>", require("telescope.builtin").find_files, "Files") -- ({ hidden = true}) causes crash
-			map("n", "<leader><c-h>", require("telescope.builtin").help_tags, "Help")
-			map("n", "<leader><c-w>", require("telescope.builtin").grep_string, "Current word")
-			map("n", "<leader><c-g>", require("telescope.builtin").live_grep, "Grep")
-			map("n", "<leader><c-d>", require("telescope.builtin").diagnostics, "Diagnostics")
-
-			map("n", "<C-p>", require("telescope.builtin").keymaps, "Search keymaps")
+			map("n", "<leader>gg", "<cmd>Neogit<CR>", "Run Neogit")
 		end,
 	},
 	-- {
@@ -270,4 +274,301 @@ return {
 	-- 		)
 	-- 	end,
 	-- },
+	{
+		"jose-elias-alvarez/null-ls.nvim",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+		},
+		config = function()
+			local null_ls = require("null-ls")
+			null_ls.setup({
+				sources = {
+					null_ls.builtins.formatting.stylua,
+					null_ls.builtins.formatting.clang_format,
+					null_ls.builtins.formatting.black,
+					null_ls.builtins.formatting.isort,
+					null_ls.builtins.formatting.shfmt,
+					null_ls.builtins.formatting.prettier,
+					-- null_ls.builtins.diagnostics.shellcheck,
+					-- null_ls.builtins.code_actions.shellcheck,
+				},
+			})
+		end,
+	},
+
+	{
+		-- Autocompletion
+		"hrsh7th/nvim-cmp",
+		-- event = "VeryLazy",
+		event = { 'BufReadPre', 'BufNewFile'},
+		dependencies = {
+			"hrsh7th/cmp-nvim-lsp",
+			"hrsh7th/cmp-nvim-lua",
+			"hrsh7th/cmp-buffer",
+			"hrsh7th/cmp-path",
+			"L3MON4D3/LuaSnip", -- NOTE very slow
+			"saadparwaiz1/cmp_luasnip",
+			"rafamadriz/friendly-snippets",
+		},
+
+		build = (not jit.os:find("Windows"))
+			and "echo 'NOTE: jsregexp is optional, so not a big deal if it fails to build'; make install_jsregexp"
+			or nil,
+
+		config = function()
+			local cmp = require("cmp")
+
+			local luasnip = require("luasnip")
+			require("luasnip/loaders/from_vscode").lazy_load()
+
+			local kind_icons = {
+				Text = "",
+				Method = "m",
+				Function = "",
+				Constructor = "",
+				Field = "",
+				Variable = "",
+				Class = "",
+				Interface = "",
+				Module = "",
+				Property = "",
+				Unit = "",
+				Value = "",
+				Enum = "",
+				Keyword = "",
+				Snippet = "",
+				Color = "",
+				File = "",
+				Reference = "",
+				Folder = "",
+				EnumMember = "",
+				Constant = "",
+				Struct = "",
+				Event = "",
+				Operator = "",
+				TypeParameter = "",
+			}
+
+			cmp.setup({
+				snippet = {
+					expand = function(args)
+						luasnip.lsp_expand(args.body)
+					end,
+				},
+				mapping = cmp.mapping.preset.insert({
+					["<C-k>"] = cmp.mapping.select_prev_item(),
+					["<C-j>"] = cmp.mapping.select_next_item(),
+					["<C-d>"] = cmp.mapping.scroll_docs(-4),
+					["<C-f>"] = cmp.mapping.scroll_docs(4),
+					["<CR>"] = cmp.mapping.confirm({
+						behavior = cmp.ConfirmBehavior.Replace,
+						select = false,
+					}),
+					["<Tab>"] = cmp.mapping(function(fallback)
+						if cmp.visible() then
+							cmp.select_next_item()
+						elseif luasnip.expand_or_jumpable() then
+							luasnip.expand_or_jump()
+						else
+							fallback()
+						end
+					end, { "i", "s" }),
+					["<S-Tab>"] = cmp.mapping(function(fallback)
+						if cmp.visible() then
+							cmp.select_prev_item()
+						elseif luasnip.jumpable(-1) then
+							luasnip.jump(-1)
+						else
+							fallback()
+						end
+					end, { "i", "s" }),
+				}),
+				formatting = {
+					fields = { "kind", "abbr", "menu" },
+					format = function(entry, vim_item)
+						-- Kind icons
+						vim_item.kind = string.format("%s", kind_icons[vim_item.kind])
+						vim_item.menu = ({
+							nvim_lsp = "[LSP]",
+							luasnip = "[Snippet]",
+							buffer = "[Buffer]",
+							path = "[Path]",
+						})[entry.source.name]
+						return vim_item
+					end,
+				},
+				sources = {
+					{ name = "nvim_lsp" },
+					{ name = "luasnip", option = { show_autosnippets = true } },
+					{ name = "buffer" },
+					{ name = "path" },
+				},
+			})
+		end,
+	},
+	{
+		-- LSP for Neovim
+		"neovim/nvim-lspconfig",
+		dependencies = {
+			"williamboman/mason.nvim",
+			"williamboman/mason-lspconfig.nvim",
+			"j-hui/fidget.nvim",
+			"folke/neodev.nvim",
+			-- "RRethy/vim-illuminate",
+			"hrsh7th/cmp-nvim-lsp",
+		},
+		config = function()
+			-- Set up Mason before anything else
+			require("mason").setup()
+			require("mason-lspconfig").setup({
+				ensure_installed = {
+					"lua_ls",
+					"pylsp",
+					"tsserver",
+					"clangd",
+					"bashls"
+				},
+				automatic_installation = true,
+			})
+
+			-- Quick access via keymap
+			require("helpers.keys").map("n", "<leader>M", "<cmd>Mason<cr>", "Show Mason")
+
+			-- Neodev setup before LSP config
+			require("neodev").setup()
+
+			-- Turn on LSP status information
+			require("fidget").setup()
+
+			-- Set up cool signs for diagnostics
+			local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
+			for type, icon in pairs(signs) do
+				local hl = "DiagnosticSign" .. type
+				vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+			end
+
+			-- Diagnostic config
+			local config = {
+				virtual_text = false,
+				signs = {
+					active = signs,
+				},
+				update_in_insert = true,
+				underline = true,
+				severity_sort = true,
+				float = {
+					focusable = true,
+					style = "minimal",
+					border = "rounded",
+					source = "always",
+					header = "",
+					prefix = "",
+				},
+			}
+			vim.diagnostic.config(config)
+
+			-- This function gets run when an LSP connects to a particular buffer.
+			local on_attach = function(client, bufnr)
+				local lsp_map = require("helpers.keys").lsp_map
+
+				lsp_map("<leader>lr", vim.lsp.buf.rename, bufnr, "Rename symbol")
+				lsp_map("<leader>la", vim.lsp.buf.code_action, bufnr, "Code action")
+				lsp_map("<leader>ld", vim.lsp.buf.type_definition, bufnr, "Type definition")
+				lsp_map("<leader>ls", require("telescope.builtin").lsp_document_symbols, bufnr, "Document symbols")
+
+				lsp_map("gd", vim.lsp.buf.definition, bufnr, "Goto Definition")
+				lsp_map("gr", require("telescope.builtin").lsp_references, bufnr, "Goto References")
+				lsp_map("gI", vim.lsp.buf.implementation, bufnr, "Goto Implementation")
+				lsp_map("K", vim.lsp.buf.hover, bufnr, "Hover Documentation")
+				lsp_map("gD", vim.lsp.buf.declaration, bufnr, "Goto Declaration")
+
+				-- Create a command `:Format` local to the LSP buffer
+				vim.api.nvim_buf_create_user_command(bufnr, "Format", function(_)
+					vim.lsp.buf.format()
+				end, { desc = "Format current buffer with LSP" })
+
+				lsp_map("<leader>ff", "<cmd>Format<cr>", bufnr, "Format")
+
+				-- Attach and configure vim-illuminate
+				-- require("illuminate").on_attach(client)
+			end
+
+			-- nvim-cmp supports additional completion capabilities, so broadcast that to servers
+			local capabilities = vim.lsp.protocol.make_client_capabilities()
+			capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
+
+			-- Lua
+			require("lspconfig")["lua_ls"].setup({
+				on_attach = on_attach,
+				capabilities = capabilities,
+				settings = {
+					Lua = {
+						completion = {
+							callSnippet = "Replace",
+						},
+						diagnostics = {
+							globals = { "vim" },
+						},
+						workspace = {
+							library = {
+								[vim.fn.expand("$VIMRUNTIME/lua")] = true,
+								[vim.fn.stdpath("config") .. "/lua"] = true,
+							},
+						},
+					},
+				},
+			})
+
+			-- Python
+			require("lspconfig")["pylsp"].setup({
+				on_attach = on_attach,
+				capabilities = capabilities,
+				settings = {
+					pylsp = {
+						plugins = {
+							flake8 = {
+								enabled = true,
+								maxLineLength = 88, -- Black's line length
+							},
+							-- Disable plugins overlapping with flake8
+							pycodestyle = {
+								enabled = false,
+							},
+							mccabe = {
+								enabled = false,
+							},
+							pyflakes = {
+								enabled = false,
+							},
+							-- Use Black as the formatter
+							autopep8 = {
+								enabled = false,
+							},
+						},
+					},
+				},
+			})
+		end,
+	},
+	{
+	-- Comment with haste
+		"numToStr/Comment.nvim",
+		opts = {},
+	},
+	{
+		-- Move stuff with <M-j> and <M-k> in both normal and visual mode
+		"echasnovski/mini.move",
+		config = function()
+			require("mini.move").setup()
+		end,
+	},
+	{
+		-- Better buffer closing actions. Available via the buffers helper.
+		"kazhala/close-buffers.nvim",
+		opts = {
+			preserve_window_layout = { "this", "nameless" },
+		},
+	},
+	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
+	"tpope/vim-surround", -- Surround stuff with the ys-, cs-, ds- commands
 }
