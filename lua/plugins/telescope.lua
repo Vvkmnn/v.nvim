@@ -54,7 +54,7 @@ return {
 				require("telescope.builtin").find_files({
 					cwd = (vim.v.shell_error == 0 and vim.fn.systemlist("git rev-parse --show-toplevel")[1])
 						or vim.lsp.get_active_clients()[1].config.root_dir,
-					hidden = true
+					hidden = true,
 				})
 			end, "Files")
 			--
@@ -86,6 +86,6 @@ return {
 			-- 				    },
 			-- 			  },
 			-- })
-		end
-	}
+		end,
+	},
 }

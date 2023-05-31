@@ -11,7 +11,7 @@ return {
 		},
 	},
 	-- {"w0ng/vim-hybrid",
-	-- 	lazy = false, 
+	-- 	lazy = false,
 	-- 	priority = 1000,
 	-- },
 	-- {
