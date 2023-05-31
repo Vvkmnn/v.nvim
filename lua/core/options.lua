@@ -7,7 +7,7 @@ local opts = {
 	-- termguicolors = false,
 	number = true,
 	relativenumber = true,
-	scrolloff = 7, -- +- 7 lines
+	-- scrolloff = 7, -- +- 7 lines
 	autochdir = true,
 	-- scrolloff = 999, -- center line
 	-- loaded_netrw =1,
@@ -27,7 +27,8 @@ vim.cmd.colorscheme(colorscheme)
 vim.cmd([[
 augroup VCenterCursor
   au!
-  au BufEnter,WinEnter,WinNew,VimResized * lua vim.wo.scrolloff = math.floor(vim.api.nvim_win_get_height(0) / 2)
+  " au BufEnter,WinEnter,WinNew,VimResized * lua vim.wo.scrolloff = math.floor(vim.api.nvim_win_get_height(0) / 2)
+  au BufEnter,VimResized * lua vim.wo.scrolloff = math.floor(vim.api.nvim_win_get_height(0) / 2)
 augroup END
 ]])
 

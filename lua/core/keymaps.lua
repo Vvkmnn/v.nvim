@@ -67,14 +67,17 @@ map("n", "<leader>ur", "<cmd>nohl<cr>", "Clear highlights")
 
 
 -- Ctrl+S to Save
-map('n', '<C-S>', ':update<CR>')
-map('v', '<C-S>', '<C-C>:update<CR>')
-map('i', '<C-S>', '<C-O>:update<CR>')
+map('n', '<C-S>', ':update!<CR>')
+map('v', '<C-S>', '<C-C>:update!<CR>')
+map('i', '<C-S>', '<C-O>:update!<CR>')
 
 -- Ctrl+Q to Quit
-map("n", "<C-Q>", ":exit<CR>")
-map("v", "<C-Q>", "<C-C>:exit<CR>")
-map("i", "<C-Q>", "<C-O>:exit<CR>")
+-- map("n", "<C-Q>", ":exit<CR>")
+-- map("v", "<C-Q>", "<C-C>:exit<CR>")
+-- map("i", "<C-Q>", "<C-O>:exit<CR>")
+map("n", "<C-Q>", ":q<CR>")
+map("v", "<C-Q>", "<C-C>:q<CR>")
+map("i", "<C-Q>", "<C-O>:q<CR>")
 
 -- Ctrl Arrow Buffer Navigation
 -- map('n', '<C-Right>', '<c-w>l')
