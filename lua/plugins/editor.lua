@@ -102,16 +102,16 @@ return {
 	{
 		-- Magit for Vim
 		"TimUntersberger/neogit",
+		event = { 'BufReadPre', 'BufNewFile'},
 		dependencies = {
 			"nvim-lua/plenary.nvim",
-			"sindrets/diffview.nvim",
+			-- "sindrets/diffview.nvim",
 		},
 		config = function()
 			require("neogit").setup({
 			    disable_builtin_notifications = true,
 				use_magit_keybindings = true,
-				integrations = { diffview = true }
-
+				-- integrations = { diffview = true }
 			})
 
 			local map = require("helpers.keys").map
@@ -276,6 +276,7 @@ return {
 	-- },
 	{
 		"jose-elias-alvarez/null-ls.nvim",
+		event = { 'BufReadPre', 'BufNewFile'},
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 		},
@@ -409,6 +410,7 @@ return {
 	{
 		-- LSP for Neovim
 		"neovim/nvim-lspconfig",
+		event = { 'BufReadPre', 'BufNewFile'},
 		dependencies = {
 			"williamboman/mason.nvim",
 			"williamboman/mason-lspconfig.nvim",
