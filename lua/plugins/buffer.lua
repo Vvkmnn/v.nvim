@@ -1,7 +1,7 @@
 return {
 	{
 		"jose-elias-alvarez/null-ls.nvim",
-		event = { 'BufReadPre', 'BufNewFile'},
+		event = { "BufReadPre", "BufNewFile" },
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 		},
@@ -25,7 +25,7 @@ return {
 		-- Autocompletion
 		"hrsh7th/nvim-cmp",
 		-- event = "VeryLazy",
-		event = { 'BufReadPre', 'BufNewFile'},
+		event = { "BufReadPre", "BufNewFile" },
 		dependencies = {
 			"hrsh7th/cmp-nvim-lsp",
 			"hrsh7th/cmp-nvim-lua",
@@ -134,7 +134,7 @@ return {
 	{
 		-- LSP for Neovim
 		"neovim/nvim-lspconfig",
-		event = { 'BufReadPre', 'BufNewFile'},
+		event = { "BufReadPre", "BufNewFile" },
 		dependencies = {
 			"williamboman/mason.nvim",
 			"williamboman/mason-lspconfig.nvim",
@@ -152,7 +152,7 @@ return {
 					"pylsp",
 					"tsserver",
 					"clangd",
-					"bashls"
+					"bashls",
 				},
 				automatic_installation = true,
 			})
@@ -408,7 +408,7 @@ return {
 	-- 	end,
 	-- },
 	{
-	-- Comment with haste
+		-- Comment with haste
 		"numToStr/Comment.nvim",
 		opts = {},
 	},
@@ -429,10 +429,10 @@ return {
 	{
 		-- Vimscript to hold window at specific line - usually center
 		"vim-scripts/scrollfix",
-		config = function ()
+		config = function()
 			vim.g["scrollfix"] = 50
 		end,
-    }, 
+	},
 	"tpope/vim-surround", -- Detect tabstop and shiftwidth automatically
 	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
 	"tpope/vim-surround", -- Surround stuff with the ys-, cs-, ds- commands
