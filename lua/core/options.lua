@@ -13,6 +13,7 @@ local opts = {
 	lazyredraw = true, -- redraw after events
 	-- loaded_netrw =1,
 	-- loaded_netrwPlugin=1
+	equalalways = true
 }
 
 -- Set options from table

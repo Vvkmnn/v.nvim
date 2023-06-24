@@ -1,4 +1,16 @@
 return {
+	-- {
+	-- 	"HampusHauffman/block.nvim",
+	-- 	config = function()
+	-- 		require("block").setup({
+	-- 			percent = 0.8,
+	-- 			depth = 4,
+	-- 			colors = nil,
+	-- 			automatic = false,
+	-- 			bg = nil,
+	-- 		})
+	-- 	end,
+	-- },
 	{
 		"jose-elias-alvarez/null-ls.nvim",
 		event = { "BufReadPre", "BufNewFile" },
@@ -37,7 +49,7 @@ return {
 		},
 
 		build = (not jit.os:find("Windows"))
-			and "echo 'NOTE: jsregexp is optional, so not a big deal if it fails to build'; make install_jsregexp"
+				and "echo 'NOTE: jsregexp is optional, so not a big deal if it fails to build'; make install_jsregexp"
 			or nil,
 
 		config = function()
