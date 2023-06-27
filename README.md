@@ -1,23 +1,35 @@
-# The sleepy Neovim starter
-This is a basic, minimal-ish jump-off point for your Neovim journey utilizing [lazy.nvim](https://github.com/folke/lazy.nvim) for package management and breaking the config up into three main components:
+# v.nvim
 
-- `core`: This contains the most basic editor set-up, including plain Neovim options, keymaps, and some bootstrapping for lazy.nvim
-- `helpers`: This is intended to house helper functions that may be `require`d elsewhere in the config
-- `plugins`: Each of the .lua files in this directory should serve as a lazy.nvim plugin spec
 
-## Quickstart
-If you're on a Linux system with `stow` installed, you can simply run
-
-```sh
-stow .
+```
+#
+#                       `......`                    
+#                 ./shmMMMMMMMMMNmho:`              
+#              :smMMMMMMMMMMMMMMMMMMMMms-           
+#           `omMMMMMMMMMMMMMMMMm+:+shmMMMm+`        
+#          oNMMMMMMMMMMMMMMMMd:     /mMMMMMN+       
+#        -mMMMMMMMMMMMMMMMMMN     oNMMMMMMMMMd.     
+#       /MMMMMMMMMMMMMMMMMMMd    -MMMMMMMMMMMMN-    
+#      :MMMMMMMMMMMMMMMMMMMMy    :MMMMMMMMMMMMMN-   
+#     `NMMMMMMMMMMMMNo:+shmMo    +MMMMMMMMMMMMMMm   
+#     oMMMMMMMMMMMm/     :hM+    oMMMMMMMMMMMMMMM/  
+#     mMMMMMMMMMMM/    /mMMMs    yMMMMMMMMMMMMMMMh  
+#    `MMMMMMMMMMMMM/   :MMMMMs   hMMMMMMMMMMMMMMMm  
+#    `MMMMMMMMMMMMMM:   /MMMMMs  mMMMMMMMMMMMMMMMd  
+#     hMMMMMMMMMMMMMM:   /MMMMMs NMMMMMMMMMMMMMMMs  
+#     :MMMMMMMMMMMMMMM:   /MMMMMyMMMMMMMMMMMMMMMM-  
+#      hMMMMMMMMMMMMMMN:   /MMMMMMMMMMMMMMMMMMMMs   
+#      `dMMMMMMMMMMMMMMN-   /MMMMMMMMMMMMMMMMMMh    
+#       `hMMMMMMMMMMMMMMN-   /MMMMMMMMMMMMMMMMy     
+#         +NMMMMMMMMMMMMMN-   +MMMMMMMMMMMMMN/      
+#          `sNMMMMMMMMMMMMN+:` +MMMMMMMMMMNo`       
+#            `+dMMMMMMMMMMMMMMNdNMMMMMMMd/`         
+#               .+hNMMMMMMMMMMMMMMMMmy/`            
+#                   `:+oyyhhhhyso/-`                
+#                                                    
 ```
 
-and be up and running! (This assumes you have cloned this repository to your home directory, otherwise you will have to supply `stow` with some more flags)
+A fork of the [LazyVim](https://github.com/LazyVim/LazyVim) starter.
 
-lazy.nvim will handle the bootstrapping process on first launch. If you run into any issues, try closing Neovim and restarting it again after lazy.nvim has performed the intial bootstrap.
+Build with [.neovim](https://github.com/neovim/neovim) from [.dotfiles](https://github.com/Vvkmnn/dotfiles/)
 
-## Other projects
-If you're looking for other options in the "Neovim config bootstrap market", here are a few cool options to consider
-- [Kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim)
-- [Neovim from scratch](https://github.com/LunarVim/Neovim-from-scratch), by ChrisAtMachine (hosted under the LunarNvim organization in GitHub)
-- [LazyVim](https://github.com/LazyVim/LazyVim)
