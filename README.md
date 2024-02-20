@@ -1,3 +1,6 @@
+## README
+True readme is in `.github/README.md`
+
 # The sleepy Neovim starter
 This is a basic, minimal-ish jump-off point for your Neovim journey utilizing [lazy.nvim](https://github.com/folke/lazy.nvim) for package management and breaking the config up into three main components:
 
