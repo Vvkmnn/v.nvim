@@ -1,8 +1,5 @@
--- Handle plugins with lazy.nvim
-require("core.lazy")
+-- bootstrap lazy.nvim, LazyVim and your plugins
+require("config.lazy")
 
--- General Neovim keymaps
-require("core.keymaps")
-
--- Other options
-require("core.options")
+-- custom functions
+require("functions.functions")
