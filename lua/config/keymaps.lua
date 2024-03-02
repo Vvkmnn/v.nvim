@@ -13,17 +13,31 @@ vim.keymap.set("n", "[c", "g;", { desc = "Previous Change" })
 
 -- Edit Alias
 vim.keymap.set("n", ",r", ":vs ~/.github/README.md", { desc = "Edit .dotfiles README" })
-
 vim.keymap.set("n", ",v", ":vs ~/.config/nvim/lua/<CR>", { desc = "Edit Neovim" })
 vim.keymap.set("n", ",k", ":vs ~/.config/nvim/lua/config/keymaps.lua<CR>", { desc = "Edit Keymaps" })
 vim.keymap.set("n", ",c", ":vs ~/.config/nvim/lua/plugins/custom.lua<CR>", { desc = "Edit Custom Plugins" })
+vim.keymap.set("n", ",m", ":vs ~/.config/nvim/lua/plugins/modify.lua<CR>", { desc = "Edit Modified Plugins" })
 vim.keymap.set("n", ",d", ":vs ~/.config/nvim/lua/plugins/disable.lua<CR>", { desc = "Edit Disabled Plugins" })
 vim.keymap.set("n", ",o", ":vs ~/.config/nvim/lua/config/options.lua<CR>", { desc = "Edit Options" })
-
 vim.keymap.set("n", ",s", ":vs ~/.shell<CR>", { desc = "Edit .shell" })
 vim.keymap.set("n", ",a", ":vs ~/.alias<CR>", { desc = "Edit .alias" })
 vim.keymap.set("n", ",t", ":vs ~/.config/tmux/tmux.conf<CR>", { desc = "Edit Tmux" })
+vim.keymap.set("n", ",w", ":vs ~/.config/wezterm/wezterm.lua<CR>", { desc = "Edit Wezterm" })
 
+-- Source
+-- vim.keymap.set("n", "<leader>r", ":source ~/.config/nvim/init.lua<CR>", { desc = "Source Neovim config" })
+-- Reload Config + Keymaps
+vim.keymap.set("n", "<leader>r", function()
+  -- Source init.lua
+  vim.cmd("source ~/.config/nvim/init.lua")
+  -- source keymaps.lua or any other config file you want to reload
+  vim.cmd("source ~/.config/nvim/lua/config/keymaps.lua")
+
+  -- Does nothing
+  -- source keymaps.lua or any other config file you want to reload
+  -- vim.cmd("source ~/.config/nvim/lua/plugins/custom.lua")
+end, { desc = "Reload Neovim config, keymaps, and custom packages" })
+-- vim.keymap.set("n", "<leader>r", ":so ~/.config/nvim/init.lua<CR>", { desc = "Source Neovim config" })
 -- TODO binds for only, vimsplit, etc.
 
 -- Escape via jj or jk in insert mode
@@ -94,10 +108,44 @@ vim.keymap.set("n", ",t", ":vs ~/.config/tmux/tmux.conf<CR>", { desc = "Edit Tmu
 -- map("n", "<C-S>", ":update!<CR>")
 -- map("v", "<C-S>", "<C-C>:update!<CR>")
 -- map("i", "<C-S>", "<C-O>:update!<CR>")
+-- vim.keymap.set("n", "<leader>s", ":update<CR>", { desc = "Quicksave" })
+vim.keymap.set("n", "<leader>s", ":wq!<CR>,", { desc = "Save and quit, no confirmation" })
 
 -- Ctrl+Q to Quit
 vim.keymap.set("n", "<C-Q>", ":exit<CR>,", { desc = "Quit without saving" })
+vim.keymap.set("n", "<leader>q", ":qa!<CR>", { desc = "Quit all, no confirmation" })
 -- vim.keymap.set({ "n", "i" }, "<C-Q>", ":exit<CR>,", { desc = "Quit without saving", expr = true }) -- doesnt work
+
+-- Unset the environment variables after opening Neogit
+vim.cmd("unlet $GIT_DIR")
+vim.cmd("unlet $GIT_WORK_TREE")
+
+-- Neogit
+
+-- Open Neogit
+vim.api.nvim_set_keymap("n", "<leader>g", ":Neogit<CR>", { desc = "Open Neogit" })
+
+-- Open Neogit for dotfiles
+-- function OpenDotfilesInNeogit()
+--   -- Ensure environment variables are set right before opening Neogit
+--   local git_dir = vim.fn.expand("~/.dotfiles")
+--   local work_tree = vim.fn.expand("~")
+--
+--   -- Use vim.cmd to ensure environment variables are set in the shell environment for the command
+--   vim.cmd("let $GIT_DIR = '" .. git_dir .. "'")
+--   vim.cmd("let $GIT_WORK_TREE = '" .. work_tree .. "'")
+--
+--   require("neogit").open()
+-- end
+
+-- Keybinding to open dotfiles with Neogit
+-- vim.api.nvim_set_keymap("n", "<leader>d", ":lua OpenDotfilesInNeogit()<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap(
+  "n",
+  "<leader>d",
+  ":lua OpenDotfilesInNeogit()<CR>",
+  { desc = "Open Neogit for dotfiles", noremap = true }
+)
 
 -- map("n", "<C-Q>", ":exit<CR>")
 -- map("v", "<C-Q>", "<C-C>:exit<CR>")

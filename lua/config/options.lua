@@ -12,8 +12,8 @@ vim.opt.termguicolors = true
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.autochdir = true
--- scrolloff = 7 -- +- 7 lines
--- scrolloff = 999 -- center line
+-- scrolloff = 3 -- +- 7 lines
+vim.opt.scrolloff = 9999 -- center line
 vim.opt.lazyredraw = true -- redraw after events
 -- loaded_netrw =1
 -- loaded_netrwPlugin=1
@@ -25,6 +25,23 @@ vim.o.fillchars = "vert: "
 
 -- Enable line numbers in all windows
 vim.wo.number = true
+
+-- No indent chars
+vim.opt_local.list = false
+
+-- No swapfilm
+vim.opt.swapfile = false
+
+-- Slower scroll
+vim.opt.mouse = "a"
+vim.opt.mousescroll = "ver:1"
+
+-- Line breaks
+-- " Indents word-wrapped lines as much as the 'parent' line
+vim.opt.breakindent = true
+-- " Ensures word-wrap does not split words
+vim.opt.formatoptions = l
+vim.opt.lbr = true
 
 -- vim.opt.cursorline = false -- Enable highlighting of the current line
 --

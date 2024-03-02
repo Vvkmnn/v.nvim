@@ -1,5 +1,15 @@
 return {
   {
+    "folke/tokyonight.nvim",
+    opts = {
+      transparent = true,
+      styles = {
+        sidebars = "transparent",
+        floats = "transparent",
+      },
+    },
+  },
+  {
     "lualine.nvim",
     opts = function()
       return {
