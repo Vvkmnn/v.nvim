@@ -1,8 +1,30 @@
 return {
+
+  {
+    "rcarriga/nvim-notify",
+    opts = {
+      fps = 120,
+      -- render = "compact",
+      render = "minimal",
+      timeout = 0,
+      -- stages = "fade",
+    },
+  },
+  {
+    "folke/noice.nvim",
+    opts = {
+      cmdline = {
+        format = {
+          cmdline = { title = { "Vim" }, pattern = "^:", icon = ":", lang = "vim" },
+          filter = { tile = { "Shell" }, pattern = "^:%s*!", icon = "!", lang = "bash" },
+        },
+      },
+    },
+  },
   {
     "folke/tokyonight.nvim",
     opts = {
-      transparent = true,
+      -- transparent = true,
       styles = {
         sidebars = "transparent",
         floats = "transparent",

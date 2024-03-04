@@ -12,7 +12,7 @@ vim.keymap.set("n", "[c", "g;", { desc = "Previous Change" })
 -- vim.keymap.set("n", "[c", "g;", { desc = "Previous Change", noremap = true })
 
 -- Edit Alias
-vim.keymap.set("n", ",r", ":vs ~/.github/README.md", { desc = "Edit .dotfiles README" })
+vim.keymap.set("n", ",r", ":vs ~/.github/README.md<CR>", { desc = "Edit .dotfiles README" })
 vim.keymap.set("n", ",v", ":vs ~/.config/nvim/lua/<CR>", { desc = "Edit Neovim" })
 vim.keymap.set("n", ",k", ":vs ~/.config/nvim/lua/config/keymaps.lua<CR>", { desc = "Edit Keymaps" })
 vim.keymap.set("n", ",c", ":vs ~/.config/nvim/lua/plugins/custom.lua<CR>", { desc = "Edit Custom Plugins" })
@@ -27,16 +27,12 @@ vim.keymap.set("n", ",w", ":vs ~/.config/wezterm/wezterm.lua<CR>", { desc = "Edi
 -- Source
 -- vim.keymap.set("n", "<leader>r", ":source ~/.config/nvim/init.lua<CR>", { desc = "Source Neovim config" })
 -- Reload Config + Keymaps
-vim.keymap.set("n", "<leader>r", function()
-  -- Source init.lua
-  vim.cmd("source ~/.config/nvim/init.lua")
-  -- source keymaps.lua or any other config file you want to reload
-  vim.cmd("source ~/.config/nvim/lua/config/keymaps.lua")
-
-  -- Does nothing
-  -- source keymaps.lua or any other config file you want to reload
-  -- vim.cmd("source ~/.config/nvim/lua/plugins/custom.lua")
-end, { desc = "Reload Neovim config, keymaps, and custom packages" })
+vim.keymap.set(
+  "n",
+  "<leader>r",
+  "<cmd>lua require('util.functions').ReloadConfig()<CR>",
+  { desc = "Reload Neovim config, keymaps, and custom packages" }
+)
 -- vim.keymap.set("n", "<leader>r", ":so ~/.config/nvim/init.lua<CR>", { desc = "Source Neovim config" })
 -- TODO binds for only, vimsplit, etc.
 
@@ -112,18 +108,14 @@ end, { desc = "Reload Neovim config, keymaps, and custom packages" })
 vim.keymap.set("n", "<leader>s", ":wq!<CR>,", { desc = "Save and quit, no confirmation" })
 
 -- Ctrl+Q to Quit
-vim.keymap.set("n", "<C-Q>", ":exit<CR>,", { desc = "Quit without saving" })
+vim.keymap.set("n", "<C-Q>", ":q<CR>,", { desc = "Quit without saving" })
 vim.keymap.set("n", "<leader>q", ":qa!<CR>", { desc = "Quit all, no confirmation" })
 -- vim.keymap.set({ "n", "i" }, "<C-Q>", ":exit<CR>,", { desc = "Quit without saving", expr = true }) -- doesnt work
-
--- Unset the environment variables after opening Neogit
-vim.cmd("unlet $GIT_DIR")
-vim.cmd("unlet $GIT_WORK_TREE")
 
 -- Neogit
 
 -- Open Neogit
-vim.api.nvim_set_keymap("n", "<leader>g", ":Neogit<CR>", { desc = "Open Neogit" })
+vim.api.nvim_set_keymap("n", "<leader>gg", ":Neogit<CR>", { noremap = true, desc = "Open Neogit" })
 
 -- Open Neogit for dotfiles
 -- function OpenDotfilesInNeogit()
@@ -140,12 +132,15 @@ vim.api.nvim_set_keymap("n", "<leader>g", ":Neogit<CR>", { desc = "Open Neogit" 
 
 -- Keybinding to open dotfiles with Neogit
 -- vim.api.nvim_set_keymap("n", "<leader>d", ":lua OpenDotfilesInNeogit()<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap(
+vim.keymap.set(
   "n",
-  "<leader>d",
-  ":lua OpenDotfilesInNeogit()<CR>",
+  "<leader>gd",
+  "<cmd>lua require('util.functions').OpenDotfilesInNeogit()<CR>",
   { desc = "Open Neogit for dotfiles", noremap = true }
 )
+
+-- TODO only to remove lazygit, replace with something
+vim.keymap.set("n", "<leader>gG", "", { desc = "", noremap = true })
 
 -- map("n", "<C-Q>", ":exit<CR>")
 -- map("v", "<C-Q>", "<C-C>:exit<CR>")

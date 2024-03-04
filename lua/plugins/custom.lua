@@ -204,6 +204,10 @@ return {
       "nvim-telescope/telescope.nvim", -- optional
       "ibhagwan/fzf-lua", -- optional
     },
+    opts = {
+      -- NOTE moved to keymaps
+      -- { require("util.functions").OpenDotfilesInNeogit },
+    },
     config = true,
   },
   -- {
