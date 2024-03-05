@@ -29,8 +29,8 @@ require("lazy").setup({
   },
   install = { colorscheme = { "tokyonight", "habamax" } },
 
+  checker = { enabled = true }, -- automatically check for plugin updates
   checker = { enabled = true, notify = false, frequency = 86400 }, -- https://www.reddit.com/r/neovim/comments/13f03p7/with_lazyvim_a_long_list_of_plugings_update_every/
-  -- checker = { enabled = true }, -- automatically check for plugin updates
 
   performance = {
     rtp = {

@@ -1,4 +1,5 @@
 return {
+
   -- {
   --   "dzfrias/arena.nvim",
   --   event = "BufWinEnter",
@@ -206,6 +207,8 @@ return {
   --     }
   --   end,
   -- },
+
+  -- Obsidian notes
   {
     "epwalsh/obsidian.nvim",
     version = "*", -- recommended, use latest release instead of latest commit
@@ -221,7 +224,6 @@ return {
     dependencies = {
       -- Required.
       "nvim-lua/plenary.nvim",
-
       -- see below for full list of optional dependencies 👇
     },
     opts = {
@@ -247,10 +249,11 @@ return {
     -- see below for full list of options 👇
   },
 
+  -- GPT in Neovim
   {
     "robitx/gp.nvim",
-    lazy = true,
     event = "VeryLazy",
+    lazy = true,
     keys = {
       { "<leader>`", false },
       -- { "<leader>`", ":'<,'>GpChatToggle<cr>", desc = "GPT Chat Contextual Toggle" },
@@ -322,50 +325,54 @@ return {
   --     "nvim-telescope/telescope.nvim",
   --   },
   -- },
-  {
-    "elentok/format-on-save.nvim",
-    event = "VeryLazy",
-    config = function()
-      local format_on_save = require("format-on-save")
-      local formatters = require("format-on-save.formatters")
 
-      format_on_save.setup({
-        exclude_path_patterns = {
-          "/node_modules/",
-          ".local/share/nvim/lazy",
-        },
-        formatter_by_ft = {
-          css = formatters.lsp,
-          html = formatters.lsp,
-          java = formatters.lsp,
-          javascript = formatters.lsp,
-          json = formatters.lsp,
-          lua = formatters.lsp,
-          markdown = formatters.prettierd,
-          openscad = formatters.lsp,
-          python = formatters.black,
-          rust = formatters.lsp,
-          scad = formatters.lsp,
-          scss = formatters.lsp,
-          sh = formatters.shfmt,
-          terraform = formatters.lsp,
-          typescript = formatters.prettierd,
-          typescriptreact = formatters.prettierd,
-          yaml = formatters.lsp,
-        },
-      })
-    end,
-  },
-  {
-    "marioortizmanero/adoc-pdf-live.nvim",
-    event = "VeryLazy",
-    config = function()
-      -- require("colorizer").setup({})
-      require("adoc_pdf_live").setup()
-    end,
-  },
+  -- {
+  --   "elentok/format-on-save.nvim",
+  --   event = "VeryLazy",
+  --   config = function()
+  --     local format_on_save = require("format-on-save")
+  --     local formatters = require("format-on-save.formatters")
+  --
+  --     format_on_save.setup({
+  --       exclude_path_patterns = {
+  --         "/node_modules/",
+  --         ".local/share/nvim/lazy",
+  --       },
+  --       formatter_by_ft = {
+  --         css = formatters.lsp,
+  --         html = formatters.lsp,
+  --         java = formatters.lsp,
+  --         javascript = formatters.lsp,
+  --         json = formatters.lsp,
+  --         lua = formatters.lsp,
+  --         markdown = formatters.prettierd,
+  --         openscad = formatters.lsp,
+  --         python = formatters.black,
+  --         rust = formatters.lsp,
+  --         scad = formatters.lsp,
+  --         scss = formatters.lsp,
+  --         sh = formatters.shfmt,
+  --         terraform = formatters.lsp,
+  --         typescript = formatters.prettierd,
+  --         typescriptreact = formatters.prettierd,
+  --         yaml = formatters.lsp,
+  --       },
+  --     })
+  --   end,
+  -- },
+
+  -- latex plugins
+  -- {
+  --   "marioortizmanero/adoc-pdf-live.nvim",
+  --   event = "VeryLazy",
+  --   config = function()
+  --     -- require("colorizer").setup({})
+  --     require("adoc_pdf_live").setup()
+  --   end,
+  -- },
   {
     "lervag/vimtex",
+    event = "VeryLazy",
     ft = "tex",
     config = function()
       vim.g.vimtex_view_method = "skim"
@@ -374,6 +381,8 @@ return {
       vim.g.maplocalleader = ","
     end,
   },
+
+  -- hex color in vim
   {
     "norcalli/nvim-colorizer.lua",
     event = "VeryLazy",
@@ -394,6 +403,8 @@ return {
       -- Configuration here, or leave empty to use defaults
     end,
   },
+
+  -- surround with cs
   {
     "kylechui/nvim-surround",
     version = "*", -- Use for stability; omit to use `main` branch for the latest features
@@ -415,6 +426,7 @@ return {
   },
   {
     "NeogitOrg/neogit",
+    event = "VeryLazy",
     lazy = true,
     dependencies = {
       "nvim-lua/plenary.nvim", -- required
@@ -440,6 +452,7 @@ return {
       },
     },
   },
+
   -- {
   --   "kdheepak/lazygit.nvim",
   --   -- optional for floating window border decoration
@@ -447,40 +460,49 @@ return {
   --     "nvim-lua/plenary.nvim",
   --   },
   -- TODO does not do the ()text (t)ext behavior yet
+  -- {
+  --   "windwp/nvim-autopairs",
+  --   event = "InsertEnter",
+  --   opts = {
+  --     fast_wrap = {
+  --       map = "<C-.>",
+  --     },
+  --   },
+  -- },
+  -- {
+  --   -- Vimscript to hold window at specific line - usually center
+  --   "vim-scripts/scrollfix",
+  --   config = function()
+  --     vim.g["scrollfix"] = 50
+  --   end,
+  -- },
+
+  -- Detect tabstop and shiftwidth automatically
+  { "tpope/vim-sleuth", event = "VeryLazy" },
+  -- Surround stuff with the ys-, cs-, ds- commands
   {
-    "windwp/nvim-autopairs",
-    event = "InsertEnter",
-    opts = {
-      fast_wrap = {
-        map = "<C-.>",
-      },
-    },
+    "tpope/vim-surround",
+    event = "VeryLazy",
   },
-  {
-    -- Vimscript to hold window at specific line - usually center
-    "vim-scripts/scrollfix",
-    config = function()
-      vim.g["scrollfix"] = 50
-    end,
-  },
-  "tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
-  -- "tpope/vim-surround", -- Surround stuff with the ys-, cs-, ds- commands
-  {
-    -- Better buffer closing actions. Available via the buffers helper.
-    "kazhala/close-buffers.nvim",
-    opts = {
-      preserve_window_layout = { "this", "nameless" },
-    },
-  },
+
+  -- {
+  --   -- Better buffer closing actions. Available via the buffers helper.
+  --   "kazhala/close-buffers.nvim",
+  --   opts = {
+  --     preserve_window_layout = { "this", "nameless" },
+  --   },
+  -- },
   {
     -- Move stuff with <M-j> and <M-k> in both normal and visual mode
     "echasnovski/mini.move",
+    event = "VeryLazy",
     config = function()
       require("mini.move").setup()
     end,
   },
   {
     "stevearc/oil.nvim",
+    event = "VeryLazy",
     dependencies = {
       "nvim-tree/nvim-web-devicons",
     },
@@ -503,6 +525,7 @@ return {
   {
     -- Resolve conflicts with cX, jump with ]x
     "akinsho/git-conflict.nvim",
+    event = "VeryLazy",
     commit = "2957f74",
     config = function()
       require("git-conflict").setup({
@@ -519,6 +542,7 @@ return {
   },
   {
     "kwkarlwang/bufresize.nvim",
+    event = "VeryLazy",
     config = function()
       require("bufresize").setup()
     end,
@@ -539,10 +563,13 @@ return {
       vim.g.beacon_size = 777
     end,
   },
+
+  -- cursor line mode color
   {
     "mawkler/modicator.nvim",
     event = "VeryLazy",
-    dependencies = "mawkler/onedark.nvim", -- Add your colorscheme plugin here
+    -- dependencies = "mawkler/onedark.nvim", -- Add your colorscheme plugin here
+    dependencies = "folke/tokyonight.nvim",
     init = function()
       -- These are required for Modicator to work
       vim.o.cursorline = true
@@ -550,6 +577,8 @@ return {
       vim.o.termguicolors = true
     end,
   },
+
+  -- customized lua bar
   -- {
   --   "romgrk/barbar.nvim",
   --   dependencies = {},

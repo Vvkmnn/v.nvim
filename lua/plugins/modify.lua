@@ -1,4 +1,17 @@
 return {
+  -- transparent tokyonight
+  {
+    "tokyonight.nvim",
+    opts = {
+      transparent = true,
+      styles = {
+        sidebars = "transparent",
+        floats = "transparent",
+      },
+    },
+  },
+
+  -- NOTE starter experiments
   -- {
   --   "echasnovski/mini.starter",
   --   opts = function()
