@@ -402,6 +402,7 @@ return {
       --
       -- Configuration here, or leave empty to use defaults
     end,
+    keys = { "<leader>cc", ":ColorizerToggle" },
   },
 
   -- surround with cs
@@ -570,13 +571,22 @@ return {
     event = "VeryLazy",
     -- dependencies = "mawkler/onedark.nvim", -- Add your colorscheme plugin here
     dependencies = "folke/tokyonight.nvim",
-    init = function()
-      -- These are required for Modicator to work
-      vim.o.cursorline = true
-      vim.o.number = true
-      vim.o.termguicolors = true
+    config = function()
+      require("modicator").setup({
+        -- Warn if any required option above is missing. May emit false positives
+        -- if some other plugin modifies them, which in that case you can just
+        -- ignore. Feel free to remove this line after you've gotten Modicator to
+        -- work properly.
+        show_warnings = true,
+      })
     end,
   },
+  -- init = function()
+  --   -- These are required for Modicator to work
+  --   vim.o.cursorline = true
+  --   vim.o.number = true
+  --   vim.o.termguicolors = true
+  -- end,
 
   -- customized lua bar
   -- {

@@ -2,27 +2,39 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
 --
--- Leader to ,
--- vim.keymap.set("n", ",", "<leader>", { desc = "Leader" })
--- vim.keymap.del("n", "]c")
--- vim.keymap.del("n", "[c")
+-- jump to change
 vim.keymap.set("n", "]c", "g,", { desc = "Next Change" })
 vim.keymap.set("n", "[c", "g;", { desc = "Previous Change" })
 -- vim.keymap.set("n", "]c", "g,", { desc = "Next Change", noremap = true })
 -- vim.keymap.set("n", "[c", "g;", { desc = "Previous Change", noremap = true })
 
 -- Edit Alias
-vim.keymap.set("n", ",r", ":vs ~/.github/README.md<CR>", { desc = "Edit .dotfiles README" })
-vim.keymap.set("n", ",v", ":vs ~/.config/nvim/lua/<CR>", { desc = "Edit Neovim" })
-vim.keymap.set("n", ",k", ":vs ~/.config/nvim/lua/config/keymaps.lua<CR>", { desc = "Edit Keymaps" })
-vim.keymap.set("n", ",c", ":vs ~/.config/nvim/lua/plugins/custom.lua<CR>", { desc = "Edit Custom Plugins" })
-vim.keymap.set("n", ",m", ":vs ~/.config/nvim/lua/plugins/modify.lua<CR>", { desc = "Edit Modified Plugins" })
-vim.keymap.set("n", ",d", ":vs ~/.config/nvim/lua/plugins/disable.lua<CR>", { desc = "Edit Disabled Plugins" })
-vim.keymap.set("n", ",o", ":vs ~/.config/nvim/lua/config/options.lua<CR>", { desc = "Edit Options" })
-vim.keymap.set("n", ",s", ":vs ~/.shell<CR>", { desc = "Edit .shell" })
-vim.keymap.set("n", ",a", ":vs ~/.alias<CR>", { desc = "Edit .alias" })
-vim.keymap.set("n", ",t", ":vs ~/.config/tmux/tmux.conf<CR>", { desc = "Edit Tmux" })
-vim.keymap.set("n", ",w", ":vs ~/.config/wezterm/wezterm.lua<CR>", { desc = "Edit Wezterm" })
+vim.keymap.set("n", ",r", ":vs ~/.github/README.md<CR>", { silent = true, desc = "Edit .dotfiles README" })
+vim.keymap.set("n", ",v", ":vs ~/.config/nvim/lua/<CR>", { silent = true, desc = "Edit Neovim" })
+vim.keymap.set("n", ",k", ":vs ~/.config/nvim/lua/config/keymaps.lua<CR>", { silent = true, desc = "Edit Keymaps" })
+vim.keymap.set(
+  "n",
+  ",c",
+  ":vs ~/.config/nvim/lua/plugins/custom.lua<CR>",
+  { silent = true, desc = "Edit Custom Plugins" }
+)
+vim.keymap.set(
+  "n",
+  ",m",
+  ":vs ~/.config/nvim/lua/plugins/modify.lua<CR>",
+  { silent = true, desc = "Edit Modified Plugins" }
+)
+vim.keymap.set(
+  "n",
+  ",d",
+  ":vs ~/.config/nvim/lua/plugins/disable.lua<CR>",
+  { silent = true, desc = "Edit Disabled Plugins" }
+)
+vim.keymap.set("n", ",o", ":vs ~/.config/nvim/lua/config/options.lua<CR>", { silent = true, desc = "Edit Options" })
+vim.keymap.set("n", ",s", ":vs ~/.shell<CR>", { silent = true, desc = "Edit .shell" })
+vim.keymap.set("n", ",a", ":vs ~/.alias<CR>", { silent = true, desc = "Edit .alias" })
+vim.keymap.set("n", ",t", ":vs ~/.config/tmux/tmux.conf<CR>", { silent = true, desc = "Edit Tmux" })
+vim.keymap.set("n", ",w", ":vs ~/.config/wezterm/wezterm.lua<CR>", { silent = true, desc = "Edit Wezterm" })
 
 -- Source
 -- vim.keymap.set("n", "<leader>r", ":source ~/.config/nvim/init.lua<CR>", { desc = "Source Neovim config" })
@@ -113,7 +125,13 @@ vim.keymap.set("n", "<leader>q", ":qa!<CR>", { desc = "Quit all, no confirmation
 -- vim.keymap.set({ "n", "i" }, "<C-Q>", ":exit<CR>,", { desc = "Quit without saving", expr = true }) -- doesnt work
 
 -- Faster Buffer
-vim.keymap.set("n", "<leader>`", ":Telescope buffers<CR>", { desc = "Telescope buffers" })
+-- vim.keymap.set(
+--   "n",
+--   "<leader>b<leader>",
+--   "<cmd>Telescope buffers sort_mru=true sort_lastused=true preview=true<cr>",
+--   { desc = "Telescope fuzzy buffers" }
+-- )
+--
 -- :lua require("telescope.builtin").current_buffer_fuzzy_find({ previewer = false })<CR>'
 
 -- Neogit

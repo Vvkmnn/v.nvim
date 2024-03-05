@@ -1,8 +1,70 @@
 return {
+  -- formatter
+  {
+    "stevearc/conform.nvim",
+    -- NOTE default to lsp for everything
+    opts = {
+      -- Define your formatters
+      formatters_by_ft = {},
+      -- formatters_by_ft = {
+      --   lua = { "stylua" },
+      --   sh = { "shfmt" },
+      --   python = { "isort", "black" },
+      --   javascript = { { "prettierd", "prettier" } },
+      --   css = { "stylelint" },
+      --   nix = { { "alejandra" } },
+      --   md = { { "mdformat", "autocorrect" } },
+      --   yaml = { { "yq" } },
+      --   json = { { "yq" } },
+      --   tex = { { "latexindent" } },
+      --   -- html = { { "djlint" } },
+      --   c = { { "astyle" } },
+      --   cpp = { { "astyle" } },
+      -- },
+      -- Set up format-on-save
+      -- Customize formatters
+      -- format_on_save = { timeout_ms = 0, lsp_fallback = true },
+      formatters = {
+        -- shfmt = {
+        --   prepend_args = { "-i", "2" },
+        -- },
+      },
+    },
+  },
+
+  -- indentscope animation
+  {
+    "echasnovski/mini.indentscope",
+    opts = {
+      -- symbol = "▏",
+      symbol = " ▏",
+      -- symbol = " ▏ ",
+      -- draw = { delay =  },
+      -- symbol = " |",
+      options = {
+        -- Type of scope's border: which line(s) with smaller indent to
+        -- categorize as border. Can be one of: 'both', 'top', 'bottom', 'none'.
+        border = "both",
+
+        -- Whether to use cursor column when computing reference indent.
+        -- Useful to see incremental scopes with horizontal cursor movements.
+        -- indent_at_cursor = false,
+
+        -- Whether to first check input line to be a border of adjacent scope.
+        -- Use it if you want to place cursor on function header to get scope of
+        -- its body.
+        try_as_border = true,
+      },
+
+      -- symbol = "╎",
+    },
+  },
+
   -- transparent tokyonight
   {
     "tokyonight.nvim",
     opts = {
+      style = "night",
       transparent = true,
       styles = {
         sidebars = "transparent",
