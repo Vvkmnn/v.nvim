@@ -60,29 +60,104 @@ return {
   --   end,
 
   -- No logo
+
+  -- override nvim-cmp and add cmp-emoji
+  {
+    "hrsh7th/nvim-cmp",
+    dependencies = { "hrsh7th/cmp-emoji" },
+    ---@param opts cmp.ConfigSchema
+    opts = function(_, opts)
+      table.insert(opts.sources, { name = "emoji" })
+    end,
+  },
+
+  -- change some telescope options and a keymap to browse plugin files
+  -- {
+  --   "nvim-telescope/telescope.nvim",
+  --   tag = "0.1.5",
+  --   dependencies = {
+  --     "nvim-lua/plenary.nvim",
+  --     "tsakirist/telescope-lazy.nvim",
+  --   },
+  --   keys = {
+  --     -- add a keymap to browse plugin files
+  --     -- stylua: ignore
+  --     {
+  --       "<leader>fp",
+  --       function() require("telescope.builtin").find_files({ cwd = require("lazy.core.config").options.root }) end,
+  --       desc = "Find Plugin File",
+  --     },
+  --   },
+  --   -- change some options
+  --   opts = {
+  --     defaults = {
+  --       layout_strategy = "horizontal",
+  --       layout_config = { prompt_position = "top" },
+  --       sorting_strategy = "ascending",
+  --       winblend = 0,
+  --     },
+  --   },
+  -- },
+
+  -- add telescope-fzf-native
+  -- {
+  --   "telescope.nvim",
+  --   dependencies = {
+  --     "nvim-telescope/telescope-fzf-native.nvim",
+  --     build = "make",
+  --     config = function()
+  --       require("telescope").load_extension("fzf")
+  --     end,
+  --   },
+  -- },
+
   {
     "nvimdev/dashboard-nvim",
     opts = {
       config = {
         -- header = { " v ", " v  " },
         -- header = { " ", " ", " ", " ", " ", " ", "v" },
+        --
+        -- header = {
+        --   "   ",
+        --   "                              ",
+        --   "                 ####         ",
+        --   "                ###           ",
+        --   "                ###           ",
+        --   "           #### ###           ",
+        --   "            ###  ##           ",
+        --   "             ###  #           ",
+        --   "              ##              ",
+        --   "               ##             ",
+        --   "                ##            ",
+        --   "                              ",
+        -- },
+
+        -- header = { "   ", "   ", "   ", " -_- ", "   " },
 
         header = {
           "   ",
           "   ",
           "   ",
-          "                              ",
-          "                 ####         ",
-          "                ###           ",
-          "                ###           ",
-          "           #### ###           ",
-          "            ###  ##           ",
-          "             ###  #           ",
-          "              ##              ",
-          "               ##             ",
-          "                ##            ",
-          "                              ",
-          "                              ",
+          -- ({ "[ ¬_¬ ]", "[ -_- ]", "◕ᴥ◕", "ツ", "ಠ_ಠ" })[math.random(5)],
+          -- " ¬_¬        ",
+          "   ",
+          "     [ ¬_¬ ]         n[v]im v"
+            -- "    ¬_¬             n[v]im v"
+            .. vim.version().major
+            .. "."
+            .. vim.version().minor
+            .. "."
+            .. vim.version().patch
+            .. "    ",
+          -- "nvim v" .. vim.version().major .. "." .. vim.version().minor .. "." .. vim.version().patch,
+          -- "v" .. vim.version().major .. "." .. vim.version().minor .. "." .. vim.version().patch,
+          -- " "
+          --   .. os.getenv("USER")
+          --   .. "."
+          --   .. os.getenv("HOST")
+          --   .. " ",
+          "   ",
           "   ",
         },
 
@@ -104,15 +179,14 @@ return {
             icon = "  ",
             action = "enew",
           },
-
-          {
-            desc = "[u]pdate plugins    ",
-            keymap = "",
-            key = "u",
-            icon = "  ",
-            action = "Lazy update",
-          },
-
+          -- {
+          --   desc = "[u]pdate plugins    ",
+          --   keymap = "",
+          --   key = "u",
+          --   icon = "  ",
+          --   action = "Lazy update",
+          -- },
+          --
           -- {
           --   desc = "manag[e] extensions ",
           --   keymap = "",
@@ -121,13 +195,13 @@ return {
           --   action = "Mason",
           -- },
 
-          {
-            desc = "[c]onfig    ",
-            keymap = "",
-            key = "c",
-            icon = "  ",
-            action = "Telescope find_files cwd=~/.config/nvim",
-          },
+          -- {
+          --   desc = "[c]onfig    ",
+          --   -- keymap = "",
+          --   key = "c",
+          --   icon = "  ",
+          --   action = "Telescope find_files cwd=~/.config/nvim",
+          -- },
           {
 
             desc = "[q]uit              ",
@@ -213,7 +287,7 @@ return {
         footer = function()
           local stats = require("lazy").stats()
           local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
-          return { "" .. stats.loaded .. "/" .. stats.count .. " plugins in " .. ms .. "ms" }
+          return { "  " .. stats.loaded .. "/" .. stats.count .. " packages in " .. ms .. "ms" }
         end,
 
         -- footer = function()

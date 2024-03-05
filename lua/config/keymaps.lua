@@ -112,10 +112,17 @@ vim.keymap.set("n", "<C-Q>", ":q<CR>,", { desc = "Quit without saving" })
 vim.keymap.set("n", "<leader>q", ":qa!<CR>", { desc = "Quit all, no confirmation" })
 -- vim.keymap.set({ "n", "i" }, "<C-Q>", ":exit<CR>,", { desc = "Quit without saving", expr = true }) -- doesnt work
 
+-- Faster Buffer
+vim.keymap.set("n", "<leader>`", ":Telescope buffers<CR>", { desc = "Telescope buffers" })
+-- :lua require("telescope.builtin").current_buffer_fuzzy_find({ previewer = false })<CR>'
+
 -- Neogit
 
 -- Open Neogit
-vim.api.nvim_set_keymap("n", "<leader>gg", ":Neogit<CR>", { noremap = true, desc = "Open Neogit" })
+-- vim.api.nvim_set_keymap("n", "<leader>gg", ":Neogit<CR>", { noremap = true, silent = true, desc = "Open Neogit" })
+
+-- GP.Nvim
+-- vim.api.nvim_set_keymap("n", "<leader>gg", ":Neogit<CR>", { noremap = true, silent = "True", desc = "Open Neogit" })
 
 -- Open Neogit for dotfiles
 -- function OpenDotfilesInNeogit()
@@ -132,15 +139,20 @@ vim.api.nvim_set_keymap("n", "<leader>gg", ":Neogit<CR>", { noremap = true, desc
 
 -- Keybinding to open dotfiles with Neogit
 -- vim.api.nvim_set_keymap("n", "<leader>d", ":lua OpenDotfilesInNeogit()<CR>", { noremap = true, silent = true })
-vim.keymap.set(
-  "n",
-  "<leader>gd",
-  "<cmd>lua require('util.functions').OpenDotfilesInNeogit()<CR>",
-  { desc = "Open Neogit for dotfiles", noremap = true }
-)
+-- vim.keymap.set(
+--   "n",
+--   "<leader>gd",
+--   "<cmd>lua require('util.functions').OpenDotfilesInNeogit()<CR>",
+--   { desc = "Open Neogit for dotfiles", noremap = true }
+-- )
 
 -- TODO only to remove lazygit, replace with something
-vim.keymap.set("n", "<leader>gG", "", { desc = "", noremap = true })
+-- vim.keymap.del("n", "<leader>gG")
+-- vim.keymap.set("n", "<leader>gG", "", { desc = "", noremap = true })
+
+-- Windows
+-- only
+vim.keymap.set("n", "<leader>o", ":only<CR>", { desc = "Only window" })
 
 -- map("n", "<C-Q>", ":exit<CR>")
 -- map("v", "<C-Q>", "<C-C>:exit<CR>")
