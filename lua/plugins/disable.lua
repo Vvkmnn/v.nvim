@@ -1,5 +1,5 @@
 return {
-  { "folke/noice.nvim", enabled = false },
+  -- { "folke/noice.nvim", enabled = false },
   { "rcarriga/nvim-notify", enabled = false },
   { "folke/flash.nvim", enabled = false },
   { "nvim-treesitter/nvim-treesitter-textobjects", enabled = false },
@@ -7,6 +7,7 @@ return {
   { "akinsho/bufferline.nvim", enabled = false },
   { "echasnovski/mini.surround", enabled = false },
   { "neo-tree.nvim", enabled = false },
+  -- { "nvimdev/dashboard-nvim", enabled = false },
   -- { "mini.pairs", enabled = false },
   -- { "indent-blankline.nvim", enabled = false },
   -- { "mini.indentscope", enabled = false },
