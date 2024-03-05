@@ -50,7 +50,7 @@ function M.vLogo()
     " #################################################### ",
   }, "\n")
 
-  return vLogo
+  return vlogo
 end
 
 return M
