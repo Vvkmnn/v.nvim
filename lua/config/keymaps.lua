@@ -9,32 +9,32 @@ vim.keymap.set("n", "[c", "g;", { desc = "Previous Change" })
 -- vim.keymap.set("n", "[c", "g;", { desc = "Previous Change", noremap = true })
 
 -- Edit Alias
-vim.keymap.set("n", ",r", ":vs ~/.github/README.md<CR>", { silent = true, desc = "Edit .dotfiles README" })
-vim.keymap.set("n", ",v", ":vs ~/.config/nvim/lua/<CR>", { silent = true, desc = "Edit Neovim" })
-vim.keymap.set("n", ",k", ":vs ~/.config/nvim/lua/config/keymaps.lua<CR>", { silent = true, desc = "Edit Keymaps" })
+vim.keymap.set("n", ",r", ":e ~/.github/README.md<CR>", { silent = true, desc = "Edit .dotfiles README" })
+vim.keymap.set("n", ",v", ":e ~/.config/nvim/lua/<CR>", { silent = true, desc = "Edit Neovim" })
+vim.keymap.set("n", ",k", ":e ~/.config/nvim/lua/config/keymaps.lua<CR>", { silent = true, desc = "Edit Keymaps" })
 vim.keymap.set(
   "n",
   ",c",
-  ":vs ~/.config/nvim/lua/plugins/custom.lua<CR>",
+  ":e ~/.config/nvim/lua/plugins/custom.lua<CR>",
   { silent = true, desc = "Edit Custom Plugins" }
 )
 vim.keymap.set(
   "n",
   ",m",
-  ":vs ~/.config/nvim/lua/plugins/modify.lua<CR>",
+  ":e ~/.config/nvim/lua/plugins/modify.lua<CR>",
   { silent = true, desc = "Edit Modified Plugins" }
 )
 vim.keymap.set(
   "n",
   ",d",
-  ":vs ~/.config/nvim/lua/plugins/disable.lua<CR>",
+  ":e ~/.config/nvim/lua/plugins/disable.lua<CR>",
   { silent = true, desc = "Edit Disabled Plugins" }
 )
-vim.keymap.set("n", ",o", ":vs ~/.config/nvim/lua/config/options.lua<CR>", { silent = true, desc = "Edit Options" })
-vim.keymap.set("n", ",s", ":vs ~/.shell<CR>", { silent = true, desc = "Edit .shell" })
-vim.keymap.set("n", ",a", ":vs ~/.alias<CR>", { silent = true, desc = "Edit .alias" })
-vim.keymap.set("n", ",t", ":vs ~/.config/tmux/tmux.conf<CR>", { silent = true, desc = "Edit Tmux" })
-vim.keymap.set("n", ",w", ":vs ~/.config/wezterm/wezterm.lua<CR>", { silent = true, desc = "Edit Wezterm" })
+vim.keymap.set("n", ",o", ":e ~/.config/nvim/lua/config/options.lua<CR>", { silent = true, desc = "Edit Options" })
+vim.keymap.set("n", ",s", ":e ~/.shell<CR>", { silent = true, desc = "Edit .shell" })
+vim.keymap.set("n", ",a", ":e ~/.alias<CR>", { silent = true, desc = "Edit .alias" })
+vim.keymap.set("n", ",t", ":e ~/.config/tmux/tmux.conf<CR>", { silent = true, desc = "Edit Tmux" })
+vim.keymap.set("n", ",w", ":e ~/.config/wezterm/wezterm.lua<CR>", { silent = true, desc = "Edit Wezterm" })
 
 -- Source
 -- vim.keymap.set("n", "<leader>r", ":source ~/.config/nvim/init.lua<CR>", { desc = "Source Neovim config" })

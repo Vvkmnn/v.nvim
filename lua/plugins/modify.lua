@@ -1,36 +1,121 @@
 return {
   -- formatter
+  -- TODO shfmt doesn't work
+  -- {
+  --   "stevearc/conform.nvim",
+  --   -- lazy = false,
+  --   -- NOTE default to lsp for everything
+  --   opts = {
+  --     -- Define your formatters
+  --     -- formatters_by_ft = {},
+  --     formatters_by_ft = {
+  --       lua = { "stylua" },
+  --       sh = { "shfmt" },
+  --       python = { "isort", "black" },
+  --       javascript = { { "prettierd", "prettier" } },
+  --       css = { "stylelint" },
+  --       nix = { { "alejandra" } },
+  --       md = { { "mdformat", "autocorrect" } },
+  --       yaml = { { "yq" } },
+  --       json = { { "yq" } },
+  --       tex = { { "latexindent" } },
+  --       -- html = { { "djlint" } },
+  --       c = { { "astyle" } },
+  --       cpp = { { "astyle" } },
+  --     },
+  --     -- Set up format-on-save
+  --     -- Customize formatters
+  --     -- format_on_save = { timeout_ms = 0, lsp_fallback = true },
+  --     formatters = {
+  --       shfmt = {
+  --         prepend_args = { "-i", "2", "-ci" },
+  --       },
+  --     },
+  --   },
+  -- },
+
+  -- No need to copy this inside `setup()`. Will be used automatically.
   {
-    "stevearc/conform.nvim",
-    -- NOTE default to lsp for everything
+    "echasnovski/mini.animate",
     opts = {
-      -- Define your formatters
-      formatters_by_ft = {},
-      -- formatters_by_ft = {
-      --   lua = { "stylua" },
-      --   sh = { "shfmt" },
-      --   python = { "isort", "black" },
-      --   javascript = { { "prettierd", "prettier" } },
-      --   css = { "stylelint" },
-      --   nix = { { "alejandra" } },
-      --   md = { { "mdformat", "autocorrect" } },
-      --   yaml = { { "yq" } },
-      --   json = { { "yq" } },
-      --   tex = { { "latexindent" } },
-      --   -- html = { { "djlint" } },
-      --   c = { { "astyle" } },
-      --   cpp = { { "astyle" } },
-      -- },
-      -- Set up format-on-save
-      -- Customize formatters
-      -- format_on_save = { timeout_ms = 0, lsp_fallback = true },
-      formatters = {
-        -- shfmt = {
-        --   prepend_args = { "-i", "2" },
-        -- },
+
+      cursor = {
+        timing = require("mini.animate").gen_timing.linear({ duration = 7, unit = "total" }),
+      },
+      scroll = {
+        timing = require("mini.animate").gen_timing.linear({ duration = 13, unit = "total" }),
       },
     },
   },
+  --
+  --
+  --   -- Cursor path
+  --   -- cursor = {
+  --   --   -- Whether to enable this animation
+  --   --   enable = true,
+  --   --
+  --   --   -- Timing of animation (how steps will progress in time)
+  --   --   -- timing = --<function: implements linear total 250ms animation duration>,
+  --   --
+  --   --   -- Path generator for visualized cursor movement
+  --   --   path = --<function: implements shortest line path>,
+  --   -- },
+  --
+  --   -- Vertical scroll
+  --   scroll = {
+  --     -- Whether to enable this animation
+  --     -- enable = true,
+  --
+  --     -- Timing of animation (how steps will progress in time)
+  --     timing = 100,
+  --
+  --     -- Subscroll generator based on total scroll
+  --     -- subscroll = --<function: implements equal scroll with at most 60 steps>,
+  --   },
+  --
+  --   -- -- Window resize
+  --   -- resize = {
+  --   --   -- Whether to enable this animation
+  --   --   -- enable = true,
+  --   --
+  --   --   -- Timing of animation (how steps will progress in time)
+  --   --   -- timing = --<function: implements linear total 250ms animation duration>,
+  --   --
+  --   --   -- Subresize generator for all steps of resize animations
+  --   --   -- subresize = --<function: implements equal linear steps>,
+  --   -- },
+  --   --
+  --   -- -- Window open
+  --   -- open = {
+  --   --   -- Whether to enable this animation
+  --   --   -- enable = true,
+  --   --
+  --   --   -- Timing of animation (how steps will progress in time)
+  --   --   -- timing = --<function: implements linear total 250ms animation duration>,
+  --   --
+  --   --   -- Floating window config generator visualizing specific window
+  --   --   -- winconfig = --<function: implements static window for 25 steps>,
+  --   --
+  --   --   -- 'winblend' (window transparency) generator for floating window
+  --   --   -- winblend = --<function: implements equal linear steps from 80 to 100>,
+  --   -- },
+  --   --
+  --   -- -- Window close
+  --   -- close = {
+  --   --   -- Whether to enable this animation
+  --   --   -- enable = true,
+  --   --
+  --   --   -- Timing of animation (how steps will progress in time)
+  --   --   -- timing = --<function: implements linear total 250ms animation duration>,
+  --   --
+  --   --   -- Floating window config generator visualizing specific window
+  --   --   -- winconfig = --<function: implements static window for 25 steps>,
+  --   --
+  --   --   -- 'winblend' (window transparency) generator for floating window
+  --   --   -- winblend = --<function: implements equal linear steps from 80 to 100>,
+  --   -- },
+  -- },
+  -- },
 
   -- indentscope animation
   {
@@ -186,6 +271,7 @@ return {
   --   },
   -- },
 
+  -- starter dashboard
   {
     "nvimdev/dashboard-nvim",
     opts = {
@@ -193,67 +279,93 @@ return {
         -- header = { " v ", " v  " },
         -- header = { " ", " ", " ", " ", " ", " ", "v" },
         --
-        -- header = {
-        --   "   ",
-        --   "                              ",
-        --   "                 ####         ",
-        --   "                ###           ",
-        --   "                ###           ",
-        --   "           #### ###           ",
-        --   "            ###  ##           ",
-        --   "             ###  #           ",
-        --   "              ##              ",
-        --   "               ##             ",
-        --   "                ##            ",
-        --   "                              ",
-        -- },
+        header = {
+          "   ",
+          "                              ",
+          "                 ####         ",
+          "                ###           ",
+          "                ###           ",
+          "           #### ###           ",
+          "            ###  ##           ",
+          "             ###  #           ",
+          "              ##              ",
+          "               ##             ",
+          "                ##            ",
+          "                              ",
+        },
 
         -- header = { "   ", "   ", "   ", " -_- ", "   " },
 
-        header = {
-          "   ",
-          "   ",
-          "   ",
-          -- ({ "[ ¬_¬ ]", "[ -_- ]", "◕ᴥ◕", "ツ", "ಠ_ಠ" })[math.random(5)],
-          -- " ¬_¬        ",
-          "   ",
-          "     [ ¬_¬ ]         n[v]im v"
-            -- "    ¬_¬             n[v]im v"
-            .. vim.version().major
-            .. "."
-            .. vim.version().minor
-            .. "."
-            .. vim.version().patch
-            .. "    ",
-          -- "nvim v" .. vim.version().major .. "." .. vim.version().minor .. "." .. vim.version().patch,
-          -- "v" .. vim.version().major .. "." .. vim.version().minor .. "." .. vim.version().patch,
-          -- " "
-          --   .. os.getenv("USER")
-          --   .. "."
-          --   .. os.getenv("HOST")
-          --   .. " ",
-          "   ",
-          "   ",
-        },
+        -- header = {
+        --   "   ",
+        --   "   ",
+        --   -- ({ "[ ¬_¬ ]", "[ -_- ]", "◕ᴥ◕", "ツ", "ಠ_ಠ" })[math.random(5)],
+        --   -- " ¬_¬        ",
+        --   "   ",
+        --   "     [ ¬_¬ ]          n[V]im "
+        --     -- "    ¬_¬             n[v]im v"
+        --     .. vim.version().major
+        --     .. "."
+        --     .. vim.version().minor
+        --     .. "."
+        --     .. vim.version().patch
+        --     .. "    ",
+        --   -- "nvim v" .. vim.version().major .. "." .. vim.version().minor .. "." .. vim.version().patch,
+        --   -- "v" .. vim.version().major .. "." .. vim.version().minor .. "." .. vim.version().patch,
+        --   -- " "
+        --   --   .. os.getenv("USER")
+        --   --   .. "."
+        --   --   .. os.getenv("HOST")
+        --   --   .. " ",
+        --   "   ",
+        -- },
 
         center = {
 
           {
-            desc = "[f]ind file         ",
-            keymap = "",
-            key = "f",
-            icon = "  ",
-            action = "Telescope find_files",
-          },
 
-          {
-
-            desc = "[n]ew file          ",
+            desc = "[n]ew               ",
             keymap = "",
             key = "n",
             icon = "  ",
             action = "enew",
           },
+
+          {
+
+            desc = "[q]uit              ",
+            keymap = "",
+            key = "q",
+            icon = "  ",
+            action = "exit",
+          },
+
+          -- {
+          --   desc = "[r]ecents           ",
+          --   keymap = "",
+          --   key = "r",
+          --   icon = "  ",
+          --   action = "Telescope oldfiles",
+          -- },
+          --
+          --
+          -- {
+          --
+          --   desc = "[q]uit              ",
+          --   keymap = "",
+          --   key = "q",
+          --   icon = "  ",
+          --   action = "exit",
+          -- },
+
+          -- {
+          --   desc = "[f]ind file         ",
+          --   keymap = "",
+          --   key = "f",
+          --   icon = "  ",
+          --   action = "Telescope find_files",
+          -- },
+
           -- {
           --   desc = "[u]pdate plugins    ",
           --   keymap = "",
@@ -277,14 +389,6 @@ return {
           --   icon = "  ",
           --   action = "Telescope find_files cwd=~/.config/nvim",
           -- },
-          {
-
-            desc = "[q]uit              ",
-            keymap = "",
-            key = "q",
-            icon = "  ",
-            action = "exit",
-          },
         },
 
         -- center = {
@@ -294,13 +398,6 @@ return {
         --     key = "f",
         --     icon = "  ",
         --     action = "Telescope find_files",
-        --   },
-        --   {
-        --     desc = "Recents",
-        --     keymap = "",
-        --     key = "r",
-        --     icon = "  ",
-        --     action = "Telescope oldfiles",
         --   },
         --
         --   {
@@ -363,6 +460,7 @@ return {
           local stats = require("lazy").stats()
           local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
           return { "  " .. stats.loaded .. "/" .. stats.count .. " packages in " .. ms .. "ms" }
+          -- return { stats.loaded .. "/" .. stats.count .. "packages         " .. ms .. " ms" }
         end,
 
         -- footer = function()
@@ -633,7 +731,8 @@ return {
       fps = 120,
       -- render = "compact",
       render = "minimal",
-      timeout = 0,
+      -- timeout = 0,
+      timeout = 30,
       -- stages = "fade",
     },
   },

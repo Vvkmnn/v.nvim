@@ -53,3 +53,22 @@ vim.opt.lbr = true
 --
 
 -- vim.cmd.colorscheme("tokyonight")
+--
+
+-- filetypes
+---- make zsh files recognized as sh for bash-ls & treesitter
+vim.filetype.add({
+  extension = {
+    zsh = "sh",
+    sh = "sh", -- force sh-files with zsh-shebang to still get sh as filetype
+  },
+  filename = {
+    [".zshrc"] = "sh",
+    [".zshenv"] = "sh",
+    [".rc"] = "sh",
+    [".profile"] = "sh",
+    [".shell"] = "sh",
+    [".alias"] = "sh",
+    [".functions"] = "sh",
+  },
+})

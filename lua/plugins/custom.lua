@@ -1,4 +1,109 @@
 return {
+  -- TODO undotree, harpoon2, grapple,
+
+  -- jump to edits like buffers
+  {
+    "bloznelis/before.nvim",
+    lazy = true,
+    config = function()
+      require("before").setup()
+    end,
+    opts = {
+      -- How many edit locations to store in memory (default: 10)
+      history_size = 11,
+      -- Should it wrap around the ends of the edit history (default: false)
+      history_wrap_enabled = true,
+    },
+    keys = {
+      { "[<leader>", "<cmd>lua require('before').jump_to_last_edit()<CR>", desc = "Last edit this Session" },
+      { "]<leader>", "<cmd>lua require('before').jump_to_next_edit()<CR>", desc = "Next edit this Session" },
+    },
+  },
+  {
+    "jiaoshijie/undotree",
+    dependencies = "nvim-lua/plenary.nvim",
+    config = true,
+    keys = { -- load the plugin only when using it's keybinding:
+      { "<leader>t", "<cmd>lua require('undotree').toggle()<cr>" },
+    },
+    opts = {
+      -- float_diff = false,
+      -- layout = "left_left_bottom", -- "left_bottom", "left_left_bottom"
+      position = "right", -- "right", "bottom"
+      -- window = {
+      --   winblend = 3000000,
+      -- },
+    },
+  },
+
+  -- file operations (Rename duplicate, etc)
+  -- {
+  --   "chrisgrieser/nvim-genghis",
+  --   dependencies = "stevearc/dressing.nvim",
+  --   lazy = true,
+  --   -- config = function()
+  --   --   require("genghis")
+  --   -- end,
+  --   -- keys = {
+  --   --   { "<leader>yp", require("genghis").copyFilepath, desc = "copyFilepath" },
+  --   --   { "<leader>yn", require("genghis").copyFilename, desc = "genghis.copyFilename" },
+  --   --   { "<leader>cx", require("genghis").chmodx, desc = "genghis.chmodx" },
+  --   --   { "<leader>rf", require("genghis").renameFile, desc = "genghis.renameFile" },
+  --   --   { "<leader>mf", require("genghis").moveAndRenameFile, desc = "genghis.moveAndRenameFile" },
+  --   --   { "<leader>mc", require("genghis").moveToFolderInCwd, desc = "genghis.moveToFolderInCwd" },
+  --   --   { "<leader>nf", require("genghis").createNewFile, desc = "genghis.createNewFile" },
+  --   --   { "<leader>yf", require("genghis").duplicateFile, desc = "genghis.duplicateFile" },
+  --   --   { "<leader>df", require("genghis").trashFile, desc = "genghis.trashFile" },
+  --   --   { "<leader>x", require("genghis").moveSelectionToNewFile, desc = "genghis.moveSelectionToNewFile" },
+  --   -- },
+  -- },
+
+  -- jump only edits with (C-h/l)
+  -- {
+  --   "bloznelis/before.nvim",
+  --   config = function()
+  --     require("before").setup()
+  --   end,
+  --   keys = {
+  --     { before = require("before") },
+  --     { "<C-h>", before.jump_to_last_edit, desc = ", before.jump_to_last_edit{}" },
+  --     { "<C-l>", before.jump_to_next_edit, desc = ", before.jump_to_next_edit{}" },
+  --   },
+  -- },
+
+  -- jump list (C-i/o) with context
+  {
+    "cbochs/portal.nvim",
+    lazy = true,
+    -- Optional dependencies
+    dependencies = {
+      "cbochs/grapple.nvim",
+      "ThePrimeagen/harpoon",
+    },
+    opts = {
+      max_results = 3,
+      select_first = true,
+      window_options = {
+        -- relative = "cursor",
+        width = 50,
+        -- height = 3,
+      },
+      escape = {
+        ["<esc>"] = true,
+        ["<C-c>"] = true,
+      },
+
+      -- filter = {
+      --   function(v)
+      --     return vim.api.nvim_buf_get_option(v.buffer, "modified")
+      --   end,
+      -- },
+    },
+    keys = {
+      { "<leader><C-o>", "<cmd>Portal jumplist backward<cr>" },
+      { "<leader><C-i>", "<cmd>Portal jumplist forward<cr>" },
+    },
+  },
 
   -- {
   --   "dzfrias/arena.nvim",
@@ -252,7 +357,7 @@ return {
   -- GPT in Neovim
   {
     "robitx/gp.nvim",
-    event = "VeryLazy",
+    lazy = true,
     lazy = true,
     keys = {
       { "<leader>`", false },
@@ -265,6 +370,7 @@ return {
       { "<leader>\\r", ":GpChatRespond<cr>", desc = "GPT Chat Respond" },
       { "<leader>\\c", ":GpContext<cr>", desc = "GPT Context (.gp.md)" },
       { "<leader>\\d", ":GpChatDelete<cr>", desc = "GPT Chat Delete" },
+      { "<leader>\\s", ":GpStop<cr>", desc = "GPT Stop Process" },
       -- disable the switch buffer keymap
       -- { "n", "<leader>`", vim.NIL },
       -- { "n", "<leader>`", ":GpChatFinder<cr>", desc = "Gp Chat Finder" },
@@ -281,6 +387,8 @@ return {
         --   "read",
         --   "op://Personal/mhgs4auyjijxtrytbsqw3hucty/Other Fields/credential",
         -- },
+
+        -- NOTE Switch with GPAgent ChatGPT4 and GPNextAgent
         agents = {
           {
             name = "ChatGPT4",
@@ -306,7 +414,7 @@ return {
 
   -- {
   --   "jackMort/ChatGPT.nvim",
-  --   event = "VeryLazy",
+  --   lazy = true,
   --   opts = {},
   --   config = function()
   --     require("chatgpt").setup({
@@ -328,7 +436,7 @@ return {
 
   -- {
   --   "elentok/format-on-save.nvim",
-  --   event = "VeryLazy",
+  --   lazy = true,
   --   config = function()
   --     local format_on_save = require("format-on-save")
   --     local formatters = require("format-on-save.formatters")
@@ -364,28 +472,39 @@ return {
   -- latex plugins
   -- {
   --   "marioortizmanero/adoc-pdf-live.nvim",
-  --   event = "VeryLazy",
+  --   lazy = true,
   --   config = function()
   --     -- require("colorizer").setup({})
   --     require("adoc_pdf_live").setup()
   --   end,
   -- },
-  {
-    "lervag/vimtex",
-    event = "VeryLazy",
-    ft = "tex",
-    config = function()
-      vim.g.vimtex_view_method = "skim"
-      vim.g.vimtex_compiler_engine = "lualatex"
-      -- vim.g.vimtex_compiler_engine = "xelatex"
-      vim.g.maplocalleader = ","
-    end,
-  },
+
+  -- tex in vim
+  -- {
+  --   "lervag/vimtex",
+  --   lazy = true,
+  --   ft = "tex",
+  --   opts = {
+  --     "-verbose",
+  --     "-file-line-error",
+  --     "-synctex=1",
+  --     "-interaction=nonstopmode",
+  --     "-shell-escape",
+  --   },
+  --   config = function()
+  --     -- vim.g.vimtex_view_method = "skim"
+  --     -- vim.g.vimtex_compiler_engine = "lualatex"
+  --     vim.g.vimtex_compiler_engine = "xelatex"
+  --     vim.g.maplocalleader = ","
+  --     vim.g.vimtex_view_general_options = "--synctex=1 @line @pdf @tex"
+  --     vim.g.vimtex_quickfix_mode = 0
+  --   end,
+  -- },
 
   -- hex color in vim
   {
     "norcalli/nvim-colorizer.lua",
-    event = "VeryLazy",
+    lazy = true,
     config = function()
       -- require("colorizer").setup({})
       require("colorizer").setup()
@@ -402,14 +521,14 @@ return {
       --
       -- Configuration here, or leave empty to use defaults
     end,
-    keys = { "<leader>cc", ":ColorizerToggle" },
+    keys = { { "<leader>cc", "<cmd>ColorizerToggle<CR>", desc = "Colorizer Toggle" } },
   },
 
   -- surround with cs
   {
     "kylechui/nvim-surround",
     version = "*", -- Use for stability; omit to use `main` branch for the latest features
-    event = "VeryLazy",
+    lazy = true,
     config = function()
       require("nvim-surround").setup({})
       --
@@ -427,7 +546,6 @@ return {
   },
   {
     "NeogitOrg/neogit",
-    event = "VeryLazy",
     lazy = true,
     dependencies = {
       "nvim-lua/plenary.nvim", -- required
@@ -478,12 +596,15 @@ return {
   --   end,
   -- },
 
+  -- Basic file ops
+  { "tpope/vim-eunuch", lazy = true },
+
   -- Detect tabstop and shiftwidth automatically
-  { "tpope/vim-sleuth", event = "VeryLazy" },
+  { "tpope/vim-sleuth", lazy = true },
   -- Surround stuff with the ys-, cs-, ds- commands
   {
     "tpope/vim-surround",
-    event = "VeryLazy",
+    lazy = true,
   },
 
   -- {
@@ -496,14 +617,14 @@ return {
   {
     -- Move stuff with <M-j> and <M-k> in both normal and visual mode
     "echasnovski/mini.move",
-    event = "VeryLazy",
+    lazy = true,
     config = function()
       require("mini.move").setup()
     end,
   },
   {
     "stevearc/oil.nvim",
-    event = "VeryLazy",
+    -- lazy = true,
     dependencies = {
       "nvim-tree/nvim-web-devicons",
     },
@@ -521,12 +642,12 @@ return {
   },
   {
     "tpope/vim-repeat",
-    event = "VeryLazy",
+    lazy = true,
   },
   {
     -- Resolve conflicts with cX, jump with ]x
     "akinsho/git-conflict.nvim",
-    event = "VeryLazy",
+    lazy = true,
     commit = "2957f74",
     config = function()
       require("git-conflict").setup({
@@ -543,14 +664,14 @@ return {
   },
   {
     "kwkarlwang/bufresize.nvim",
-    event = "VeryLazy",
+    lazy = true,
     config = function()
       require("bufresize").setup()
     end,
   },
   {
     "danilamihailov/beacon.nvim",
-    event = "VeryLazy",
+    lazy = true,
     keys = {
       { "n", "n:Beacon<cr>", desc = "Beacon Search Term Next" },
       { "N", "N:Beacon<cr>", desc = "Beacon Search Term Prev" },
@@ -568,7 +689,7 @@ return {
   -- cursor line mode color
   {
     "mawkler/modicator.nvim",
-    event = "VeryLazy",
+    lazy = true,
     -- dependencies = "mawkler/onedark.nvim", -- Add your colorscheme plugin here
     dependencies = "folke/tokyonight.nvim",
     config = function()
