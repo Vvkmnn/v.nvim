@@ -155,6 +155,16 @@ return {
         sidebars = "transparent",
         floats = "transparent",
       },
+
+      -- TODO doesn't do a damn thing
+      -- highlights = {
+      --   CursorLineNr = {
+      --     bg = "#161616",
+      --     -- c.bg_highlight,
+      --   },
+      -- },
+      -- on_highlights = function(hl, c)
+      -- end,
     },
   },
 

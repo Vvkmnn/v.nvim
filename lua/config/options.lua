@@ -55,6 +55,11 @@ vim.opt.lbr = true
 -- vim.cmd.colorscheme("tokyonight")
 --
 
+-- colors
+-- vim.api.nvim_set_hl(0, "CursorLine", { guibg = "#D3D3D3", ctermbg = 235 })
+
+-- vim.cmd([[highlight CursorLine guibg=white ctermbg=15]])
+
 -- filetypes
 ---- make zsh files recognized as sh for bash-ls & treesitter
 vim.filetype.add({

@@ -1,5 +1,133 @@
 return {
-  -- TODO undotree, harpoon2, grapple,
+  -- TODO grapple,
+
+  {
+    -- mx              Set mark x
+    -- m,              Set the next available alphabetical (lowercase) mark
+    -- m;              Toggle the next available mark at the current line
+    -- dmx             Delete mark x
+    -- dm-             Delete all marks on the current line
+    -- dm<space>       Delete all marks in the current buffer
+    -- m]              Move to next mark
+    -- m[              Move to previous mark
+    -- m:              Preview mark. This will prompt you for a specific mark to
+    --                 preview; press <cr> to preview the next mark.
+    --
+    -- m[0-9]          Add a bookmark from bookmark group[0-9].
+    -- dm[0-9]         Delete all bookmarks from bookmark group[0-9].
+    -- m}              Move to the next bookmark having the same type as the bookmark under
+    --                 the cursor. Works across buffers.
+    -- m{              Move to the previous bookmark having the same type as the bookmark under
+    --                 the cursor. Works across buffers.
+    -- dm=             Delete the bookmark under the cursor.
+    "chentoast/marks.nvim",
+    config = function()
+      require("marks").setup()
+    end,
+    opts = {
+      bookmark_0 = {
+        sign = "⚑",
+        virt_text = "hello world",
+        -- explicitly prompt for a virtual line annotation when setting a bookmark from this group.
+        -- defaults to false.
+        annotate = false,
+      },
+    },
+  },
+
+  -- global marks
+  -- {
+  --   "theprimeagen/harpoon",
+  --   branch = "harpoon2",
+  --   dependencies = { "nvim-lua/plenary.nvim", "nvim-telescope/telescope.nvim" },
+  --   -- config = function()
+  --   --   require("harpoon"):setup()
+  --   -- end,
+  --   opts = {
+  --     menu = {
+  --       width = vim.api.nvim_win_get_width(0) - 4,
+  --     },
+  --     keys = {
+  --       {
+  --         "<C-e>",
+  --         function()
+  --           -- basic telescope configuration
+  --           local conf = require("telescope.config").values
+  --           local function toggle_telescope(harpoon_files)
+  --             local file_paths = {}
+  --             for _, item in ipairs(harpoon_files.items) do
+  --               table.insert(file_paths, item.value)
+  --             end
+  --
+  --             require("telescope.pickers")
+  --               .new({}, {
+  --                 prompt_title = "Harpoon",
+  --                 finder = require("telescope.finders").new_table({
+  --                   results = file_paths,
+  --                 }),
+  --                 previewer = conf.file_previewer({}),
+  --                 sorter = conf.generic_sorter({}),
+  --               })
+  --               :find()
+  --           end
+  --
+  --           toggle_telescope(require("harpoon"):list())
+  --         end,
+  --         desc = "Open Telescope harpoon window",
+  --       },
+  --       {
+  --         "<leader>A",
+  --         function()
+  --           require("harpoon"):list():append()
+  --         end,
+  --         desc = "harpoon file",
+  --       },
+  --       {
+  --         "<leader>a",
+  --         function()
+  --           local harpoon = require("harpoon")
+  --           harpoon.ui:toggle_quick_menu(harpoon:list())
+  --         end,
+  --         desc = "harpoon quick menu",
+  --       },
+  --       {
+  --         "<leader>1",
+  --         function()
+  --           require("harpoon"):list():select(1)
+  --         end,
+  --         desc = "harpoon to file 1",
+  --       },
+  --       {
+  --         "<leader>2",
+  --         function()
+  --           require("harpoon"):list():select(2)
+  --         end,
+  --         desc = "harpoon to file 2",
+  --       },
+  --       {
+  --         "<leader>3",
+  --         function()
+  --           require("harpoon"):list():select(3)
+  --         end,
+  --         desc = "harpoon to file 3",
+  --       },
+  --       {
+  --         "<leader>4",
+  --         function()
+  --           require("harpoon"):list():select(4)
+  --         end,
+  --         desc = "harpoon to file 4",
+  --       },
+  --       {
+  --         "<leader>5",
+  --         function()
+  --           require("harpoon"):list():select(5)
+  --         end,
+  --         desc = "harpoon to file 5",
+  --       },
+  --     },
+  --   },
+  -- },
 
   -- jump to edits like buffers
   {
@@ -323,8 +451,9 @@ return {
     event = {
       -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
       -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/**.md"
-      "BufReadPre path/to/my-vault/**.md",
-      "BufNewFile path/to/my-vault/**.md",
+      "BufReadPre ~/Documents/vault/**.md",
+      "BufNewFile ~/Documents/vault/**.md",
+      -- "BufNewFile path/to/my-vault/**.md",
     },
     dependencies = {
       -- Required.
@@ -362,15 +491,16 @@ return {
     keys = {
       { "<leader>`", false },
       -- { "<leader>`", ":'<,'>GpChatToggle<cr>", desc = "GPT Chat Contextual Toggle" },
-      { mode = { "n", "v" }, "<leader>\\", ":GpChatToggle<cr>", desc = "GPT Chat Contextual Toggle" },
-      { "<leader>\\\\", ":GpChatRespond<cr>", desc = "GPT Chat Respond" },
-      { "<leader>\\f", ":GpChatFinder<cr>", desc = "GPT Chat Finder" },
-      { "<leader>\\p", ":GpChatPaste<cr>", desc = "GPT Chat Paste" },
-      { "<leader>\\n", ":GpChatNew<cr>", desc = "GPT Chat New" },
-      { "<leader>\\r", ":GpChatRespond<cr>", desc = "GPT Chat Respond" },
-      { "<leader>\\c", ":GpContext<cr>", desc = "GPT Context (.gp.md)" },
-      { "<leader>\\d", ":GpChatDelete<cr>", desc = "GPT Chat Delete" },
-      { "<leader>\\s", ":GpStop<cr>", desc = "GPT Stop Process" },
+      -- { mode = { "n", "v" }, "<leader>\\", ":GpChatToggle<cr>", desc = "GPT Chat Contextual Toggle" },
+      { mode = { "n", "v" }, "<C-g>", ":GpChatToggle<cr>", desc = "GPT Chat Contextual Toggle" },
+      -- { "<leader>\\\\", ":GpChatRespond<cr>", desc = "GPT Chat Respond" },
+      { "<leader>Cf", ":GpChatFinder<cr>", desc = "GPT Chat Finder" },
+      { "<leader>Cp", ":GpChatPaste<cr>", desc = "GPT Chat Paste" },
+      { "<leader>Cn", ":GpChatNew<cr>", desc = "GPT Chat New" },
+      { "<leader>Cr", ":GpChatRespond<cr>", desc = "GPT Chat Respond" },
+      { "<leader>Cc", ":GpContext<cr>", desc = "GPT Context (.gp.md)" },
+      { "<leader>Cd", ":GpChatDelete<cr>", desc = "GPT Chat Delete" },
+      { "<leader>Cs", ":GpStop<cr>", desc = "GPT Stop Process" },
       -- disable the switch buffer keymap
       -- { "n", "<leader>`", vim.NIL },
       -- { "n", "<leader>`", ":GpChatFinder<cr>", desc = "Gp Chat Finder" },
@@ -404,7 +534,10 @@ return {
               .. "- Think deeply and carefully from first principles step by step.\n"
               .. "- Zoom out first to see the big picture and then zoom in to details.\n"
               .. "- Use Socratic method to improve your thinking and coding skills.\n"
-              .. "- Don't elide any code from your output if the answer requires coding.\n"
+              .. "- Don't hide any code from your output if the answer requires coding.\n"
+              .. "- Break down the steps where possible, but use as few words are tokens to explain the solution. Be terse.\n"
+              .. "- Try and use pure solutions that are as short as possible, with clear and beautiful patterns. When coding, use as few libraries, and use only pure or very popular libraries.\n"
+              .. "-When dealing with anything that is not code, make sure to research the latest information, demonstrate expertise and always reference popular best practices.\n"
               .. "- Take a deep breath; You've got this!\n",
           },
         },
@@ -683,6 +816,11 @@ return {
       vim.g.beacon_shrink = 0
       vim.g.beacon_fade = 1
       vim.g.beacon_size = 777
+
+      -- color
+      -- highlight Beacon guibg=white ctermbg=15
+      -- vim.api.nvim_set_hl(0, "Beacon", { guibg = "white", ctermbg = 15 })
+      -- vim.cmd([[highlight Beacon guibg=white ctermbg=15]])
     end,
   },
 

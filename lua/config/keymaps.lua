@@ -35,6 +35,8 @@ vim.keymap.set("n", ",s", ":e ~/.shell<CR>", { silent = true, desc = "Edit .shel
 vim.keymap.set("n", ",a", ":e ~/.alias<CR>", { silent = true, desc = "Edit .alias" })
 vim.keymap.set("n", ",t", ":e ~/.config/tmux/tmux.conf<CR>", { silent = true, desc = "Edit Tmux" })
 vim.keymap.set("n", ",w", ":e ~/.config/wezterm/wezterm.lua<CR>", { silent = true, desc = "Edit Wezterm" })
+vim.keymap.set("n", ",y", ":e ~/.yabairc<CR>", { silent = true, desc = "Edit yabai service" })
+vim.keymap.set("n", ",sk", ":e ~/.skhdrc<CR>", { silent = true, desc = "Edit skhd service" })
 
 -- Source
 -- vim.keymap.set("n", "<leader>r", ":source ~/.config/nvim/init.lua<CR>", { desc = "Source Neovim config" })
