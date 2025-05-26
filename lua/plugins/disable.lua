@@ -11,6 +11,7 @@ return {
   { "akinsho/bufferline.nvim", enabled = false },
   { "echasnovski/mini.surround", enabled = false },
   { "neo-tree.nvim", enabled = false },
+  -- { "snacks.nvim", enabled = false },  -- Disable snacks.nvim as it's causing errors
   -- { "nvimdev/dashboard-nvim", enabled = false },
   -- { "mini.pairs", enabled = false },
   -- { "indent-blankline.nvim", enabled = false },

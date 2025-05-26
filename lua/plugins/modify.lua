@@ -281,14 +281,17 @@ return {
   --   },
   -- },
 
-  -- starter dashboard
+  -- LazyVim configuration with custom UI settings
   {
-    "nvimdev/dashboard-nvim",
+    "LazyVim/LazyVim",
     opts = {
-      config = {
-        -- header = { " v ", " v  " },
-        -- header = { " ", " ", " ", " ", " ", " ", "v" },
-        --
+      colorscheme = "tokyonight",
+      defaults = {
+        autocmds = true,
+        keymaps = true,
+      },
+      ui = {
+        -- Custom header for the dashboard
         header = {
           "   ",
           "                              ",
@@ -466,12 +469,15 @@ return {
         --   },
         -- },
 
+        },
         footer = function()
           local stats = require("lazy").stats()
           local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
           return { "  " .. stats.loaded .. "/" .. stats.count .. " packages in " .. ms .. "ms" }
-          -- return { stats.loaded .. "/" .. stats.count .. "packages         " .. ms .. " ms" }
         end,
+      },
+    },
+  },
 
         -- footer = function()
         --   return {
@@ -692,48 +698,7 @@ return {
   --     key = "u",
   --     icon = "  ",
   --     action = "Lazy update",
-  --   },
-  --
-  --   {
-  --     desc = "Manage Extensions",
-  --     keymap = "",
-  --     key = "e",
-  --     icon = "  ",
-  --     action = "Mason",
-  --   },
-  --
-  --   {
-  --     desc = "Config",
-  --     keymap = "",
-  --     key = "s",
-  --     icon = "  ",
-  --     action = "Telescope find_files cwd=~/.config/nvim",
-  --   },
-  --   {
-  --     desc = "Exit",
-  --     keymap = "",
-  --     key = "q",
-  --     icon = "  ",
-  --     action = "exit",
-  --   },
-  -- }
-
-  -- require("dashboard").setup({
-  -- local opts = {
-  --   config = {
-  --     header = header,
-  --     center = center,
-  --   footer = function()
-  --     return {
-  --       "type  :help<Enter>  or  <F1>  for on-line help,  <F2>  news changelog",
-  --       "Startup time: " .. require("lazy").stats().startuptime .. " ms",
-  --     }
-  --   end,
-  -- },
-  -- }
-  -- }
-  -- end,
-  -- },
+  -- Cleaned up dashboard configuration
 
   {
     "rcarriga/nvim-notify",

@@ -484,66 +484,66 @@ return {
   },
 
   -- GPT in Neovim
-  {
-    "robitx/gp.nvim",
-    lazy = true,
-    lazy = true,
-    keys = {
-      { "<leader>`", false },
-      -- { "<leader>`", ":'<,'>GpChatToggle<cr>", desc = "GPT Chat Contextual Toggle" },
-      -- { mode = { "n", "v" }, "<leader>\\", ":GpChatToggle<cr>", desc = "GPT Chat Contextual Toggle" },
-      { mode = { "n", "v" }, "<C-g>", ":GpChatToggle<cr>", desc = "GPT Chat Contextual Toggle" },
-      -- { "<leader>\\\\", ":GpChatRespond<cr>", desc = "GPT Chat Respond" },
-      { "<leader>Cf", ":GpChatFinder<cr>", desc = "GPT Chat Finder" },
-      { "<leader>Cp", ":GpChatPaste<cr>", desc = "GPT Chat Paste" },
-      { "<leader>Cn", ":GpChatNew<cr>", desc = "GPT Chat New" },
-      { "<leader>Cr", ":GpChatRespond<cr>", desc = "GPT Chat Respond" },
-      { "<leader>Cc", ":GpContext<cr>", desc = "GPT Context (.gp.md)" },
-      { "<leader>Cd", ":GpChatDelete<cr>", desc = "GPT Chat Delete" },
-      { "<leader>Cs", ":GpStop<cr>", desc = "GPT Stop Process" },
-      -- disable the switch buffer keymap
-      -- { "n", "<leader>`", vim.NIL },
-      -- { "n", "<leader>`", ":GpChatFinder<cr>", desc = "Gp Chat Finder" },
-      -- { "n", "<leader>`", "<cmd>Telescope find_files<cr>", desc = "Open GPT Chat Finder" },
-    },
-    config = function()
-      require("gp").setup({
-        openai_api_key = {
-          "cat",
-          "/Users/v/.openai",
-        },
-        -- openai_api_key = {
-        --   "op",
-        --   "read",
-        --   "op://Personal/mhgs4auyjijxtrytbsqw3hucty/Other Fields/credential",
-        -- },
-
-        -- NOTE Switch with GPAgent ChatGPT4 and GPNextAgent
-        agents = {
-          {
-            name = "ChatGPT4",
-            chat = true,
-            command = true,
-            -- string with model name or table with model name and parameters
-            model = { model = "gpt-4-1106-preview", temperature = 1.1, top_p = 1 },
-            -- system prompt (use this to specify the persona/role of the AI)
-            system_prompt = "You are a general AI assistant.\n\n"
-              .. "The user provided the additional info about how they would like you to respond:\n\n"
-              .. "- If you're unsure don't guess and say you don't know instead.\n"
-              .. "- Ask question if you need clarification to provide better answer.\n"
-              .. "- Think deeply and carefully from first principles step by step.\n"
-              .. "- Zoom out first to see the big picture and then zoom in to details.\n"
-              .. "- Use Socratic method to improve your thinking and coding skills.\n"
-              .. "- Don't hide any code from your output if the answer requires coding.\n"
-              .. "- Break down the steps where possible, but use as few words are tokens to explain the solution. Be terse.\n"
-              .. "- Try and use pure solutions that are as short as possible, with clear and beautiful patterns. When coding, use as few libraries, and use only pure or very popular libraries.\n"
-              .. "-When dealing with anything that is not code, make sure to research the latest information, demonstrate expertise and always reference popular best practices.\n"
-              .. "- Take a deep breath; You've got this!\n",
-          },
-        },
-      })
-    end,
-  },
+  -- {
+  --   "robitx/gp.nvim",
+  --   lazy = true,
+  --   lazy = true,
+  --   keys = {
+  --     { "<leader>`", false },
+  --     -- { "<leader>`", ":'<,'>GpChatToggle<cr>", desc = "GPT Chat Contextual Toggle" },
+  --     -- { mode = { "n", "v" }, "<leader>\\", ":GpChatToggle<cr>", desc = "GPT Chat Contextual Toggle" },
+  --     { mode = { "n", "v" }, "<C-g>", ":GpChatToggle<cr>", desc = "GPT Chat Contextual Toggle" },
+  --     -- { "<leader>\\\\", ":GpChatRespond<cr>", desc = "GPT Chat Respond" },
+  --     { "<leader>Cf", ":GpChatFinder<cr>", desc = "GPT Chat Finder" },
+  --     { "<leader>Cp", ":GpChatPaste<cr>", desc = "GPT Chat Paste" },
+  --     { "<leader>Cn", ":GpChatNew<cr>", desc = "GPT Chat New" },
+  --     { "<leader>Cr", ":GpChatRespond<cr>", desc = "GPT Chat Respond" },
+  --     { "<leader>Cc", ":GpContext<cr>", desc = "GPT Context (.gp.md)" },
+  --     { "<leader>Cd", ":GpChatDelete<cr>", desc = "GPT Chat Delete" },
+  --     { "<leader>Cs", ":GpStop<cr>", desc = "GPT Stop Process" },
+  --     -- disable the switch buffer keymap
+  --     -- { "n", "<leader>`", vim.NIL },
+  --     -- { "n", "<leader>`", ":GpChatFinder<cr>", desc = "Gp Chat Finder" },
+  --     -- { "n", "<leader>`", "<cmd>Telescope find_files<cr>", desc = "Open GPT Chat Finder" },
+  --   },
+  --   config = function()
+  --     require("gp").setup({
+  --       openai_api_key = {
+  --         "cat",
+  --         "/Users/v/.openai",
+  --       },
+  --       -- openai_api_key = {
+  --       --   "op",
+  --       --   "read",
+  --       --   "op://Personal/mhgs4auyjijxtrytbsqw3hucty/Other Fields/credential",
+  --       -- },
+  --
+  --       -- NOTE Switch with GPAgent ChatGPT4 and GPNextAgent
+  --       agents = {
+  --         {
+  --           name = "ChatGPT4",
+  --           chat = true,
+  --           command = true,
+  --           -- string with model name or table with model name and parameters
+  --           model = { model = "gpt-4-1106-preview", temperature = 1.1, top_p = 1 },
+  --           -- system prompt (use this to specify the persona/role of the AI)
+  --           system_prompt = "You are a general AI assistant.\n\n"
+  --             .. "The user provided the additional info about how they would like you to respond:\n\n"
+  --             .. "- If you're unsure don't guess and say you don't know instead.\n"
+  --             .. "- Ask question if you need clarification to provide better answer.\n"
+  --             .. "- Think deeply and carefully from first principles step by step.\n"
+  --             .. "- Zoom out first to see the big picture and then zoom in to details.\n"
+  --             .. "- Use Socratic method to improve your thinking and coding skills.\n"
+  --             .. "- Don't hide any code from your output if the answer requires coding.\n"
+  --             .. "- Break down the steps where possible, but use as few words are tokens to explain the solution. Be terse.\n"
+  --             .. "- Try and use pure solutions that are as short as possible, with clear and beautiful patterns. When coding, use as few libraries, and use only pure or very popular libraries.\n"
+  --             .. "-When dealing with anything that is not code, make sure to research the latest information, demonstrate expertise and always reference popular best practices.\n"
+  --             .. "- Take a deep breath; You've got this!\n",
+  --         },
+  --       },
+  --     })
+  --   end,
+  -- },
 
   -- {
   --   "jackMort/ChatGPT.nvim",
