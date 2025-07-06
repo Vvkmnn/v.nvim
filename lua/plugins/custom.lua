@@ -1,5 +1,114 @@
 return {
+  -- 🎯 EDIT TRACKING: This change should appear instantly on the left!
+
+  -- {
+  --   "greggh/claude-code.nvim",
+  --   dependencies = {
+  --     "nvim-lua/plenary.nvim", -- Required for git operations
+  --   },
+  --   config = function()
+  --     require("claude-code").setup({
+  --       window = {
+  --         split_ratio = 0.42, -- Percentage of screen for the terminal window (height for horizontal, width for vertical splits)
+  --         position = "vertical", -- Position of the window: "botright", "topleft", "vertical", "float", etc.
+  --         enter_insert = true, -- Whether to enter insert mode when opening Claude Code
+  --         -- hide_numbers = true, -- Hide line numbers in the terminal window
+  --         -- hide_signcolumn = true, -- Hide the sign column in the terminal window
+  --         -- border = "double", -- Use double border style
+  --         float = {
+  --           width = "40%", -- Width: number of columns or percentage string
+  --           height = "80%", -- Height: number of rows or percentage string
+  --           row = "50%", -- Row position: number, "center", or percentage string
+  --           col = "50%", -- Column position: number, "center", or percentage string
+  --           relative = "editor", -- Relative to: "editor" or "cursor"
+  --           border = "rounded", -- Border style: "none", "single", "double", "rounded", "solid", "shadow"
+  --         },
+  --       },
+  --       scrolling = true,
+  --     })
+  --   end,
+  -- },
+
+  -- Best unified single-view diff experience with proven plugin
+  {
+    "lambdalisue/vim-unified-diff",
+    event = "VeryLazy",
+    config = function()
+      -- Auto-enable unified diff for any diffthis usage (including claudecode.nvim)
+      vim.api.nvim_create_autocmd("OptionSet", {
+        pattern = "diff",
+        callback = function()
+          if vim.wo.diff then
+            vim.schedule(function()
+              -- Enable unified diff mode when any diff starts
+              pcall(function() vim.cmd("UnifiedDiffUpdate") end)
+            end)
+          end
+        end,
+      })
+    end,
+  },
+
+  -- Character-level highlighting with native Neovim - WORKING!
+  {
+    "lewis6991/gitsigns.nvim",
+    event = "VeryLazy",
+    opts = {
+      -- Minimal config to avoid claudecode.nvim conflicts
+      signs = {
+        add = { text = '+' },
+        change = { text = '~' },
+        delete = { text = '_' },
+      },
+      -- Disable features that might conflict with claudecode.nvim
+      word_diff = false,
+      attach_to_untracked = false,
+    },
+  },
+
+  -- {
+  --   "jonroosevelt/gemini-cli.nvim",
+  --   config = function()
+  --     require("gemini").setup()
+  --   end,
+  -- },
+
+  -- Automatic unified diff enhancement for claudecode.nvim (now with seamless inline view)
+
+  {
+    "coder/claudecode.nvim",
+    dependencies = { "folke/snacks.nvim" },
+    config = true,
+    keys = {
+      { "<leader>a", nil, desc = "AI/Claude Code" },
+      { "<leader>aC", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
+      { "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude" },
+      { "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume Claude" },
+      { "<leader>ac", "<cmd>ClaudeCode --continue<cr>", desc = "Continue Claude" },
+      { "<leader>ab", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add current buffer" },
+      { "<leader>as", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "Send to Claude" },
+      {
+        "<leader>as",
+        "<cmd>ClaudeCodeTreeAdd<cr>",
+        desc = "Add file",
+        ft = { "NvimTree", "neo-tree", "oil" },
+      },
+      -- Diff management
+      { "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
+      { "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
+      -- { "<leader>av", "<cmd>DiffviewOpen<cr>", desc = "Open enhanced diff view" },
+    },
+  },
+
   -- TODO grapple,
+  -- Claude Code test: Auto-opening integration working!
+  -- Test 2: Updated hook configuration
+  -- Test 3: Jump to last edit location
+  -- Test 4: After restart - testing auto-open integration
+  -- Test 5: Fixed JSON parsing in hook
+  -- Test 6: Manual file opening - SUCCESS! 🎉
+  -- Test 7: Jump to last edit location
+  -- Test 8: Fixed buffer loading issue
 
   {
     -- mx              Set mark x
@@ -757,21 +866,44 @@ return {
   },
   {
     "stevearc/oil.nvim",
-    -- lazy = true,
+    lazy = false, -- Load immediately to replace default file explorer
     dependencies = {
       "nvim-tree/nvim-web-devicons",
     },
     opts = {
+      default_file_explorer = true, -- Take over directory buffers (vim ., :e src/, etc)
+      columns = {
+        "icon",
+        "permissions",
+        "size",
+        "mtime",
+      },
       keymaps = {
         ["?"] = "actions.show_help",
+        ["<C-h>"] = false, -- Disable default to avoid conflict with window navigation
+        ["<C-l>"] = false, -- Disable default to avoid conflict with window navigation
       },
       view_options = {
-        show_hidden = true,
+        show_hidden = true, -- Show hidden files
+        is_always_hidden = function(name, bufnr)
+          return name == ".."
+        end,
+      },
+      win_options = {
+        wrap = false,
+        signcolumn = "no",
+        cursorcolumn = false,
+        foldcolumn = "0",
+        spell = false,
+        list = false,
+        conceallevel = 3,
+        concealcursor = "nvic",
       },
     },
-    -- config = function()
-    -- 	require("oil").setup({})
-    -- end,
+    keys = {
+      { "<leader>e", "<cmd>Oil<cr>", desc = "Open Oil file explorer" },
+      { "-", "<cmd>Oil<cr>", desc = "Open parent directory" },
+    },
   },
   {
     "tpope/vim-repeat",
@@ -829,7 +961,8 @@ return {
     "mawkler/modicator.nvim",
     lazy = true,
     -- dependencies = "mawkler/onedark.nvim", -- Add your colorscheme plugin here
-    dependencies = "folke/tokyonight.nvim",
+    -- dependencies = "folke/tokyonight.nvim", -- Commented out - using Kanagawa instead
+    dependencies = "rebelot/kanagawa.nvim",
     config = function()
       require("modicator").setup({
         -- Warn if any required option above is missing. May emit false positives

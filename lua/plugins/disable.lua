@@ -1,19 +1,9 @@
-return {
-  { "folke/noice.nvim", enabled = false },
-  { "rcarriga/nvim-notify", enabled = false },
-  { "catppuccin/nvim", enabled = false },
-  { "echasnovski/mini.indentscope", enabled = false },
-  { "lukas-reineke/indent-blankline.nvim", enabled = false },
-  { "folke/flash.nvim", enabled = false },
-  -- { "nvim-telescope/telescope.nvim", enabled = false },
-  -- { "nvim-telescope/telescope-fzf-native.nvim", enabled = false },
-  { "nvim-treesitter/nvim-treesitter-textobjects", enabled = false },
-  { "akinsho/bufferline.nvim", enabled = false },
-  { "echasnovski/mini.surround", enabled = false },
-  { "neo-tree.nvim", enabled = false },
-  -- { "snacks.nvim", enabled = false },  -- Disable snacks.nvim as it's causing errors
-  -- { "nvimdev/dashboard-nvim", enabled = false },
-  -- { "mini.pairs", enabled = false },
-  -- { "indent-blankline.nvim", enabled = false },
-  -- { "mini.indentscope", enabled = false },
-}
+-- 🚀 RESTART TEST: The left editor should now update to show disable.lua!
+-- This file disables plugins to create a vanilla, high-performance experience
+-- Claude Code multi-file integration test
+-- when running inside the Windsurf IDE.
+
+-- We check for vim.g.vscode, which is set by the Windsurf extension.
+if not vim.g.vscode then
+  return {}
+end

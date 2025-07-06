@@ -35,18 +35,18 @@ return {
   -- },
 
   -- No need to copy this inside `setup()`. Will be used automatically.
-  {
-    "echasnovski/mini.animate",
-    opts = {
-
-      cursor = {
-        timing = require("mini.animate").gen_timing.linear({ duration = 7, unit = "total" }),
-      },
-      scroll = {
-        timing = require("mini.animate").gen_timing.linear({ duration = 13, unit = "total" }),
-      },
-    },
-  },
+  -- {
+  --   "echasnovski/mini.animate",
+  --   opts = {
+  --
+  --     cursor = {
+  --       timing = require("mini.animate").gen_timing.linear({ duration = 7, unit = "total" }),
+  --     },
+  --     scroll = {
+  --       timing = require("mini.animate").gen_timing.linear({ duration = 13, unit = "total" }),
+  --     },
+  --   },
+  -- },
   --
   --
   --   -- Cursor path
@@ -117,56 +117,35 @@ return {
   -- },
   -- },
 
-  -- indentscope animation
-  {
-    "echasnovski/mini.indentscope",
-    opts = {
-      -- symbol = "▏",
-      symbol = " ▏",
-      -- symbol = " ▏ ",
-      -- draw = { delay =  },
-      -- symbol = " |",
-      options = {
-        -- Type of scope's border: which line(s) with smaller indent to
-        -- categorize as border. Can be one of: 'both', 'top', 'bottom', 'none'.
-        border = "both",
+  -- indentscope animation - DISABLED
+  -- {
+  --   "echasnovski/mini.indentscope",
+  --   opts = {
+  --     -- symbol = "▏",
+  --     symbol = " ▏",
+  --     -- symbol = " ▏ ",
+  --     -- draw = { delay =  },
+  --     -- symbol = " |",
+  --     options = {
+  --       -- Type of scope's border: which line(s) with smaller indent to
+  --       -- categorize as border. Can be one of: 'both', 'top', 'bottom', 'none'.
+  --       border = "both",
+  --
+  --       -- Whether to use cursor column when computing reference indent.
+  --       -- Useful to see incremental scopes with horizontal cursor movements.
+  --       -- indent_at_cursor = false,
+  --
+  --       -- Whether to first check input line to be a border of adjacent scope.
+  --       -- Use it if you want to place cursor on function header to get scope of
+  --       -- its body.
+  --       try_as_border = true,
+  --     },
+  --
+  --     -- symbol = "╎",
+  --   },
+  -- },
 
-        -- Whether to use cursor column when computing reference indent.
-        -- Useful to see incremental scopes with horizontal cursor movements.
-        -- indent_at_cursor = false,
-
-        -- Whether to first check input line to be a border of adjacent scope.
-        -- Use it if you want to place cursor on function header to get scope of
-        -- its body.
-        try_as_border = true,
-      },
-
-      -- symbol = "╎",
-    },
-  },
-
-  -- transparent tokyonight
-  {
-    "tokyonight.nvim",
-    opts = {
-      style = "night",
-      transparent = true,
-      styles = {
-        sidebars = "transparent",
-        floats = "transparent",
-      },
-
-      -- TODO doesn't do a damn thing
-      -- highlights = {
-      --   CursorLineNr = {
-      --     bg = "#161616",
-      --     -- c.bg_highlight,
-      --   },
-      -- },
-      -- on_highlights = function(hl, c)
-      -- end,
-    },
-  },
+  -- Kanagawa theme configuration moved to theme.lua for better organization
 
   -- NOTE starter experiments
   -- {
@@ -231,13 +210,137 @@ return {
 
   -- No logo
 
-  -- override nvim-cmp and add cmp-emoji
+  -- NOTE: Enhanced LSP configuration for better development experience
+  {
+    "neovim/nvim-lspconfig",
+    dependencies = {
+      "williamboman/mason-lspconfig.nvim",
+      { "j-hui/fidget.nvim", opts = {} }, -- LSP progress indicators
+    },
+    opts = {
+      servers = {
+        -- AI: Disable deprecated servers for better performance
+        ruff_lsp = false, -- Use ruff instead
+
+        -- NOTE: TypeScript with enhanced inlay hints
+        tsserver = {
+          root_dir = function()
+            return vim.fn.getcwd() -- Use current working directory
+          end,
+          single_file_support = true, -- Support single TypeScript files
+          settings = {
+            completions = {
+              completeFunctionCalls = true, -- Complete function calls with parentheses
+            },
+            typescript = {
+              inlayHints = {
+                includeInlayParameterNameHints = "all", -- Show parameter names
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayFunctionParameterTypeHints = true, -- Show parameter types
+                includeInlayVariableTypeHints = true, -- Show variable types
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true, -- Show return types
+                includeInlayEnumMemberValueHints = true,
+              },
+            },
+            javascript = {
+              inlayHints = {
+                includeInlayParameterNameHints = "all",
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayVariableTypeHints = true,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayEnumMemberValueHints = true,
+              },
+            },
+          },
+        },
+
+        -- AI: Modern Python linting with Ruff
+        ruff = {
+          cmd = { "ruff-lsp" }, -- Use ruff-lsp for fast Python linting
+          filetypes = { "python" },
+          init_options = {
+            settings = {
+              args = {}, -- Add custom ruff arguments here
+            },
+          },
+        },
+
+        -- NOTE: Enhanced TailwindCSS support for modern web development
+        tailwindcss = {
+          filetypes = {
+            "html",
+            "css",
+            "scss",
+            "javascript",
+            "javascriptreact",
+            "typescript",
+            "typescriptreact",
+            "svelte",
+            "vue",
+          },
+          init_options = {
+            userLanguages = {
+              html = "html",
+              css = "css",
+              scss = "css",
+              javascript = "javascript",
+              typescript = "typescript",
+              svelte = "svelte",
+              vue = "vue",
+            },
+          },
+        },
+      },
+      -- AI: Enhanced LSP keymaps and functionality
+      on_attach = function(client, bufnr)
+        vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc" -- Enable LSP completion
+
+        local bufopts = { noremap = true, silent = true, buffer = bufnr }
+
+        -- NOTE: Essential LSP navigation keymaps
+        vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts) -- Go to declaration
+        vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts) -- Go to definition
+        vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts) -- Show hover info
+        vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts) -- Go to implementation
+        vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, bufopts) -- Show signature
+        vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts) -- Show references
+
+        -- AI: Workspace and refactoring operations
+        vim.keymap.set("n", "<space>wa", vim.lsp.buf.add_workspace_folder, bufopts)
+        vim.keymap.set("n", "<space>wr", vim.lsp.buf.remove_workspace_folder, bufopts)
+        vim.keymap.set("n", "<space>wl", function()
+          print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+        end, bufopts)
+        vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, bufopts)
+        vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, bufopts) -- Rename symbol
+        vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, bufopts) -- Code actions
+        vim.keymap.set("n", "<space>f", function()
+          vim.lsp.buf.format({ async = true })
+        end, bufopts) -- Format code
+
+        -- NOTE: TypeScript specific enhancements
+        if client.name == "tsserver" or client.name == "ts_ls" then
+          vim.keymap.set("n", "<leader>co", function()
+            vim.lsp.buf.code_action({
+              apply = true,
+              context = { only = { "source.organizeImports.ts" } }, -- Organize imports
+            })
+          end, bufopts)
+        end
+      end,
+    },
+  },
+
+  -- AI: Enhanced completion with emoji support
   {
     "hrsh7th/nvim-cmp",
     dependencies = { "hrsh7th/cmp-emoji" },
     ---@param opts cmp.ConfigSchema
     opts = function(_, opts)
-      table.insert(opts.sources, { name = "emoji" })
+      table.insert(opts.sources, { name = "emoji" }) -- Add emoji completion source
     end,
   },
 
@@ -281,424 +384,52 @@ return {
   --   },
   -- },
 
-  -- LazyVim configuration with custom UI settings
+  -- LazyVim configuration (theme moved to theme.lua)
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "tokyonight",
       defaults = {
         autocmds = true,
         keymaps = true,
       },
-      ui = {
-        -- Custom header for the dashboard
-        header = {
-          "   ",
-          "                              ",
-          "                 ####         ",
-          "                ###           ",
-          "                ###           ",
-          "           #### ###           ",
-          "            ###  ##           ",
-          "             ###  #           ",
-          "              ##              ",
-          "               ##             ",
-          "                ##            ",
-          "                              ",
-        },
-
-        -- header = { "   ", "   ", "   ", " -_- ", "   " },
-
-        -- header = {
-        --   "   ",
-        --   "   ",
-        --   -- ({ "[ ¬_¬ ]", "[ -_- ]", "◕ᴥ◕", "ツ", "ಠ_ಠ" })[math.random(5)],
-        --   -- " ¬_¬        ",
-        --   "   ",
-        --   "     [ ¬_¬ ]          n[V]im "
-        --     -- "    ¬_¬             n[v]im v"
-        --     .. vim.version().major
-        --     .. "."
-        --     .. vim.version().minor
-        --     .. "."
-        --     .. vim.version().patch
-        --     .. "    ",
-        --   -- "nvim v" .. vim.version().major .. "." .. vim.version().minor .. "." .. vim.version().patch,
-        --   -- "v" .. vim.version().major .. "." .. vim.version().minor .. "." .. vim.version().patch,
-        --   -- " "
-        --   --   .. os.getenv("USER")
-        --   --   .. "."
-        --   --   .. os.getenv("HOST")
-        --   --   .. " ",
-        --   "   ",
-        -- },
-
-        center = {
-
-          {
-
-            desc = "[n]ew               ",
-            keymap = "",
-            key = "n",
-            icon = "  ",
-            action = "enew",
-          },
-
-          {
-
-            desc = "[q]uit              ",
-            keymap = "",
-            key = "q",
-            icon = "  ",
-            action = "exit",
-          },
-
-          -- {
-          --   desc = "[r]ecents           ",
-          --   keymap = "",
-          --   key = "r",
-          --   icon = "  ",
-          --   action = "Telescope oldfiles",
-          -- },
-          --
-          --
-          -- {
-          --
-          --   desc = "[q]uit              ",
-          --   keymap = "",
-          --   key = "q",
-          --   icon = "  ",
-          --   action = "exit",
-          -- },
-
-          -- {
-          --   desc = "[f]ind file         ",
-          --   keymap = "",
-          --   key = "f",
-          --   icon = "  ",
-          --   action = "Telescope find_files",
-          -- },
-
-          -- {
-          --   desc = "[u]pdate plugins    ",
-          --   keymap = "",
-          --   key = "u",
-          --   icon = "  ",
-          --   action = "Lazy update",
-          -- },
-          --
-          -- {
-          --   desc = "manag[e] extensions ",
-          --   keymap = "",
-          --   key = "e",
-          --   icon = "  ",
-          --   action = "Mason",
-          -- },
-
-          -- {
-          --   desc = "[c]onfig    ",
-          --   -- keymap = "",
-          --   key = "c",
-          --   icon = "  ",
-          --   action = "Telescope find_files cwd=~/.config/nvim",
-          -- },
-        },
-
-        -- center = {
-        --   {
-        --     desc = "Find File                     ",
-        --     keymap = "",
-        --     key = "f",
-        --     icon = "  ",
-        --     action = "Telescope find_files",
-        --   },
-        --
-        --   {
-        --     desc = "Browse Files",
-        --     keymap = "",
-        --     key = ".",
-        --     icon = "  ",
-        --     action = "Telescope file_browser",
-        --   },
-        --
-        --   {
-        --     desc = "New File",
-        --     keymap = "",
-        --     key = "n",
-        --     icon = "  ",
-        --     action = "enew",
-        --   },
-        --
-        --   {
-        --     desc = "Load Last Session",
-        --     keymap = "",
-        --     key = "L",
-        --     icon = "  ",
-        --     action = "SessionLoad",
-        --   },
-        --
-        --   {
-        --     desc = "Update Plugins",
-        --     keymap = "",
-        --     key = "u",
-        --     icon = "  ",
-        --     action = "Lazy update",
-        --   },
-        --
-        --   {
-        --     desc = "Manage Extensions",
-        --     keymap = "",
-        --     key = "e",
-        --     icon = "  ",
-        --     action = "Mason",
-        --   },
-        --
-        --   {
-        --     desc = "Config",
-        --     keymap = "",
-        --     key = "s",
-        --     icon = "  ",
-        --     action = "Telescope find_files cwd=~/.config/nvim",
-        --   },
-        --   {
-        --     desc = "Exit",
-        --     keymap = "",
-        --     key = "q",
-        --     icon = "  ",
-        --     action = "exit",
-        --   },
-        -- },
-
-        },
-        footer = function()
-          local stats = require("lazy").stats()
-          local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
-          return { "  " .. stats.loaded .. "/" .. stats.count .. " packages in " .. ms .. "ms" }
-        end,
-      },
     },
   },
+  -- UI configuration moved to theme.lua
 
-        -- footer = function()
-        --   return {
-        --     "type  :help<Enter>  or  <F1>  for on-line help,  <F2>  news changelog",
-        --     "Startup time: " .. require("lazy").stats().startuptime .. " ms",
-        --   }
-        -- end,
+  -- Native character-level diff is configured in options.lua with diffopt
+
+  -- Neo-tree sidebar for ClaudeCodeTreeAdd - minimal config (DISABLED), oil.nvim remains default
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    opts = {
+      close_if_last_window = true, -- Close if it's the last window
+      popup_border_style = "rounded",
+      filesystem = {
+        hijack_netrw_behavior = "disabled", -- Keep oil.nvim as default
+        follow_current_file = { enabled = true },
+        group_empty_dirs = true, -- Cleaner view
       },
+      window = {
+        width = 21,
+        mapping_options = {
+          noremap = true,
+          nowait = true,
+        },
+      },
+      default_component_configs = {
+        container = {
+          enable_character_fade = true,
+        },
+        indent = {
+          with_markers = false, -- Remove indent markers
+        },
+      },
+      -- Remove all borders and separators for seamless look
+      popup_border_style = "none",
+      use_default_mappings = false,
+      window_border_style = "none",
     },
   },
-
-  -- {
-  --   "nvimdev/dashboard-nvim",
-  --   event = "VimEnter",
-  --   opts = {
-  --     logo = {
-  --       "            :h-                                  Nhy`               ",
-  --       "           -mh.                           h.    `Ndho               ",
-  --       "           hmh+                          oNm.   oNdhh               ",
-  --       "          `Nmhd`                        /NNmd  /NNhhd               ",
-  --       "          -NNhhy                      `hMNmmm`+NNdhhh               ",
-  --       "          .NNmhhs              ```....`..-:/./mNdhhh+               ",
-  --       "           mNNdhhh-     `.-::///+++////++//:--.`-/sd`               ",
-  --       "           oNNNdhhdo..://++//++++++/+++//++///++/-.`                ",
-  --       "      y.   `mNNNmhhhdy+/++++//+/////++//+++///++////-` `/oos:       ",
-  --       " .    Nmy:  :NNNNmhhhhdy+/++/+++///:.....--:////+++///:.`:s+        ",
-  --       " h-   dNmNmy oNNNNNdhhhhy:/+/+++/-         ---:/+++//++//.`         ",
-  --       " hd+` -NNNy`./dNNNNNhhhh+-://///    -+oo:`  ::-:+////++///:`        ",
-  --       " /Nmhs+oss-:++/dNNNmhho:--::///    /mmmmmo  ../-///++///////.       ",
-  --       "  oNNdhhhhhhhs//osso/:---:::///    /yyyyso  ..o+-//////////:/.      ",
-  --       "   /mNNNmdhhhh/://+///::://////     -:::- ..+sy+:////////::/:/.     ",
-  --       "     /hNNNdhhs--:/+++////++/////.      ..-/yhhs-/////////::/::/`    ",
-  --       "       .ooo+/-::::/+///////++++//-/ossyyhhhhs/:///////:::/::::/:    ",
-  --       "       -///:::::::////++///+++/////:/+ooo+/::///////.::://::---+`   ",
-  --       "       /////+//++++/////+////-..//////////::-:::--`.:///:---:::/:   ",
-  --       "       //+++//++++++////+++///::--                 .::::-------::   ",
-  --       "       :/++++///////////++++//////.                -:/:----::../-   ",
-  --       "       -/++++//++///+//////////////               .::::---:::-.+`   ",
-  --       "       `////////////////////////////:.            --::-----...-/    ",
-  --       "        -///://////////////////////::::-..      :-:-:-..-::.`.+`    ",
-  --       "         :/://///:///::://::://::::::/:::::::-:---::-.-....``/- -   ",
-  --       "           ::::://::://::::::::::::::----------..-:....`.../- -+oo/ ",
-  --       "            -/:::-:::::---://:-::-::::----::---.-.......`-/.      ``",
-  --       "           s-`::--:::------:////----:---.-:::...-.....`./:          ",
-  --       "          yMNy.`::-.--::..-dmmhhhs-..-.-.......`.....-/:`           ",
-  --       "         oMNNNh. `-::--...:NNNdhhh/.--.`..``.......:/-              ",
-  --       "        :dy+:`      .-::-..NNNhhd+``..`...````.-::-`                ",
-  --       "                        .-:mNdhh:.......--::::-`                    ",
-  --       "                           yNh/..------..`                          ",
-  --       "                                                                    ",
-  --       "N E O V I M - v ",
-  --     },
-  --     center = {
-  --       {
-  --         desc = "Find File                     ",
-  --         keymap = "",
-  --         key = "f",
-  --         icon = "  ",
-  --         action = "Telescope find_files",
-  --       },
-  --       {
-  --         desc = "Recents",
-  --         keymap = "",
-  --         key = "r",
-  --         icon = "  ",
-  --         action = "Telescope oldfiles",
-  --       },
-  --
-  --       {
-  --         desc = "Browse Files",
-  --         keymap = "",
-  --         key = ".",
-  --         icon = "  ",
-  --         action = "Telescope file_browser",
-  --       },
-  --
-  --       {
-  --         desc = "New File",
-  --         keymap = "",
-  --         key = "n",
-  --         icon = "  ",
-  --         action = "enew",
-  --       },
-  --
-  --       {
-  --         desc = "Load Last Session",
-  --         keymap = "",
-  --         key = "L",
-  --         icon = "  ",
-  --         action = "SessionLoad",
-  --       },
-  --
-  --       {
-  --         desc = "Update Plugins",
-  --         keymap = "",
-  --         key = "u",
-  --         icon = "  ",
-  --         action = "Lazy update",
-  --       },
-  --
-  --       {
-  --         desc = "Manage Extensions",
-  --         keymap = "",
-  --         key = "e",
-  --         icon = "  ",
-  --         action = "Mason",
-  --       },
-  --
-  --       {
-  --         desc = "Config",
-  --         keymap = "",
-  --         key = "s",
-  --         icon = "  ",
-  --         action = "Telescope find_files cwd=~/.config/nvim",
-  --       },
-  --       {
-  --         desc = "Exit",
-  --         keymap = "",
-  --         key = "q",
-  --         icon = "  ",
-  --         action = "exit",
-  --       },
-  --     },
-  --     footer = function()
-  --       return {
-  --         "type  :help<Enter>  or  <F1>  for on-line help,  <F2>  news changelog",
-  --         "Startup time: " .. require("lazy").stats().startuptime .. " ms",
-  --       }
-  --     end,
-  --   },
-  -- },
-
-  --
-  -- opts = function()
-  --   local version = vim.version()
-  --   local header = {
-  --     "            :h-                                  Nhy`               ",
-  --     "           -mh.                           h.    `Ndho               ",
-  --     "           hmh+                          oNm.   oNdhh               ",
-  --     "          `Nmhd`                        /NNmd  /NNhhd               ",
-  --     "          -NNhhy                      `hMNmmm`+NNdhhh               ",
-  --     "          .NNmhhs              ```....`..-:/./mNdhhh+               ",
-  --     "           mNNdhhh-     `.-::///+++////++//:--.`-/sd`               ",
-  --     "           oNNNdhhdo..://++//++++++/+++//++///++/-.`                ",
-  --     "      y.   `mNNNmhhhdy+/++++//+/////++//+++///++////-` `/oos:       ",
-  --     " .    Nmy:  :NNNNmhhhhdy+/++/+++///:.....--:////+++///:.`:s+        ",
-  --     " h-   dNmNmy oNNNNNdhhhhy:/+/+++/-         ---:/+++//++//.`         ",
-  --     " hd+` -NNNy`./dNNNNNhhhh+-://///    -+oo:`  ::-:+////++///:`        ",
-  --     " /Nmhs+oss-:++/dNNNmhho:--::///    /mmmmmo  ../-///++///////.       ",
-  --     "  oNNdhhhhhhhs//osso/:---:::///    /yyyyso  ..o+-//////////:/.      ",
-  --     "   /mNNNmdhhhh/://+///::://////     -:::- ..+sy+:////////::/:/.     ",
-  --     "     /hNNNdhhs--:/+++////++/////.      ..-/yhhs-/////////::/::/`    ",
-  --     "       .ooo+/-::::/+///////++++//-/ossyyhhhhs/:///////:::/::::/:    ",
-  --     "       -///:::::::////++///+++/////:/+ooo+/::///////.::://::---+`   ",
-  --     "       /////+//++++/////+////-..//////////::-:::--`.:///:---:::/:   ",
-  --     "       //+++//++++++////+++///::--                 .::::-------::   ",
-  --     "       :/++++///////////++++//////.                -:/:----::../-   ",
-  --     "       -/++++//++///+//////////////               .::::---:::-.+`   ",
-  --     "       `////////////////////////////:.            --::-----...-/    ",
-  --     "        -///://////////////////////::::-..      :-:-:-..-::.`.+`    ",
-  --     "         :/://///:///::://::://::::::/:::::::-:---::-.-....``/- -   ",
-  --     "           ::::://::://::::::::::::::----------..-:....`.../- -+oo/ ",
-  --     "            -/:::-:::::---://:-::-::::----::---.-.......`-/.      ``",
-  --     "           s-`::--:::------:////----:---.-:::...-.....`./:          ",
-  --     "          yMNy.`::-.--::..-dmmhhhs-..-.-.......`.....-/:`           ",
-  --     "         oMNNNh. `-::--...:NNNdhhh/.--.`..``.......:/-              ",
-  --     "        :dy+:`      .-::-..NNNhhd+``..`...````.-::-`                ",
-  --     "                        .-:mNdhh:.......--::::-`                    ",
-  --     "                           yNh/..------..`                          ",
-  --     "                                                                    ",
-  --     "N E O V I M - v " .. version.major .. "." .. version.minor,
-  --     "",
-  --   }
-
-  -- local center = {
-  --   {
-  --     desc = "Find File                     ",
-  --     keymap = "",
-  --     key = "f",
-  --     icon = "  ",
-  --     action = "Telescope find_files",
-  --   },
-  --   {
-  --     desc = "Recents",
-  --     keymap = "",
-  --     key = "r",
-  --     icon = "  ",
-  --     action = "Telescope oldfiles",
-  --   },
-  --
-  --   {
-  --     desc = "Browse Files",
-  --     keymap = "",
-  --     key = ".",
-  --     icon = "  ",
-  --     action = "Telescope file_browser",
-  --   },
-  --
-  --   {
-  --     desc = "New File",
-  --     keymap = "",
-  --     key = "n",
-  --     icon = "  ",
-  --     action = "enew",
-  --   },
-  --
-  --   {
-  --     desc = "Load Last Session",
-  --     keymap = "",
-  --     key = "L",
-  --     icon = "  ",
-  --     action = "SessionLoad",
-  --   },
-  --
-  --   {
-  --     desc = "Update Plugins",
-  --     keymap = "",
-  --     key = "u",
-  --     icon = "  ",
-  --     action = "Lazy update",
-  -- Cleaned up dashboard configuration
 
   {
     "rcarriga/nvim-notify",
@@ -722,16 +453,19 @@ return {
       },
     },
   },
-  {
-    "folke/tokyonight.nvim",
-    opts = {
-      -- transparent = true,
-      styles = {
-        sidebars = "transparent",
-        floats = "transparent",
-      },
-    },
-  },
+
+  -- TokyoNight theme (commented out - switch back if needed)
+  -- {
+  --   "folke/tokyonight.nvim",
+  --   opts = {
+  --     -- transparent = true,
+  --     styles = {
+  --       sidebars = "transparent",
+  --       floats = "transparent",
+  --     },
+  --   },
+  -- },
+
   {
     "lualine.nvim",
     opts = function()

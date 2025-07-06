@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(nvim:*)",
+      "Bash(ls:*)",
+      "Bash(if [ -f /tmp/claude-feedback ])",
+      "Bash(then echo '💬 Feedback from Neovim:')",
+      "Bash(cat:*)",
+      "Bash(rm:*)",
+      "Bash(fi)",
+      "Bash(else echo 'No feedback file found')",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(mkdir:*)",
+      "Bash(FILE_PATH=\"/Users/v/.config/nvim/lua/plugins/windsurf.lua\")",
+      "Bash(LINE_NUM=\"19\")",
+      "Bash(grep:*)",
+      "WebFetch(domain:www.lazyvim.org)",
+      "Bash(rg:*)",
+      "Bash(mv:*)",
+      "Bash(sed:*)",
+      "Bash(find:*)"
+    ],
+    "deny": []
+  }
+}

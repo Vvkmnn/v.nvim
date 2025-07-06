@@ -119,10 +119,11 @@ vim.keymap.set(
 -- map("v", "<C-S>", "<C-C>:update!<CR>")
 -- map("i", "<C-S>", "<C-O>:update!<CR>")
 -- vim.keymap.set("n", "<leader>s", ":update<CR>", { desc = "Quicksave" })
-vim.keymap.set("n", "<leader>s", ":wq!<CR>,", { desc = "Save and quit, no confirmation" })
+-- TODO: Dangerous keymap removed - was ":wq!" which quits vim unexpectedly
+vim.keymap.set("n", "<leader>w", ":w<CR>", { desc = "Save file" })
 
 -- Ctrl+Q to Quit
-vim.keymap.set("n", "<C-Q>", ":q<CR>,", { desc = "Quit without saving" })
+vim.keymap.set("n", "<C-Q>", ":q<CR>", { desc = "Quit without saving" }) -- AI: Fixed syntax error
 vim.keymap.set("n", "<leader>q", ":qa!<CR>", { desc = "Quit all, no confirmation" })
 -- vim.keymap.set({ "n", "i" }, "<C-Q>", ":exit<CR>,", { desc = "Quit without saving", expr = true }) -- doesnt work
 

@@ -1,5 +1,5 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   -- bootstrap lazy.nvim
   -- stylua: ignore
   vim.fn.system({ "git", "clone", "--filter=blob:none", "https://github.com/folke/lazy.nvim.git", "--branch=stable",
@@ -27,10 +27,9 @@ require("lazy").setup({
     version = false, -- always use the latest git commit
     -- version = "*", -- try installing the latest stable version for plugins that support semver
   },
-  install = { colorscheme = { "tokyonight", "habamax" } },
+  install = { colorscheme = { "kanagawa", "habamax" } }, -- Removed tokyonight to avoid conflicts
 
-  checker = { enabled = true }, -- automatically check for plugin updates
-  checker = { enabled = true, notify = false, frequency = 86400 }, -- https://www.reddit.com/r/neovim/comments/13f03p7/with_lazyvim_a_long_list_of_plugings_update_every/
+  checker = { enabled = true, notify = false, frequency = 86400 }, -- Auto-check for plugin updates daily
 
   performance = {
     rtp = {

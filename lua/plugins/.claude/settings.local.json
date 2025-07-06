@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "Bash(lua:*)",
+      "Bash(nvim:*)",
+      "WebFetch(domain:raw.githubusercontent.com)"
+    ],
+    "deny": []
+  }
+}
