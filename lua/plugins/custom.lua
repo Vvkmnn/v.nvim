@@ -41,12 +41,32 @@ return {
           if vim.wo.diff then
             vim.schedule(function()
               -- Enable unified diff mode when any diff starts
-              pcall(function() vim.cmd("UnifiedDiffUpdate") end)
+              pcall(function()
+                vim.cmd("UnifiedDiffUpdate")
+              end)
             end)
           end
         end,
       })
     end,
+  },
+
+  -- One diff view NOTE: Does not work
+  -- {
+  --   "axkirillov/unified.nvim",
+  --   opts = {
+  --     -- your configuration comes here
+  --   },
+  -- },
+
+  -- 3 screens
+  {
+    "sindrets/diffview.nvim",
+  },
+  {
+    "chrisgrieser/nvim-recorder",
+    dependencies = "rcarriga/nvim-notify", -- optional
+    opts = {}, -- required even with default settings, since it calls `setup()`
   },
 
   -- Character-level highlighting with native Neovim - WORKING!
@@ -56,13 +76,13 @@ return {
     opts = {
       -- Minimal config to avoid claudecode.nvim conflicts
       signs = {
-        add = { text = '+' },
-        change = { text = '~' },
-        delete = { text = '_' },
+        add = { text = "+" },
+        change = { text = "·" },
+        delete = { text = "_" },
       },
       -- Disable features that might conflict with claudecode.nvim
-      word_diff = false,
-      attach_to_untracked = false,
+      -- word_diff = false,
+      -- attach_to_untracked = false,
     },
   },
 
@@ -551,46 +571,46 @@ return {
   -- },
 
   -- Obsidian notes
-  {
-    "epwalsh/obsidian.nvim",
-    version = "*", -- recommended, use latest release instead of latest commit
-    lazy = true,
-    ft = "markdown",
-    -- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
-    event = {
-      -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
-      -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/**.md"
-      "BufReadPre ~/Documents/vault/**.md",
-      "BufNewFile ~/Documents/vault/**.md",
-      -- "BufNewFile path/to/my-vault/**.md",
-    },
-    dependencies = {
-      -- Required.
-      "nvim-lua/plenary.nvim",
-      -- see below for full list of optional dependencies 👇
-    },
-    opts = {
-      workspaces = {
-        {
-          name = "vault",
-          path = "~/Documents/vault/",
-        },
-      },
-      -- notes_subdir = "6 - etc/notes",
-      -- daily_notes = {
-      --   folder = "0 - agenda",
-      -- },
-      -- Optional, completion of wiki links, local markdown links, and tags using nvim-cmp.
-      completion = {
-        -- Set to false to disable completion.
-        nvim_cmp = true,
-        -- Trigger completion at 2 chars.
-        min_chars = 2,
-      },
-    },
-
-    -- see below for full list of options 👇
-  },
+  -- {
+  --   "epwalsh/obsidian.nvim",
+  --   version = "*", -- recommended, use latest release instead of latest commit
+  --   lazy = true,
+  --   ft = "markdown",
+  --   -- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
+  --   event = {
+  --     -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
+  --     -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/**.md"
+  --     "BufReadPre ~/Documents/vault/**.md",
+  --     "BufNewFile ~/Documents/vault/**.md",
+  --     -- "BufNewFile path/to/my-vault/**.md",
+  --   },
+  --   dependencies = {
+  --     -- Required.
+  --     "nvim-lua/plenary.nvim",
+  --     -- see below for full list of optional dependencies 👇
+  --   },
+  --   opts = {
+  --     workspaces = {
+  --       {
+  --         name = "vault",
+  --         path = "~/Documents/vault/",
+  --       },
+  --     },
+  --     -- notes_subdir = "6 - etc/notes",
+  --     -- daily_notes = {
+  --     --   folder = "0 - agenda",
+  --     -- },
+  --     -- Optional, completion of wiki links, local markdown links, and tags using nvim-cmp.
+  --     completion = {
+  --       -- Set to false to disable completion.
+  --       nvim_cmp = true,
+  --       -- Trigger completion at 2 chars.
+  --       min_chars = 2,
+  --     },
+  --   },
+  --
+  --   -- see below for full list of options 👇
+  -- },
 
   -- GPT in Neovim
   -- {
@@ -934,27 +954,44 @@ return {
       require("bufresize").setup()
     end,
   },
-  {
-    "danilamihailov/beacon.nvim",
-    lazy = true,
-    keys = {
-      { "n", "n:Beacon<cr>", desc = "Beacon Search Term Next" },
-      { "N", "N:Beacon<cr>", desc = "Beacon Search Term Prev" },
-      { "*", "*:Beacon<cr>", desc = "Beacon Cursor Term Next" },
-      { "#", "#:Beacon<cr>", desc = "Beacon Cursor Term Prev" },
-    },
-    config = function()
-      -- beacon_minimal_jump = 2,
-      vim.g.beacon_shrink = 0
-      vim.g.beacon_fade = 1
-      vim.g.beacon_size = 777
 
-      -- color
-      -- highlight Beacon guibg=white ctermbg=15
-      -- vim.api.nvim_set_hl(0, "Beacon", { guibg = "white", ctermbg = 15 })
-      -- vim.cmd([[highlight Beacon guibg=white ctermbg=15]])
-    end,
+  {
+    "OXY2DEV/markview.nvim",
+    lazy = false,
+
+    -- For `nvim-treesitter` users.
+    priority = 49,
+
+    -- For blink.cmp's completion
+    -- source
+    dependencies = {
+      "saghen/blink.cmp",
+    },
   },
+
+  { "danilamihailov/beacon.nvim" }, -- lazy calls setup() by itself
+  -- TODO some error here
+  -- {
+  --   "danilamihailov/beacon.nvim",
+  --   lazy = true,
+  --   keys = {
+  --     { "n", "n:Beacon<cr>", desc = "Beacon Search Term Next" },
+  --     { "N", "N:Beacon<cr>", desc = "Beacon Search Term Prev" },
+  --     { "*", "*:Beacon<cr>", desc = "Beacon Cursor Term Next" },
+  --     { "#", "#:Beacon<cr>", desc = "Beacon Cursor Term Prev" },
+  --   },
+  --   config = function()
+  --     -- beacon_minimal_jump = 2,
+  --     vim.g.beacon_shrink = 0
+  --     vim.g.beacon_fade = 1
+  --     vim.g.beacon_size = 777
+  --
+  --     -- color
+  --     -- highlight Beacon guibg=white ctermbg=15
+  --     -- vim.api.nvim_set_hl(0, "Beacon", { guibg = "white", ctermbg = 15 })
+  --     -- vim.cmd([[highlight Beacon guibg=white ctermbg=15]])
+  --   end,
+  -- },
 
   -- cursor line mode color
   {

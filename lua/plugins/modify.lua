@@ -208,7 +208,28 @@ return {
   --     return config
   --   end,
 
-  -- No logo
+  -- AI:
+  -- AI
+  -- NOTE:
+  -- TODO:
+  -- AI:
+  -- CLAUDE:
+  {
+    "folke/todo-comments.nvim",
+    cmd = { "TodoTrouble", "TodoTelescope" },
+    event = "LazyFile",
+    opts = {
+
+      keywords = {
+        AI = {
+          icon = "󰚩", -- icon used for the sign, and in search results
+          color = "hint", -- can be a hex color, or a named color (see below)
+          alt = { "CLAUDE", "GEMINI", "CHATGPT" }, -- a set of other keywords that all map to this FIX keywords
+          -- signs = false, -- configure signs for some keywords individually
+        },
+      },
+    },
+  },
 
   -- NOTE: Enhanced LSP configuration for better development experience
   {
@@ -218,6 +239,20 @@ return {
       { "j-hui/fidget.nvim", opts = {} }, -- LSP progress indicators
     },
     opts = {
+      -- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0
+      -- Be aware that you also will need to properly configure your LSP server to
+      -- provide the inlay hints.
+      inlay_hints = {
+        enabled = true,
+        exclude = { "vue" }, -- filetypes for which you don't want to enable inlay hints
+      },
+      -- Enable this to enable the builtin LSP code lenses on Neovim >= 0.10.0
+      -- Be aware that you also will need to properly configure your LSP server to
+      -- provide the code lenses.
+      codelens = {
+        enabled = false,
+      },
+
       servers = {
         -- AI: Disable deprecated servers for better performance
         ruff_lsp = false, -- Use ruff instead
@@ -472,7 +507,9 @@ return {
       return {
         sections = {
           lualine_y = {},
-          lualine_z = {},
+          lualine_z = {
+            { require("recorder").recordingStatus },
+          },
         },
       }
     end,

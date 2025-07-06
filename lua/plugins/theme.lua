@@ -28,7 +28,7 @@ return {
           LineNr = { bg = "none" },
           CursorLineNr = { fg = theme.syn.fun, bg = "none", bold = true },
           SignColumn = { bg = "none" },
-          CursorLine = { bg = "none", fg = theme.syn.fun }, -- Match cursor line color to line number
+          -- CursorLine = { bg = "none", fg = theme.syn.fun }, -- Match cursor line color to line number
 
           -- Make float windows consistent
           NormalFloat = { bg = "none" },
@@ -55,10 +55,10 @@ return {
         }
       end,
       theme = "wave",
-      background = {
-        dark = "wave",
-        light = "lotus",
-      },
+      -- background = {
+      --   dark = "wave",
+      --   light = "lotus",
+      -- },
     },
     config = function(_, opts)
       require("kanagawa").setup(opts)
@@ -81,19 +81,41 @@ return {
       dashboard = {
         preset = {
           header = [[
-   
-                              
-                 ####         
-                ###           
-                ###           
-           #### ###           
-            ###  ##           
-             ###  #           
-              ##              
-               ##             
-                ##            
-                              
-          ]],
+
+               #######   
+             #########   
+            ########     
+            ######       
+            ######       
+    ####### ######       
+  ######### ######       
+  #######   ######       
+   ######    #####       
+    ######    ####       
+     ######    ###       
+      ######    #        
+       ######            
+        #####            
+         #####           
+          #####          
+           #####         
+            #####       
+
+                    ]],
+
+          -- [[
+          --
+          --                ####
+          --               ###
+          --               ###
+          --          #### ###
+          --           ###  ##
+          --            ###  #
+          --             ##
+          --              ##
+          --               ##
+          --
+          --         ]],
         },
         sections = {
           { section = "header" },

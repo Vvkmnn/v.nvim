@@ -19,6 +19,18 @@ vim.api.nvim_create_autocmd("ColorScheme", {
   command = [[highlight CursorLine guibg=black ctermbg=115]],
 })
 
+-- Macros with q dont show up (replacedf with plugin, moves up screen)
+-- vim.api.nvim_create_autocmd("RecordingEnter", {
+--   callback = function()
+--     vim.opt.cmdheight = 1
+--   end,
+-- })
+-- vim.api.nvim_create_autocmd("RecordingLeave", {
+--   callback = function()
+--     vim.opt.cmdheight = 0
+--   end,
+-- })
+
 -- Auto-open neo-tree sidebar when opening files (not directories)
 vim.api.nvim_create_autocmd("VimEnter", {
   callback = function()
@@ -39,20 +51,19 @@ vim.api.nvim_create_autocmd("VimEnter", {
   desc = "Open neo-tree sidebar when opening files",
 })
 
-
 -- 🎯 CTRL-H TEST: Should switch to left editor and show autocmds.lua here!
 
 -- Create the ClaudeFeedback command
-vim.api.nvim_create_user_command('ClaudeFeedback', function(opts)
-  require('util.functions').ClaudeFeedback(opts.range == 2 and {line1 = opts.line1, line2 = opts.line2} or nil)
+vim.api.nvim_create_user_command("ClaudeFeedback", function(opts)
+  require("util.functions").ClaudeFeedback(opts.range == 2 and { line1 = opts.line1, line2 = opts.line2 } or nil)
 end, {
-  desc = 'Add tasks/comments to CLAUDE.md for next session',
-  range = true
+  desc = "Add tasks/comments to CLAUDE.md for next session",
+  range = true,
 })
 
 -- Create the ClaudeCleanup command
-vim.api.nvim_create_user_command('ClaudeCleanup', function()
-  require('util.functions').ClaudeCleanup()
+vim.api.nvim_create_user_command("ClaudeCleanup", function()
+  require("util.functions").ClaudeCleanup()
 end, {
-  desc = 'Archive completed tasks and clean CLAUDE.md'
+  desc = "Archive completed tasks and clean CLAUDE.md",
 })

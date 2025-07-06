@@ -114,13 +114,13 @@ vim.keymap.set(
 -- Clear after search
 -- map("n", "<leader>ur", "<cmd>nohl<cr>", "Clear highlights")
 
--- Ctrl+S to Save
+-- Ctrl+S to Save (default in LazyVim)
 -- map("n", "<C-S>", ":update!<CR>")
 -- map("v", "<C-S>", "<C-C>:update!<CR>")
 -- map("i", "<C-S>", "<C-O>:update!<CR>")
 -- vim.keymap.set("n", "<leader>s", ":update<CR>", { desc = "Quicksave" })
 -- TODO: Dangerous keymap removed - was ":wq!" which quits vim unexpectedly
-vim.keymap.set("n", "<leader>w", ":w<CR>", { desc = "Save file" })
+vim.keymap.set("n", "<leader>w", ":x<CR>", { desc = "Save file" })
 
 -- Ctrl+Q to Quit
 vim.keymap.set("n", "<C-Q>", ":q<CR>", { desc = "Quit without saving" }) -- AI: Fixed syntax error
