@@ -20,7 +20,13 @@
       "Bash(rg:*)",
       "Bash(mv:*)",
       "Bash(sed:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "mcp__brave-search__brave_web_search",
+      "mcp__fetch__fetch",
+      "mcp__github__search_code",
+      "mcp__github__get_file_contents"
     ],
     "deny": []
   }

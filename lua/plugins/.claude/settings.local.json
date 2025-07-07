@@ -4,7 +4,12 @@
       "WebFetch(domain:github.com)",
       "Bash(lua:*)",
       "Bash(nvim:*)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "mcp__fetch__fetch",
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(brew info:*)",
+      "Bash(brew install:*)",
+      "WebFetch(domain:neovim.io)"
     ],
     "deny": []
   }

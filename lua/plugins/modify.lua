@@ -379,56 +379,86 @@ return {
     end,
   },
 
-  -- change some telescope options and a keymap to browse plugin files
-  -- {
-  --   "nvim-telescope/telescope.nvim",
-  --   tag = "0.1.5",
-  --   dependencies = {
-  --     "nvim-lua/plenary.nvim",
-  --     "tsakirist/telescope-lazy.nvim",
-  --   },
-  --   keys = {
-  --     -- add a keymap to browse plugin files
-  --     -- stylua: ignore
-  --     {
-  --       "<leader>fp",
-  --       function() require("telescope.builtin").find_files({ cwd = require("lazy.core.config").options.root }) end,
-  --       desc = "Find Plugin File",
-  --     },
-  --   },
-  --   -- change some options
-  --   opts = {
-  --     defaults = {
-  --       layout_strategy = "horizontal",
-  --       layout_config = { prompt_position = "top" },
-  --       sorting_strategy = "ascending",
-  --       winblend = 0,
-  --     },
-  --   },
-  -- },
+  -- ============================================================================
+  -- THEME CONFIGURATION - Let LazyVim handle tokyonight defaults
+  -- ============================================================================
 
-  -- add telescope-fzf-native
-  -- {
-  --   "telescope.nvim",
-  --   dependencies = {
-  --     "nvim-telescope/telescope-fzf-native.nvim",
-  --     build = "make",
-  --     config = function()
-  --       require("telescope").load_extension("fzf")
-  --     end,
-  --   },
-  -- },
-
-  -- LazyVim configuration (theme moved to theme.lua)
+  -- Commented out custom theme configs - LazyVim handles tokyonight by default
   {
     "LazyVim/LazyVim",
     opts = {
-      defaults = {
-        autocmds = true,
-        keymaps = true,
-      },
+      colorscheme = "tokyonight",
     },
   },
+
+  {
+    "folke/tokyonight.nvim",
+    lazy = false,
+    priority = 1000,
+    opts = {
+      style = "night",
+      transparent = true,
+      terminal_colors = true,
+      styles = {
+        sidebars = "transparent",
+        floats = "transparent",
+      },
+      on_highlights = function(hl, c)
+        -- Complete transparency configuration
+        hl.Normal = { bg = "none" }
+        hl.NormalFloat = { bg = "none" }
+        
+        -- Telescope transparency
+        hl.TelescopeNormal = { bg = "none" }
+        hl.TelescopeBorder = { bg = "none" }
+        hl.TelescopePromptNormal = { bg = "none" }
+        hl.TelescopeResultsNormal = { bg = "none" }
+        hl.TelescopePreviewNormal = { bg = "none" }
+        
+        -- File tree transparency
+        hl.NeoTreeNormal = { bg = "none" }
+        hl.NeoTreeNormalNC = { bg = "none" }
+        
+        -- Keep important UI elements visible
+        hl.Pmenu = { bg = c.bg_popup }
+        hl.PmenuSel = { bg = c.bg_highlight }
+      end,
+    },
+  },
+
+  -- Snacks.nvim - minimal configuration to avoid conflicts
+  {
+    "folke/snacks.nvim",
+    opts = {
+      -- Keep only essential modules enabled
+      bigfile = { enabled = true },
+      quickfile = { enabled = true },
+      scroll = { enabled = true },
+      words = { enabled = true },
+
+      -- Disable potentially conflicting modules
+      dashboard = { enabled = false },
+      input = { enabled = false },
+      notifier = { enabled = false },
+      terminal = { enabled = false },
+      toggle = { enabled = false },
+      scope = { enabled = false },
+      indent = { enabled = false },
+      explorer = { enabled = false },
+      image = { enabled = false },
+      picker = { enabled = false },
+      statuscolumn = { enabled = false },
+      lazygit = { enabled = false },
+    },
+  },
+
+  -- Theme section cleaned - LazyVim handles tokyonight defaults automatically
+
+  -- ============================================================================
+  -- END THEME CONFIGURATION
+  -- ============================================================================
+
+  -- Removed duplicate LazyVim config - colorscheme set above
   -- UI configuration moved to theme.lua
 
   -- Native character-level diff is configured in options.lua with diffopt
@@ -488,18 +518,6 @@ return {
       },
     },
   },
-
-  -- TokyoNight theme (commented out - switch back if needed)
-  -- {
-  --   "folke/tokyonight.nvim",
-  --   opts = {
-  --     -- transparent = true,
-  --     styles = {
-  --       sidebars = "transparent",
-  --       floats = "transparent",
-  --     },
-  --   },
-  -- },
 
   {
     "lualine.nvim",

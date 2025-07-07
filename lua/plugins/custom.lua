@@ -998,8 +998,8 @@ return {
     "mawkler/modicator.nvim",
     lazy = true,
     -- dependencies = "mawkler/onedark.nvim", -- Add your colorscheme plugin here
-    -- dependencies = "folke/tokyonight.nvim", -- Commented out - using Kanagawa instead
-    dependencies = "rebelot/kanagawa.nvim",
+    -- dependencies = "folke/tokyonight.nvim", -- Using tokyonight for consistency
+    dependencies = "folke/tokyonight.nvim",
     config = function()
       require("modicator").setup({
         -- Warn if any required option above is missing. May emit false positives

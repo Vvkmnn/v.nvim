@@ -15,9 +15,10 @@
 -- })
 --
 
-vim.api.nvim_create_autocmd("ColorScheme", {
-  command = [[highlight CursorLine guibg=black ctermbg=115]],
-})
+-- Commented out - was interfering with tokyonight theme
+-- vim.api.nvim_create_autocmd("ColorScheme", {
+--   command = [[highlight CursorLine guibg=black ctermbg=115]],
+-- })
 
 -- Macros with q dont show up (replacedf with plugin, moves up screen)
 -- vim.api.nvim_create_autocmd("RecordingEnter", {
