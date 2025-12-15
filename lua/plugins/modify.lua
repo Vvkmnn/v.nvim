@@ -1,4 +1,70 @@
 return {
+  -- Persistent error logging and enhanced notifications
+  --  TODO: Does not work
+  -- {
+  --   "rcarriga/nvim-notify",
+  --   opts = {
+  --     timeout = false, -- Never auto-dismiss notifications
+  --     max_height = function()
+  --       return math.floor(vim.o.lines * 0.75)
+  --     end,
+  --     max_width = function()
+  --       return math.floor(vim.o.columns * 0.75)
+  --     end,
+  --     stages = "static", -- No animations, keep them visible
+  --     render = "compact",
+  --     background_colour = "#000000", -- Use hex color instead of highlight group
+  --     fps = 30,
+  --     level = 2,
+  --     minimum_width = 50,
+  --     icons = {
+  --       ERROR = "",
+  --       WARN = "",
+  --       INFO = "",
+  --       DEBUG = "",
+  --       TRACE = "✎",
+  --     },
+  --   },
+  --   config = function(_, opts)
+  --     local notify = require("notify")
+  --     notify.setup(opts)
+  --     vim.notify = notify
+  --
+  --     -- Create persistent error buffer for startup issues
+  --     vim.api.nvim_create_autocmd("VimEnter", {
+  --       callback = function()
+  --         local error_buf = vim.api.nvim_create_buf(false, true)
+  --         vim.api.nvim_buf_set_name(error_buf, "Startup Errors")
+  --         vim.api.nvim_buf_set_option(error_buf, "buftype", "nofile")
+  --         vim.api.nvim_buf_set_option(error_buf, "swapfile", false)
+  --         vim.api.nvim_buf_set_option(error_buf, "modifiable", false)
+  --
+  --         -- Store error buffer globally for error logging
+  --         vim.g.startup_error_buf = error_buf
+  --       end,
+  --     })
+  --   end,
+  --   keys = {
+  --     {
+  --       "<leader>nd",
+  --       function()
+  --         require("notify").dismiss({ silent = true, pending = true })
+  --       end,
+  --       desc = "Dismiss notifications",
+  --     },
+  --     { "<leader>nh", ":Notifications<cr>", desc = "Show notification history" },
+  --     {
+  --       "<leader>ne",
+  --       function()
+  --         if vim.g.startup_error_buf then
+  --           vim.cmd("split | buffer " .. vim.g.startup_error_buf)
+  --         end
+  --       end,
+  --       desc = "Show startup errors",
+  --     },
+  --   },
+  -- },
+
   -- formatter
   -- TODO shfmt doesn't work
   -- {
@@ -36,7 +102,7 @@ return {
 
   -- No need to copy this inside `setup()`. Will be used automatically.
   -- {
-  --   "echasnovski/mini.animate",
+  --   "nvim-mini/mini.animate",
   --   opts = {
   --
   --     cursor = {
@@ -119,7 +185,7 @@ return {
 
   -- indentscope animation - DISABLED
   -- {
-  --   "echasnovski/mini.indentscope",
+  --   "nvim-mini/mini.indentscope",
   --   opts = {
   --     -- symbol = "▏",
   --     symbol = " ▏",
@@ -149,7 +215,7 @@ return {
 
   -- NOTE starter experiments
   -- {
-  --   "echasnovski/mini.starter",
+  --   "nvim-mini/mini.starter",
   --   opts = function()
   --     -- local vlogo = require("util.functions").vLogo()
   --
@@ -235,10 +301,34 @@ return {
   {
     "neovim/nvim-lspconfig",
     dependencies = {
-      "williamboman/mason-lspconfig.nvim",
+      "mason-org/mason-lspconfig.nvim",
       { "j-hui/fidget.nvim", opts = {} }, -- LSP progress indicators
     },
     opts = {
+      -- Configure diagnostics (LazyVim standard approach)
+      diagnostics = {
+        virtual_text = false, -- Completely disable inline diagnostic text
+        signs = {
+          text = {
+            [vim.diagnostic.severity.ERROR] = "❌",
+            [vim.diagnostic.severity.WARN] = "⚠️",
+            [vim.diagnostic.severity.HINT] = "💡",
+            [vim.diagnostic.severity.INFO] = "ℹ️",
+          },
+        },
+        underline = false, -- Disable underlines
+        update_in_insert = false, -- Don't update during insert mode
+        severity_sort = true, -- Sort by severity
+        float = {
+          focusable = false,
+          close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+          border = "rounded",
+          source = "never", -- Hide the "Diagnostics:" header
+          prefix = "", -- Remove prefix spacing
+          scope = "cursor", -- Only show diagnostics for current cursor position
+          header = "", -- Remove header
+        },
+      },
       -- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0
       -- Be aware that you also will need to properly configure your LSP server to
       -- provide the inlay hints.
@@ -254,11 +344,50 @@ return {
       },
 
       servers = {
-        -- AI: Disable deprecated servers for better performance
-        ruff_lsp = false, -- Use ruff instead
+        -- NOTE: Lua LSP optimized for Neovim development
+        lua_ls = {
+          settings = {
+            Lua = {
+              runtime = { version = "LuaJIT" },
+              workspace = {
+                checkThirdParty = false,
+                library = {
+                  vim.env.VIMRUNTIME,
+                  "${3rd}/luv/library",
+                  "${3rd}/busted/library",
+                },
+              },
+              completion = {
+                callSnippet = "Replace",
+              },
+              diagnostics = {
+                globals = { "vim", "Snacks", "LazyVim" },
+              },
+              hint = {
+                enable = true,
+                setType = true,
+                paramType = true,
+                arrayIndex = "Disable",
+              },
+            },
+          },
+        },
+
+        -- AI: Python linting with Ruff (modern, fast replacement for pylint/flake8)
+        ruff = {
+          cmd = { "ruff", "server" },
+          filetypes = { "python" },
+          single_file_support = true,
+          init_options = {
+            settings = {
+              lineLength = 100,
+              lint = { select = { "E", "F", "W", "I", "UP", "B", "SIM" } },
+            },
+          },
+        },
 
         -- NOTE: TypeScript with enhanced inlay hints
-        tsserver = {
+        ts_ls = {
           root_dir = function()
             return vim.fn.getcwd() -- Use current working directory
           end,
@@ -292,17 +421,6 @@ return {
           },
         },
 
-        -- AI: Modern Python linting with Ruff
-        ruff = {
-          cmd = { "ruff-lsp" }, -- Use ruff-lsp for fast Python linting
-          filetypes = { "python" },
-          init_options = {
-            settings = {
-              args = {}, -- Add custom ruff arguments here
-            },
-          },
-        },
-
         -- NOTE: Enhanced TailwindCSS support for modern web development
         tailwindcss = {
           filetypes = {
@@ -328,7 +446,36 @@ return {
             },
           },
         },
+
+        -- LTeX: Grammar and spell checking for prose (markdown, latex, etc.)
+        ltex = {
+          filetypes = { "markdown", "tex", "latex", "plaintex", "gitcommit" },
+          settings = {
+            ltex = {
+              language = "en-AU", -- Australian English
+              additionalRules = {
+                enablePickyRules = true, -- More thorough checking
+                motherTongue = "en-AU",
+              },
+              dictionary = {}, -- Custom words (will sync with zg)
+              disabledRules = {},
+              hiddenFalsePositives = {},
+            },
+          },
+        },
       },
+
+      -- Enhanced LSP signature help handler (hover handled by autocmds.lua)
+      handlers = {
+        ["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
+          border = "rounded",
+          max_width = math.floor(vim.o.columns * 0.6),
+          max_height = math.floor(vim.o.lines * 0.4),
+          focusable = false,
+          close_events = { "CursorMoved", "BufHidden", "InsertCharPre" },
+        }),
+      },
+
       -- AI: Enhanced LSP keymaps and functionality
       on_attach = function(client, bufnr)
         vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc" -- Enable LSP completion
@@ -338,7 +485,27 @@ return {
         -- NOTE: Essential LSP navigation keymaps
         vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts) -- Go to declaration
         vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts) -- Go to definition
-        vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts) -- Show hover info
+
+        -- Enhanced scrollable hover
+        vim.keymap.set("n", "K", function()
+          local winid = nil
+          for _, win in ipairs(vim.api.nvim_list_wins()) do
+            local config = vim.api.nvim_win_get_config(win)
+            if config.relative ~= "" then
+              winid = win
+              break
+            end
+          end
+
+          if winid then
+            -- Focus the existing hover window for scrolling
+            vim.api.nvim_set_current_win(winid)
+          else
+            -- Create new hover window
+            vim.lsp.buf.hover()
+          end
+        end, bufopts)
+
         vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts) -- Go to implementation
         vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, bufopts) -- Show signature
         vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts) -- Show references
@@ -369,13 +536,36 @@ return {
     },
   },
 
-  -- AI: Enhanced completion with emoji support
+  -- AI: Enhanced completion with blink.cmp supertab
   {
-    "hrsh7th/nvim-cmp",
-    dependencies = { "hrsh7th/cmp-emoji" },
-    ---@param opts cmp.ConfigSchema
-    opts = function(_, opts)
-      table.insert(opts.sources, { name = "emoji" }) -- Add emoji completion source
+    "saghen/blink.cmp",
+    opts = {
+      keymap = { preset = "super-tab" }, -- <Tab> smart accept/navigate
+      completion = {
+        list = { selection = { preselect = false, auto_insert = true } },
+      },
+    },
+  },
+
+  -- AI: Enhanced fzf-lua with glob patterns and resume functionality
+  {
+    "ibhagwan/fzf-lua",
+    opts = {
+      grep = {
+        rg_glob = true, -- Enable *.js patterns
+        resume = true, -- Resume searches
+      },
+      files = {
+        resume = true, -- Resume file searches
+      },
+    },
+  },
+
+  -- Disable LaTeX concealing - show all raw markup (\vspace, \alpha, etc.)
+  {
+    "lervag/vimtex",
+    opts = function()
+      vim.g.vimtex_syntax_conceal_disable = 1 -- Disable all VimTeX concealing
     end,
   },
 
@@ -407,21 +597,37 @@ return {
         -- Complete transparency configuration
         hl.Normal = { bg = "none" }
         hl.NormalFloat = { bg = "none" }
-        
+
+        -- Orange cursorline customization matching line numbers
+        hl.CursorLine = {
+          bg = "#2A1F0A", -- Dark version of e0af68
+          blend = 20,
+        }
+        hl.CursorLineNr = {
+          fg = "#e0af68", -- Tokyo Night yellow-orange (matches line numbers)
+          bold = true,
+        }
+
         -- Telescope transparency
         hl.TelescopeNormal = { bg = "none" }
         hl.TelescopeBorder = { bg = "none" }
         hl.TelescopePromptNormal = { bg = "none" }
         hl.TelescopeResultsNormal = { bg = "none" }
         hl.TelescopePreviewNormal = { bg = "none" }
-        
+
         -- File tree transparency
         hl.NeoTreeNormal = { bg = "none" }
         hl.NeoTreeNormalNC = { bg = "none" }
-        
+
         -- Keep important UI elements visible
         hl.Pmenu = { bg = c.bg_popup }
         hl.PmenuSel = { bg = c.bg_highlight }
+
+        -- Beautiful diff colors (GitHub/VS Code style - subtle bg, syntax shows through)
+        hl.DiffAdd = { bg = "#1a2e1a" } -- Subtle green tint for additions
+        hl.DiffDelete = { bg = "#2e1a1a" } -- Subtle red tint for deletions
+        hl.DiffChange = { bg = "#1a1a2e" } -- Subtle blue tint for changed lines
+        hl.DiffText = { bg = "#ff9e64", fg = "#1a1b26", bold = true } -- Bright orange for exact character changes
       end,
     },
   },
@@ -502,8 +708,8 @@ return {
       fps = 120,
       -- render = "compact",
       render = "minimal",
-      -- timeout = 0,
-      timeout = 30,
+      timeout = 10,
+      -- timeout = 10000,
       -- stages = "fade",
     },
   },
@@ -532,6 +738,12 @@ return {
       }
     end,
   },
+  -- Disable bufferline/tabs completely
+  {
+    "akinsho/bufferline.nvim",
+    enabled = false,
+  },
+
   {
     "gbprod/yanky.nvim",
     keys = {
@@ -556,5 +768,18 @@ return {
   --     { "n", "]c", ":Gitsigns next_hunk<CR>", desc = "Next Hunk" },
   --     { "n", "[c", ":Gitsigns prev_hunk<CR>", desc = "Prev Hunk" },
   --   },
+  -- },
+
+  -- DISABLED: mini.diff override for claudecode unified inline diff
+  -- This was used with the single-pane mini.diff approach (see autocmds.lua)
+  -- gen_source.none() disables git source, allowing manual set_ref_text()
+  -- Disabled because: buffer modification before accept causes artifacts
+  -- {
+  --   "echasnovski/mini.diff",
+  --   opts = function()
+  --     return {
+  --       source = require("mini.diff").gen_source.none(),
+  --     }
+  --   end,
   -- },
 }

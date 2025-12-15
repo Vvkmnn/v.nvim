@@ -2,6 +2,9 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
 --
+-- ========================================
+-- Change List Navigation
+-- ========================================
 -- jump to change
 vim.keymap.set("n", "]c", "g,", { desc = "Next Change" })
 vim.keymap.set("n", "[c", "g;", { desc = "Previous Change" })
@@ -37,6 +40,19 @@ vim.keymap.set("n", ",t", ":e ~/.config/tmux/tmux.conf<CR>", { silent = true, de
 vim.keymap.set("n", ",w", ":e ~/.config/wezterm/wezterm.lua<CR>", { silent = true, desc = "Edit Wezterm" })
 vim.keymap.set("n", ",y", ":e ~/.yabairc<CR>", { silent = true, desc = "Edit yabai service" })
 vim.keymap.set("n", ",sk", ":e ~/.skhdrc<CR>", { silent = true, desc = "Edit skhd service" })
+
+-- Error capture and debugging
+vim.keymap.set("n", "<leader>xm", function()
+  -- Toggle messages buffer
+  local current_buf = vim.api.nvim_get_current_buf()
+  local buf_name = vim.api.nvim_buf_get_name(current_buf)
+  if buf_name:match("messages") then
+    vim.cmd("close")
+  else
+    vim.cmd("messages")
+  end
+end, { desc = "Toggle Vim messages (errors)" })
+vim.keymap.set("n", "<leader>xh", ":checkhealth<CR>", { desc = "Check Neovim health" })
 
 -- Source
 -- vim.keymap.set("n", "<leader>r", ":source ~/.config/nvim/init.lua<CR>", { desc = "Source Neovim config" })
@@ -114,13 +130,16 @@ vim.keymap.set(
 -- Clear after search
 -- map("n", "<leader>ur", "<cmd>nohl<cr>", "Clear highlights")
 
--- Ctrl+S to Save (default in LazyVim)
--- map("n", "<C-S>", ":update!<CR>")
--- map("v", "<C-S>", "<C-C>:update!<CR>")
--- map("i", "<C-S>", "<C-O>:update!<CR>")
--- vim.keymap.set("n", "<leader>s", ":update<CR>", { desc = "Quicksave" })
--- TODO: Dangerous keymap removed - was ":wq!" which quits vim unexpectedly
-vim.keymap.set("n", "<leader>w", ":x<CR>", { desc = "Save file" })
+-- Cmd+S / Ctrl+S to Save (works in normal, visual, and insert mode)
+-- <C-S> works in all neovim environments
+vim.keymap.set({ "n", "v", "i" }, "<C-S>", "<cmd>update<CR>", { desc = "Save file" })
+-- <D-s> works in GUI neovim (Neovide, gvim, etc.)
+vim.keymap.set({ "n", "v", "i" }, "<D-s>", "<cmd>update<CR>", { desc = "Save file (GUI)" })
+-- Terminal escape sequences for Cmd+S (CSI u encoding: \x1b[115;9u where 115='s', 9=Super modifier)
+-- This allows terminals like Ghostty/Kitty/WezTerm that send CSI u sequences to work without config
+vim.keymap.set({ "n", "v", "i" }, "\x1b[115;9u", "<cmd>update<CR>", { desc = "Save file (terminal Cmd+S)" })
+-- Alternative: <leader>w for save
+vim.keymap.set("n", "<leader>w", ":update<CR>", { desc = "Save file" })
 
 -- Ctrl+Q to Quit
 vim.keymap.set("n", "<C-Q>", ":q<CR>", { desc = "Quit without saving" }) -- AI: Fixed syntax error
@@ -171,9 +190,23 @@ vim.keymap.set("n", "<leader>q", ":qa!<CR>", { desc = "Quit all, no confirmation
 -- vim.keymap.del("n", "<leader>gG")
 -- vim.keymap.set("n", "<leader>gG", "", { desc = "", noremap = true })
 
+-- Custom ripgrep with hidden files
+vim.keymap.set("n", "<leader>rg", function()
+  require("fzf-lua").live_grep({
+    cmd = "rg --column --line-number --no-heading --color=always --smart-case --hidden --follow --iglob !.git/",
+  })
+end, { desc = "Live grep (include hidden files)" })
+
 -- Windows
 -- only
 vim.keymap.set("n", "<leader>o", ":only<CR>", { desc = "Only window" })
+
+-- NOTE: <leader>aD removed - replaced by <leader>| in claudecode.nvim keys table (custom.lua)
+
+-- Window/tab picker via fzf-lua
+vim.keymap.set("n", "<leader>ww", function()
+  require("fzf-lua").tabs()
+end, { desc = "Pick window/tab" })
 
 -- map("n", "<C-Q>", ":exit<CR>")
 -- map("v", "<C-Q>", "<C-C>:exit<CR>")

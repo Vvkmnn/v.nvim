@@ -1,5 +1,6 @@
 return {
   -- 🎯 EDIT TRACKING: This change should appear instantly on the left!
+  -- Diff test: edited on 2025-11-25 to verify sidekick.nvim diff view.
 
   -- {
   --   "greggh/claude-code.nvim",
@@ -30,26 +31,26 @@ return {
   -- },
 
   -- Best unified single-view diff experience with proven plugin
-  {
-    "lambdalisue/vim-unified-diff",
-    event = "VeryLazy",
-    config = function()
-      -- Auto-enable unified diff for any diffthis usage (including claudecode.nvim)
-      vim.api.nvim_create_autocmd("OptionSet", {
-        pattern = "diff",
-        callback = function()
-          if vim.wo.diff then
-            vim.schedule(function()
-              -- Enable unified diff mode when any diff starts
-              pcall(function()
-                vim.cmd("UnifiedDiffUpdate")
-              end)
-            end)
-          end
-        end,
-      })
-    end,
-  },
+  -- {
+  --   "lambdalisue/vim-unified-diff",
+  --   event = "VeryLazy",
+  --   config = function()
+  --     -- Auto-enable unified diff for any diffthis usage (including claudecode.nvim)
+  --     vim.api.nvim_create_autocmd("OptionSet", {
+  --       pattern = "diff",
+  --       callback = function()
+  --         if vim.wo.diff then
+  --           vim.schedule(function()
+  --             -- Enable unified diff mode when any diff starts
+  --             pcall(function()
+  --               vim.cmd("UnifiedDiffUpdate")
+  --             end)
+  --           end)
+  --         end
+  --       end,
+  --     })
+  --   end,
+  -- },
 
   -- One diff view NOTE: Does not work
   -- {
@@ -60,9 +61,10 @@ return {
   -- },
 
   -- 3 screens
-  {
-    "sindrets/diffview.nvim",
-  },
+  -- {
+  --   "sindrets/diffview.nvim",
+  -- },
+
   {
     "chrisgrieser/nvim-recorder",
     dependencies = "rcarriga/nvim-notify", -- optional
@@ -93,15 +95,41 @@ return {
   --   end,
   -- },
 
-  -- Automatic unified diff enhancement for claudecode.nvim (now with seamless inline view)
+  -- diffchar.vim - Word-level diff highlighting with single color (maximum clarity)
+  {
+    "rickhowe/diffchar.vim",
+    event = "VeryLazy",
+    config = function()
+      vim.g.DiffUnit = "Word1" -- Word-level (easier to scan than char-by-char)
+      vim.g.DiffColors = 0 -- Single DiffText color (maximum clarity)
+      vim.g.DiffPairVisible = 0 -- No cursor highlighting on pairs
+      vim.g.DiffDelPosVisible = 0 -- Disabled: deletion indicators not helpful
+    end,
+  },
 
   {
     "coder/claudecode.nvim",
     dependencies = { "folke/snacks.nvim" },
-    config = true,
+    -- enabled = false, -- Disabled for sidekick.nvim testing
+    opts = {
+      terminal = {
+        split_width_percentage = 0.42,
+        split_side = "left",
+        -- provider = "snacks",
+        auto_close = true,
+      },
+      diff_opts = {
+        auto_close_on_accept = true,
+        vertical_split = true,
+        open_in_current_tab = false,
+        keep_terminal_focus = false,
+        hide_terminal_in_new_tab = true,
+      },
+    },
     keys = {
       { "<leader>a", nil, desc = "AI/Claude Code" },
       { "<leader>aC", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
+      { "<leader>\\", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude", mode = { "n", "t" } },
       { "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude" },
       { "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume Claude" },
       { "<leader>ac", "<cmd>ClaudeCode --continue<cr>", desc = "Continue Claude" },
@@ -113,12 +141,81 @@ return {
         desc = "Add file",
         ft = { "NvimTree", "neo-tree", "oil" },
       },
-      -- Diff management
       { "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
       { "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
-      -- { "<leader>av", "<cmd>DiffviewOpen<cr>", desc = "Open enhanced diff view" },
+      -- Simple diff keybindings (claudecode.nvim handles the logic)
+      { "<leader>]", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
+      { "<leader>[", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Reject diff" },
+      {
+        "<leader>|",
+        function()
+          -- Search current tab first
+          for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+            local buf = vim.api.nvim_win_get_buf(win)
+            if vim.b[buf].claudecode_diff_tab_name then
+              vim.api.nvim_set_current_win(win)
+              return
+            end
+          end
+          -- Search all tabs
+          for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+            for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
+              local buf = vim.api.nvim_win_get_buf(win)
+              if vim.b[buf].claudecode_diff_tab_name then
+                vim.api.nvim_set_current_tabpage(tab)
+                vim.api.nvim_set_current_win(win)
+                return
+              end
+            end
+          end
+          vim.notify("No active diff found", vim.log.levels.WARN)
+        end,
+        desc = "Go to diff",
+      },
     },
+    config = function(_, opts)
+      require("claudecode").setup(opts)
+
+      -- Diff highlighting for Claude diffs
+      vim.cmd([[
+        highlight! DiffAdd guifg=#a7c957 guibg=#1a2e1a gui=bold
+        highlight! DiffDelete guifg=#8a8a8a guibg=#2a1a1a gui=bold
+        highlight! DiffChange guifg=#f4a261 guibg=#2a2519 gui=bold
+        highlight! DiffText guifg=#ffffff guibg=#3d3520 gui=bold
+      ]])
+    end,
   },
+
+  -- sidekick.nvim - Alternative AI coding assistant with visual diffs
+  -- Shows diffs as extmarks/virtual text without modifying buffer
+  -- Hunk-by-hunk navigation, Tab to accept, Esc to clear
+  -- {
+  --   "folke/sidekick.nvim",
+  --   enabled = true,
+  --   dependencies = {
+  --     "nvim-lua/plenary.nvim",
+  --   },
+  --   opts = {
+  --     -- Keep the terminal on the right like your previous setup
+  --     cli = {
+  --       win = {
+  --         layout = "right",
+  --         split = {
+  --           width = 0, -- use default split width (set a number to force)
+  --         },
+  --       },
+  --     },
+  --   },
+  --   keys = {
+  --     { "<leader>a", nil, desc = "AI/Sidekick" },
+  --     { "<leader>aS", "<cmd>Sidekick cli toggle name=codex<cr>", desc = "Toggle Sidekick (codex)" },
+  --     { "<leader>af", "<cmd>Sidekick cli focus name=codex<cr>", desc = "Focus Sidekick" },
+  --     { "<leader>as", "<cmd>Sidekick cli send<cr>", mode = "v", desc = "Send to Sidekick" },
+  --     { "<leader>aa", "<cmd>Sidekick nes apply<cr>", desc = "Apply NES edit" },
+  --     { "<leader>ad", "<cmd>Sidekick nes clear<cr>", desc = "Clear NES edits" },
+  --     { "<leader>an", "<cmd>Sidekick nes jump<cr>", desc = "Jump to NES edit" },
+  --   },
+  -- },
 
   -- TODO grapple,
   -- Claude Code test: Auto-opening integration working!
@@ -878,7 +975,7 @@ return {
   -- },
   {
     -- Move stuff with <M-j> and <M-k> in both normal and visual mode
-    "echasnovski/mini.move",
+    "nvim-mini/mini.move",
     lazy = true,
     config = function()
       require("mini.move").setup()
