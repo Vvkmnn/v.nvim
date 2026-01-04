@@ -960,11 +960,6 @@ return {
 
   -- Detect tabstop and shiftwidth automatically
   { "tpope/vim-sleuth", lazy = true },
-  -- Surround stuff with the ys-, cs-, ds- commands
-  {
-    "tpope/vim-surround",
-    lazy = true,
-  },
 
   -- {
   --   -- Better buffer closing actions. Available via the buffers helper.
@@ -1134,4 +1129,71 @@ return {
   --   --   "lewis6991/gitsigns.nvim",
   --   -- },
   -- }
+
+  -- Smooth cursor animations (macOS optimized)
+  {
+    "sphamba/smear-cursor.nvim",
+    event = "VeryLazy",
+    opts = {
+      stiffness = 0.8,
+      trailing_stiffness = 0.5,
+      distance_stop_animating = 0.5,
+    },
+  },
+
+  -- Beautiful inline diagnostics (replaces virtual text)
+  {
+    "rachartier/tiny-inline-diagnostic.nvim",
+    event = "LspAttach",
+    priority = 1000,
+    opts = { preset = "modern" },
+  },
+
+  -- Split/join code blocks with Treesitter awareness
+  {
+    "Wansmer/treesj",
+    keys = {
+      { "gJ", "<cmd>TSJToggle<cr>", desc = "Toggle split/join" },
+    },
+    opts = { use_default_keymaps = false },
+  },
+
+  -- Interactive text alignment
+  {
+    "echasnovski/mini.align",
+    keys = {
+      { "ga", mode = { "n", "v" }, desc = "Align" },
+      { "gA", mode = { "n", "v" }, desc = "Align with preview" },
+    },
+    opts = {},
+  },
+
+  -- IDE-like breadcrumb navigation (clickable, Treesitter-powered)
+  {
+    "Bekaboo/dropbar.nvim",
+    event = "VeryLazy",
+    opts = {},
+  },
+
+  -- Enable additional Snacks modules
+  {
+    "folke/snacks.nvim",
+    opts = {
+      dim = { enabled = true },
+      zen = { enabled = true },
+      words = { enabled = true },
+      gitbrowse = { enabled = true },
+      scratch = { enabled = true },
+    },
+  },
+
+  -- Session management with git branch awareness
+  {
+    "olimorris/persisted.nvim",
+    lazy = false,
+    opts = {
+      autoload = true,
+      use_git_branch = true,
+    },
+  },
 }

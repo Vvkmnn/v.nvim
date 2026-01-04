@@ -7,7 +7,7 @@
 vim.opt.shiftwidth = 4 -- Use 4 spaces instead of default 2
 vim.opt.tabstop = 4 -- Display tabs as 4 spaces instead of default 2
 vim.opt.wrap = true -- Enable line wrapping (LazyVim default is false)
-vim.opt.scrolloff = 999 -- Always center the cursor line
+-- vim.opt.scrolloff = 999 -- Moved to autocmds.lua for dynamic centering (better performance)
 vim.opt.showtabline = 0 -- Never show tab line (LazyVim default is 1)
 -- Clean fillchars for better diff display - no unwanted characters
 vim.opt.fillchars = {
@@ -26,6 +26,7 @@ vim.opt.fillchars = {
   foldsep = " ", -- Remove fold separators
 }
 vim.opt.foldcolumn = "0" -- Remove fold column completely
+vim.opt.list = false -- Disable visual tab/space indicators (removes > symbols)
 
 -- Best-in-class diffopt (research: vimways.org, neovim docs, community best practices)
 vim.opt.diffopt = {

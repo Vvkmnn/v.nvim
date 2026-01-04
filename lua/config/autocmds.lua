@@ -79,6 +79,15 @@ vim.api.nvim_create_autocmd("CursorHold", {
   end
 })
 
+-- Dynamic centered cursor (better performance than fixed scrolloff = 999)
+vim.api.nvim_create_autocmd({ "VimResized", "WinEnter", "BufWinEnter" }, {
+  group = vim.api.nvim_create_augroup("DynamicScrolloff", { clear = true }),
+  callback = function()
+    vim.opt.scrolloff = math.floor(vim.fn.winheight(0) / 2)
+  end,
+  desc = "Keep cursor centered dynamically (adapts to window height)",
+})
+
 -- Commented out - was interfering with tokyonight theme
 -- vim.api.nvim_create_autocmd("ColorScheme", {
 --   command = [[highlight CursorLine guibg=black ctermbg=115]],
@@ -167,12 +176,18 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- Diff window settings (claudecode.nvim and general diff)
--- NOTE: Do NOT set modifiable=false or readonly=true here - claudecode.nvim
--- requires buffers to be editable ("You can edit Claude's suggestions before accepting")
 vim.api.nvim_create_autocmd("OptionSet", {
   pattern = "diff",
   callback = function()
+    local buf = vim.api.nvim_get_current_buf()
+    local bufname = vim.api.nvim_buf_get_name(buf)
+
     if vim.wo.diff then
+      -- Only apply to claudecode proposed buffers
+      if not bufname:match("%(proposed%)") then
+        return
+      end
+
       -- Disable diagnostics in diff view
       vim.diagnostic.enable(false, { bufnr = 0 })
 
@@ -188,12 +203,103 @@ vim.api.nvim_create_autocmd("OptionSet", {
       vim.wo.list = false
       vim.wo.conceallevel = 0
 
-      -- Sync all diff windows after they're created
+      -- Lock buffer by default - requires explicit unlock with <leader>e
+      vim.bo.modifiable = false
+
+      -- Helper: Show reminder when trying to edit
+      local function show_unlock_reminder()
+        vim.notify("Diff buffer locked. Press <leader>e to unlock editing", vim.log.levels.WARN)
+      end
+
+      -- Map common edit keys to show reminder
+      local edit_keys = { "i", "I", "a", "A", "o", "O", "s", "S", "c", "C", "d", "x" }
+      for _, key in ipairs(edit_keys) do
+        vim.keymap.set("n", key, show_unlock_reminder, {
+          buffer = 0,
+          desc = "Remind about unlock key",
+        })
+      end
+
+      -- Add unlock keybind (buffer-local)
+      vim.keymap.set("n", "<leader>e", function()
+        vim.bo.modifiable = true
+        -- Clear the reminder mappings so normal editing works
+        for _, key in ipairs(edit_keys) do
+          pcall(vim.keymap.del, "n", key, { buffer = 0 })
+        end
+        vim.notify("Diff buffer unlocked - editing enabled", vim.log.levels.INFO)
+      end, {
+        buffer = 0,
+        desc = "Unlock diff buffer for editing",
+      })
+
+      -- Add buffer-local diff control keymaps (ensures they work regardless of lazy loading)
+      -- These work from EITHER window in the diff view
+      local function find_diff_tab_name()
+        -- First check current buffer
+        local tab_name = vim.b[vim.api.nvim_get_current_buf()].claudecode_diff_tab_name
+        if tab_name then return tab_name end
+        -- Search other windows in current tab for the proposed buffer
+        for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+          local buf = vim.api.nvim_win_get_buf(win)
+          tab_name = vim.b[buf].claudecode_diff_tab_name
+          if tab_name then return tab_name end
+        end
+        return nil
+      end
+
+      vim.keymap.set("n", "<leader>[", function()
+        local tab_name = find_diff_tab_name()
+        if tab_name then
+          vim.cmd("ClaudeCodeDiffDeny")
+        else
+          vim.notify("No active diff found", vim.log.levels.WARN)
+        end
+      end, { buffer = 0, desc = "Reject diff (buffer-local)" })
+
+      vim.keymap.set("n", "<leader>]", function()
+        local tab_name = find_diff_tab_name()
+        if tab_name then
+          vim.cmd("ClaudeCodeDiffAccept")
+        else
+          vim.notify("No active diff found", vim.log.levels.WARN)
+        end
+      end, { buffer = 0, desc = "Accept diff (buffer-local)" })
+
+      vim.keymap.set("n", "q", function()
+        -- Quick escape: reject diff and close
+        local tab_name = find_diff_tab_name()
+        if tab_name then
+          vim.cmd("ClaudeCodeDiffDeny")
+        else
+          vim.cmd("close")
+        end
+      end, { buffer = 0, desc = "Quick reject/close diff" })
+
+      -- Sync all diff windows after they're created (preserve window focus)
       vim.defer_fn(function()
-        vim.cmd("windo if &diff | set scrollbind cursorbind wrap linebreak | endif")
-        vim.cmd("syncbind")
+        local current_win = vim.api.nvim_get_current_win()
+        vim.cmd("noautocmd windo if &diff | set scrollbind cursorbind wrap linebreak | endif")
+        vim.cmd("noautocmd syncbind")
         vim.cmd("wincmd =")
+        -- Restore focus to original window
+        if vim.api.nvim_win_is_valid(current_win) then
+          vim.api.nvim_set_current_win(current_win)
+        end
       end, 50)
+    else
+      -- Only cleanup claudecode buffers
+      if not bufname:match("%(proposed%)") then
+        return
+      end
+
+      -- Clean up ALL keymaps we created
+      local all_keymaps = { "<leader>[", "<leader>]", "<leader>e", "q",
+                           "i", "I", "a", "A", "o", "O", "s", "S", "c", "C", "d", "x" }
+      for _, key in ipairs(all_keymaps) do
+        pcall(vim.keymap.del, "n", key, { buffer = buf })
+      end
+      vim.bo.modifiable = true
     end
   end,
   desc = "Diff window settings",
@@ -204,7 +310,7 @@ vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI", "WinScrolled" }, {
   group = vim.api.nvim_create_augroup("DiffScrollSync", { clear = true }),
   callback = function()
     if vim.wo.diff and vim.wo.scrollbind then
-      vim.cmd("syncbind")
+      vim.cmd("noautocmd syncbind")
     end
   end,
   desc = "Keep diff windows synchronized when scrolling",
@@ -442,22 +548,110 @@ vim.api.nvim_create_autocmd("FocusGained", {
   desc = "Auto-focus Claude terminal on FocusGained (skips if diff view open)"
 })
 
--- ============================================================================
--- SIMPLE AUTO-RELOAD (for LLM editing workflows)
--- ============================================================================
--- Automatically reload files when changed externally (e.g., by LLM)
--- NOTE: This will reload immediately without prompting, even if you have
--- unsaved changes. Your changes will be lost if the file changes externally!
+-- == Silent Auto-Reload with Three-Way Merge ==
+-- Merges external changes while preserving your unsaved edits.
+-- Your edits + Claude's edits = both preserved (if on different lines).
+-- When both edit the same line: you win, conflict is notified.
 
--- Trigger checktime frequently to detect external changes
-vim.api.nvim_create_autocmd({"FocusGained", "BufEnter", "CursorHold"}, {
-  group = vim.api.nvim_create_augroup("AutoReload", { clear = true }),
-  callback = function()
-    if vim.bo.buftype == "" then
-      vim.cmd("silent! checktime")
-    end
+local reload_group = vim.api.nvim_create_augroup("SmartAutoReload", { clear = true })
+
+-- Store base content and mtime when buffer is loaded
+vim.api.nvim_create_autocmd("BufReadPost", {
+  group = reload_group,
+  callback = function(ev)
+    vim.b[ev.buf].base_lines = vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false)
+    local stat = vim.uv.fs_stat(vim.api.nvim_buf_get_name(ev.buf))
+    vim.b[ev.buf].last_mtime = stat and stat.mtime.sec
   end,
-  desc = "Check for external file changes and auto-reload"
+})
+
+-- Update base when you save
+vim.api.nvim_create_autocmd("BufWritePost", {
+  group = reload_group,
+  callback = function(ev)
+    vim.b[ev.buf].base_lines = vim.api.nvim_buf_get_lines(ev.buf, 0, -1, false)
+    local stat = vim.uv.fs_stat(vim.api.nvim_buf_get_name(ev.buf))
+    vim.b[ev.buf].last_mtime = stat and stat.mtime.sec
+  end,
+})
+
+-- Check if two hunks overlap (conflict)
+local function hunks_overlap(h1, h2)
+  local s1, e1 = h1[1], h1[1] + math.max(h1[2] - 1, 0)
+  local s2, e2 = h2[1], h2[1] + math.max(h2[2] - 1, 0)
+  return s1 <= e2 and s2 <= e1
+end
+
+-- Check for external changes and merge
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+  group = reload_group,
+  callback = function(ev)
+    local buf = ev.buf
+    if vim.bo[buf].buftype ~= "" then return end
+
+    local fname = vim.api.nvim_buf_get_name(buf)
+    if fname == "" then return end
+
+    local stat = vim.uv.fs_stat(fname)
+    if not stat then return end
+
+    -- Check mtime
+    local disk_mtime = stat.mtime.sec
+    if vim.b[buf].last_mtime == disk_mtime then return end
+    vim.b[buf].last_mtime = disk_mtime
+
+    local base = vim.b[buf].base_lines
+    local disk_lines = vim.fn.readfile(fname)
+    if not base or not disk_lines then return end
+
+    local base_text = table.concat(base, "\n")
+    local disk_text = table.concat(disk_lines, "\n")
+    if base_text == disk_text then return end
+
+    -- Compute user's changes (base → buffer)
+    local buf_lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+    local buf_text = table.concat(buf_lines, "\n")
+    local user_hunks = vim.diff(base_text, buf_text, { result_type = "indices" }) or {}
+
+    -- Compute Claude's changes (base → disk)
+    local claude_hunks = vim.diff(base_text, disk_text, { result_type = "indices" }) or {}
+    if #claude_hunks == 0 then return end
+
+    -- Apply Claude's changes, skipping conflicts (user wins)
+    local applied, skipped = 0, 0
+    for i = #claude_hunks, 1, -1 do
+      local ch = claude_hunks[i]
+      local conflict = false
+
+      for _, uh in ipairs(user_hunks) do
+        if hunks_overlap(ch, uh) then
+          conflict = true
+          skipped = skipped + 1
+          break
+        end
+      end
+
+      if not conflict then
+        local new_lines = {}
+        for j = ch[3], ch[3] + ch[4] - 1 do
+          new_lines[#new_lines + 1] = disk_lines[j] or ""
+        end
+        vim.api.nvim_buf_set_lines(buf, ch[1] - 1, ch[1] - 1 + ch[2], false, new_lines)
+        applied = applied + 1
+      end
+    end
+
+    -- Update base to new disk content
+    vim.b[buf].base_lines = disk_lines
+
+    -- Notify
+    local msg = "Merged: " .. vim.fn.fnamemodify(fname, ":t")
+    if skipped > 0 then
+      msg = msg .. " (" .. skipped .. " conflict" .. (skipped > 1 and "s" or "") .. " - yours kept)"
+    end
+    vim.notify(msg, skipped > 0 and vim.log.levels.WARN or vim.log.levels.INFO)
+  end,
+  desc = "Silent auto-reload with three-way merge (user wins conflicts)"
 })
 
 -- ============================================================================

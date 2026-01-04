@@ -90,6 +90,12 @@ vim.keymap.set(
 -- map("n", "<C-k>", "<C-w><C-k>", "Navigate windows up")
 -- map("n", "<C-l>", "<C-w><C-l>", "Navigate windows to the right")
 
+-- Window navigation (extended to visual mode for cross-window comparisons)
+vim.keymap.set({ "n", "v", "x" }, "<C-h>", "<C-w>h", { desc = "Go to Left Window", remap = true })
+vim.keymap.set({ "n", "v", "x" }, "<C-j>", "<C-w>j", { desc = "Go to Lower Window", remap = true })
+vim.keymap.set({ "n", "v", "x" }, "<C-k>", "<C-w>k", { desc = "Go to Upper Window", remap = true })
+vim.keymap.set({ "n", "v", "x" }, "<C-l>", "<C-w>l", { desc = "Go to Right Window", remap = true })
+
 -- Move with shift-arrows
 -- map("n", "<S-Left>", "<C-w><S-h>", "Move window to the left")
 -- map("n", "<S-Down>", "<C-w><S-j>", "Move window down")
@@ -237,3 +243,16 @@ end, { desc = "Pick window/tab" })
 -- sW for sudo :w
 -- TODO fix
 -- vim.cmd("command sW execute ':silent w !sudo tee % > /dev/null' | edit!")
+
+-- Yank selection with file path for Claude context (optional)
+-- Uncomment to enable: Visual select code, press <leader>yp to copy with file:line info
+-- vim.keymap.set("v", "<leader>yp", function()
+--   local start_line = vim.fn.line("'<")
+--   local end_line = vim.fn.line("'>")
+--   local file = vim.fn.expand("%:.")
+--   vim.cmd('normal! "vy')
+--   local content = vim.fn.getreg("v")
+--   local result = string.format("```%s:%d-%d\n%s\n```", file, start_line, end_line, content)
+--   vim.fn.setreg("+", result)
+--   vim.notify("Yanked with path: " .. file)
+-- end, { desc = "Yank with file path for Claude" })
