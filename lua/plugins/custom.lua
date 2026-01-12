@@ -113,7 +113,7 @@ return {
     -- enabled = false, -- Disabled for sidekick.nvim testing
     opts = {
       terminal = {
-        split_width_percentage = 0.42,
+        split_width_percentage = 0.44,
         split_side = "left",
         -- provider = "snacks",
         auto_close = true,
@@ -129,7 +129,88 @@ return {
     keys = {
       { "<leader>a", nil, desc = "AI/Claude Code" },
       { "<leader>aC", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
-      { "<leader>\\", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude", mode = { "n", "t" } },
+      -- Smart continue: tries --continue first, falls back to new session
+      {
+        "<leader>\\",
+        function()
+          -- Try to continue existing session
+          local ok = pcall(vim.cmd, "ClaudeCode --continue")
+          if not ok then
+            -- No session to continue, start new
+            vim.cmd("ClaudeCode")
+          end
+        end,
+        desc = "Continue/Start Claude",
+        mode = { "n", "t" },
+      },
+      --NOTE: Using \ now, unbound, this conflicts with LazyVim grep
+      -- { "<leader>/", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude", mode = { "n", "t" } },
+      -- Jump to Claude marker (toggle: first press = jump, second press = return) - claude-jump
+      -- Cross-ref: tmux version in ~/.config/tmux/claude_jump.sh (prefix b)
+      -- Searches for user prompts (^> ) OR Claude bullets (^⏺), skips markdown quote blocks
+      -- Smart visibility check: does nothing if marker already visible
+      -- claude-jump: Jump to previous Claude marker (user prompt or action bullet)
+      -- Cross-ref: tmux version in ~/.config/tmux/claude_jump.sh (prefix b)
+      -- Usage: Esc then gb (go back) to jump, gb again to return
+      {
+        "gb",
+        function()
+          vim.notify("gb triggered", vim.log.levels.INFO) -- DEBUG
+          local bufnr = vim.api.nvim_get_current_buf()
+          local jumped = vim.b[bufnr].claude_jumped
+
+          if jumped then
+            -- SECOND PRESS: Jump back to bottom and enter insert mode
+            vim.notify("gb: returning to bottom", vim.log.levels.INFO) -- DEBUG
+            vim.cmd([[normal! G]])
+            vim.cmd([[startinsert]])
+            vim.b[bufnr].claude_jumped = false
+            return
+          end
+
+          -- Check if marker already visible in current window
+          local first_visible = vim.fn.line("w0")
+          local last_visible = vim.fn.line("w$")
+          for lnum = first_visible, last_visible do
+            local line = vim.fn.getline(lnum)
+            if line:match("^> ") or line:match("^⏺") then
+              vim.notify("gb: marker visible at line " .. lnum .. ", skipping", vim.log.levels.INFO) -- DEBUG
+              return
+            end
+          end
+
+          -- FIRST PRESS: Search for marker
+          local current_line = vim.fn.line(".")
+
+          while true do
+            -- Search for user prompt OR Claude bullet
+            local found = vim.fn.search([[^\(> \|⏺\)]], "bW")
+            if found == 0 then
+              vim.fn.cursor(current_line, 1)
+              vim.notify("No marker found", vim.log.levels.WARN)
+              return
+            end
+
+            local line = vim.fn.getline(found)
+            -- If user prompt, check if isolated (not part of quote block)
+            if line:match("^> ") then
+              local prev_line = vim.fn.getline(found - 1)
+              if found == 1 or not prev_line:match("^>") then
+                vim.cmd("normal! zt") -- Position at top
+                vim.b[bufnr].claude_jumped = true
+                return
+              end
+            else
+              -- Claude bullet - always valid
+              vim.cmd("normal! zt") -- Position at top
+              vim.b[bufnr].claude_jumped = true
+              return
+            end
+          end
+        end,
+        mode = "n",
+        desc = "Jump to Claude marker (toggle)",
+      },
       { "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude" },
       { "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume Claude" },
       { "<leader>ac", "<cmd>ClaudeCode --continue<cr>", desc = "Continue Claude" },
@@ -176,13 +257,18 @@ return {
     config = function(_, opts)
       require("claudecode").setup(opts)
 
-      -- Diff highlighting for Claude diffs
-      vim.cmd([[
-        highlight! DiffAdd guifg=#a7c957 guibg=#1a2e1a gui=bold
-        highlight! DiffDelete guifg=#8a8a8a guibg=#2a1a1a gui=bold
-        highlight! DiffChange guifg=#f4a261 guibg=#2a2519 gui=bold
-        highlight! DiffText guifg=#ffffff guibg=#3d3520 gui=bold
-      ]])
+      -- DISABLED: Hardcoded diff colors (2025-01-07)
+      -- These highlight! commands were overriding tokyonight theme settings.
+      -- Problem: Used bold text + bright backgrounds (#1a2e1a) creating visual noise
+      -- Solution: Let tokyonight theme handle diff colors (modify.lua:626-638)
+      --           which provides subtle backgrounds + dimmed syntax via winhighlight
+      -- To restore old colors, uncomment this block and comment out modify.lua colors
+      -- vim.cmd([[
+      --   highlight! DiffAdd guifg=#a7c957 guibg=#1a2e1a gui=bold
+      --   highlight! DiffDelete guifg=#8a8a8a guibg=#2a1a1a gui=bold
+      --   highlight! DiffChange guifg=#f4a261 guibg=#2a2519 gui=bold
+      --   highlight! DiffText guifg=#ffffff guibg=#3d3520 gui=bold
+      -- ]])
     end,
   },
 

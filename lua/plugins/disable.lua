@@ -1,4 +1,4 @@
 return {
-  -- flash.nvim re-enabled - community best navigation plugin (s=jump, S=treesitter select, r=remote)
-  -- { "folke/flash.nvim", enabled = false },
+  -- flash.nvim disabled - not using the jump navigation features
+  { "folke/flash.nvim", enabled = false },
 }

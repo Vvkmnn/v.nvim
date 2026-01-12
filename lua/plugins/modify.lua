@@ -623,11 +623,25 @@ return {
         hl.Pmenu = { bg = c.bg_popup }
         hl.PmenuSel = { bg = c.bg_highlight }
 
-        -- Beautiful diff colors (GitHub/VS Code style - subtle bg, syntax shows through)
-        hl.DiffAdd = { bg = "#1a2e1a" } -- Subtle green tint for additions
-        hl.DiffDelete = { bg = "#2e1a1a" } -- Subtle red tint for deletions
-        hl.DiffChange = { bg = "#1a1a2e" } -- Subtle blue tint for changed lines
-        hl.DiffText = { bg = "#ff9e64", fg = "#1a1b26", bold = true } -- Bright orange for exact character changes
+        -- Diff colors - TokyoNight Harmony (2025-01-07)
+        -- Colors derived from TokyoNight palette for beautiful, readable diffs
+        -- Syntax highlighting stays FULL COLOR (no dimming via winhighlight)
+
+        -- REMOVED: DiffDimmed* groups (winhighlight disabled in autocmds.lua:206-224)
+
+        -- Added lines: Soft forest green (derived from theme green #9ece6a)
+        hl.DiffAdd = { bg = "#1e2e1a" }
+
+        -- Deleted lines: Soft burgundy rose (derived from theme red #f7768e)
+        -- Rose is PINK-ish (not orange!) - clearly distinct from amber changes
+        hl.DiffDelete = { bg = "#2e1a1e" }
+
+        -- Changed lines: Warm amber glow (derived from theme yellow #e0af68)
+        -- Matches your cursorline! Clearly GOLD (not pink)
+        hl.DiffChange = { bg = "#2e2618" }
+
+        -- Word-level changes: Theme yellow text (perfect harmony)
+        hl.DiffText = { bg = "#3d3520", fg = "#e0af68" }
       end,
     },
   },

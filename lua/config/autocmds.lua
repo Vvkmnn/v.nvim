@@ -203,6 +203,26 @@ vim.api.nvim_create_autocmd("OptionSet", {
       vim.wo.list = false
       vim.wo.conceallevel = 0
 
+      -- DISABLED: Syntax dimming (2025-01-07)
+      -- winhighlight dimmed ALL syntax to gray, making diff hard to read
+      -- New approach: Keep syntax colors FULL, use subtle line backgrounds (modify.lua)
+      -- Intensity Scaling Design: line bg (whisper) → word bg (speak) → word text (shout)
+      -- vim.wo.winhighlight = table.concat({
+      --   "Comment:DiffDimmedComment",
+      --   "@comment:DiffDimmedComment",
+      --   "@keyword:DiffDimmedKeyword",
+      --   "Keyword:DiffDimmedKeyword",
+      --   "@string:DiffDimmedString",
+      --   "String:DiffDimmedString",
+      --   "@function:DiffDimmedFunction",
+      --   "Function:DiffDimmedFunction",
+      --   "@variable:DiffDimmed",
+      --   "@parameter:DiffDimmed",
+      --   "@property:DiffDimmed",
+      --   "Identifier:DiffDimmed",
+      --   "Normal:DiffDimmed",
+      -- }, ",")
+
       -- Lock buffer by default - requires explicit unlock with <leader>e
       vim.bo.modifiable = false
 
@@ -306,6 +326,9 @@ vim.api.nvim_create_autocmd("OptionSet", {
 })
 
 -- Perfect scroll synchronization with multiple triggers
+-- NOTE (2026-01-05): If j/k scrolling freezes in diff mode, this autocmd may be causing
+-- a cascade of syncbind calls. CursorMoved fires on every keypress which can create
+-- a feedback loop even with noautocmd. Disable this block if scrolling becomes laggy.
 vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI", "WinScrolled" }, {
   group = vim.api.nvim_create_augroup("DiffScrollSync", { clear = true }),
   callback = function()
