@@ -1,17 +1,33 @@
--- Keymaps are automatically loaded on the VeryLazy event
--- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
--- Add any additional keymaps here
---
--- ========================================
--- Change List Navigation
--- ========================================
--- jump to change
-vim.keymap.set("n", "]c", "g,", { desc = "Next Change" })
-vim.keymap.set("n", "[c", "g;", { desc = "Previous Change" })
--- vim.keymap.set("n", "]c", "g,", { desc = "Next Change", noremap = true })
--- vim.keymap.set("n", "[c", "g;", { desc = "Previous Change", noremap = true })
+--  ╭────────────────────────────────────────────────────────────────────────╮
+--  │                                                                        │
+--  │                       ######                                           │
+--  │                     ######                                             │
+--  │                    #####                                               │
+--  │                    #####                                               │
+--  │                    #####                                               │
+--  │            ######  #####                                               │
+--  │          ######    #####         keymaps.lua                           │
+--  │        #######     #####         Custom keybindings (VeryLazy)          │
+--  │       ######        ####                                               │
+--  │        ######        ###         defaults → lazyvim.config.keymaps     │
+--  │          #####        ##                                               │
+--  │           #####        #                                               │
+--  │            #####                                                       │
+--  │             #####                                                      │
+--  │              #####                                                     │
+--  │               #####                                                    │
+--  │                #####                                                   │
+--  │                 #####                                                  │
+--  │                                                                        │
+--  ╰────────────────────────────────────────────────────────────────────────╯
 
--- Edit Alias
+-- change list navigation --------------------------------
+-- NOTE: ]x/[x for change list (g, and g; also work natively)
+--       ]c/[c freed for native diff hunk navigation (used in claudecode diffs)
+vim.keymap.set("n", "]x", "g,", { desc = "Next change (edit list)" })
+vim.keymap.set("n", "[x", "g;", { desc = "Previous change (edit list)" })
+
+-- edit shortcuts ----------------------------------------
 vim.keymap.set("n", ",r", ":e ~/.github/README.md<CR>", { silent = true, desc = "Edit .dotfiles README" })
 vim.keymap.set("n", ",v", ":e ~/.config/nvim/lua/<CR>", { silent = true, desc = "Edit Neovim" })
 vim.keymap.set("n", ",k", ":e ~/.config/nvim/lua/config/keymaps.lua<CR>", { silent = true, desc = "Edit Keymaps" })
@@ -41,9 +57,8 @@ vim.keymap.set("n", ",w", ":e ~/.config/wezterm/wezterm.lua<CR>", { silent = tru
 vim.keymap.set("n", ",y", ":e ~/.yabairc<CR>", { silent = true, desc = "Edit yabai service" })
 vim.keymap.set("n", ",sk", ":e ~/.skhdrc<CR>", { silent = true, desc = "Edit skhd service" })
 
--- Error capture and debugging
+-- diagnostics and debugging -----------------------------
 vim.keymap.set("n", "<leader>xm", function()
-  -- Toggle messages buffer
   local current_buf = vim.api.nvim_get_current_buf()
   local buf_name = vim.api.nvim_buf_get_name(current_buf)
   if buf_name:match("messages") then
@@ -54,198 +69,67 @@ vim.keymap.set("n", "<leader>xm", function()
 end, { desc = "Toggle Vim messages (errors)" })
 vim.keymap.set("n", "<leader>xh", ":checkhealth<CR>", { desc = "Check Neovim health" })
 
--- Source
--- vim.keymap.set("n", "<leader>r", ":source ~/.config/nvim/init.lua<CR>", { desc = "Source Neovim config" })
--- Reload Config + Keymaps
+-- config reload -----------------------------------------
+-- NOTE: sources init.lua + keymaps + custom packages via util.functions
 vim.keymap.set(
   "n",
   "<leader>r",
   "<cmd>lua require('util.functions').ReloadConfig()<CR>",
   { desc = "Reload Neovim config, keymaps, and custom packages" }
 )
--- vim.keymap.set("n", "<leader>r", ":so ~/.config/nvim/init.lua<CR>", { desc = "Source Neovim config" })
--- TODO binds for only, vimsplit, etc.
 
--- Escape via jj or jk in insert mode
--- map("i", "jj", "<ESC>")
--- map("i", "jk", "<esc>")
-
--- Quick access to some common actions
--- map("n", "<leader>fw", "<cmd>w<cr>", "Write")
--- map("n", "<leader>fa", "<cmd>wa<cr>", "Write all")
--- map("n", "<leader>qq", "<cmd>q<cr>", "Quit")
--- map("n", "<leader>qa", "<cmd>qa!<cr>", "Quit all")
--- map("n", "<leader>dw", "<cmd>close<cr>", "Window")
-
--- Diagnostic keymaps
--- map('n', 'gx', vim.diagnostic.open_float, "Show diagnostics under cursor")
-
--- Easier access to beginning and end of lines
--- map("n", "<M-h>", "^", "Go to beginning of line")
--- map("n", "<M-l>", "$", "Go to end of line")
-
--- Better window navigation
--- map("n", "<C-h>", "<C-w><C-h>", "Navigate windows to the left")
--- map("n", "<C-j>", "<C-w><C-j>", "Navigate windows down")
--- map("n", "<C-k>", "<C-w><C-k>", "Navigate windows up")
--- map("n", "<C-l>", "<C-w><C-l>", "Navigate windows to the right")
-
--- Window navigation (extended to visual mode for cross-window comparisons)
+-- window navigation -------------------------------------
+-- NOTE: extended to visual mode for cross-window comparisons in diff
 vim.keymap.set({ "n", "v", "x" }, "<C-h>", "<C-w>h", { desc = "Go to Left Window", remap = true })
 vim.keymap.set({ "n", "v", "x" }, "<C-j>", "<C-w>j", { desc = "Go to Lower Window", remap = true })
 vim.keymap.set({ "n", "v", "x" }, "<C-k>", "<C-w>k", { desc = "Go to Upper Window", remap = true })
 vim.keymap.set({ "n", "v", "x" }, "<C-l>", "<C-w>l", { desc = "Go to Right Window", remap = true })
 
--- Move with shift-arrows
--- map("n", "<S-Left>", "<C-w><S-h>", "Move window to the left")
--- map("n", "<S-Down>", "<C-w><S-j>", "Move window down")
--- map("n", "<S-Up>", "<C-w><S-k>", "Move window up")
--- map("n", "<S-Right>", "<C-w><S-l>", "Move window to the right")
-
--- Resize with arrows
--- map("n", "<C-Up>", ":resize +2<CR>")
--- map("n", "<C-Down>", ":resize -2<CR>")
--- map("n", "<C-Left>", ":vertical resize +2<CR>")
--- map("n", "<C-Right>", ":vertical resize -2<CR>")
-
--- Deleting buffers
--- local buffers = require("helpers.buffers")
--- map("n", "<leader>db", buffers.delete_this, "Current buffer")
--- map("n", "<leader>do", buffers.delete_others, "Other buffers")
--- map("n", "<leader>da", buffers.delete_all, "All buffers")
-
--- Navigate buffers
--- map("n", "<S-l>", ":bnext<CR>")
--- map("n", "<S-h>", ":bprevious<CR>")
--- map("n", "<S-j>", ":bnext<CR>")
--- map("n", "<S-k>", ":bprevious<CR>")
-
--- Stay in indent mode
--- map("v", "<", "<gv")
--- map("v", ">", ">gv")
-
--- Switch between light and dark modes
--- map("n", "<leader>ut", function()
---   if vim.o.background == "dark" then
---     vim.o.background = "light"
---   else
---     vim.o.background = "dark"
---   end
--- end, "Toggle between light and dark themes")
-
--- Clear after search
--- map("n", "<leader>ur", "<cmd>nohl<cr>", "Clear highlights")
-
--- Cmd+S / Ctrl+S to Save (works in normal, visual, and insert mode)
--- <C-S> works in all neovim environments
+-- save --------------------------------------------------
 vim.keymap.set({ "n", "v", "i" }, "<C-S>", "<cmd>update<CR>", { desc = "Save file" })
--- <D-s> works in GUI neovim (Neovide, gvim, etc.)
 vim.keymap.set({ "n", "v", "i" }, "<D-s>", "<cmd>update<CR>", { desc = "Save file (GUI)" })
--- Terminal escape sequences for Cmd+S (CSI u encoding: \x1b[115;9u where 115='s', 9=Super modifier)
--- This allows terminals like Ghostty/Kitty/WezTerm that send CSI u sequences to work without config
+-- NOTE: CSI u encoding (\x1b[115;9u where 115='s', 9=Super modifier)
+--       allows Ghostty/Kitty/WezTerm to send Cmd+S without terminal config
 vim.keymap.set({ "n", "v", "i" }, "\x1b[115;9u", "<cmd>update<CR>", { desc = "Save file (terminal Cmd+S)" })
--- Alternative: <leader>w for save
-vim.keymap.set("n", "<leader>w", ":update<CR>", { desc = "Save file" })
+-- NOTE: <leader>w freed for LazyVim window prefix
+vim.keymap.set("n", "<leader>S", ":update<CR>", { desc = "Save file" })
 
--- Ctrl+Q to Quit
-vim.keymap.set("n", "<C-Q>", ":q<CR>", { desc = "Quit without saving" }) -- AI: Fixed syntax error
-vim.keymap.set("n", "<leader>q", ":qa!<CR>", { desc = "Quit all, no confirmation" })
--- vim.keymap.set({ "n", "i" }, "<C-Q>", ":exit<CR>,", { desc = "Quit without saving", expr = true }) -- doesnt work
+-- quit --------------------------------------------------
+vim.keymap.set("n", "<C-Q>", ":q<CR>", { desc = "Quit without saving" })
+vim.keymap.set("n", "<leader>Q", ":confirm qa<CR>", { desc = "Quit all (confirms unsaved)" })
 
--- Faster Buffer
--- vim.keymap.set(
---   "n",
---   "<leader>b<leader>",
---   "<cmd>Telescope buffers sort_mru=true sort_lastused=true preview=true<cr>",
---   { desc = "Telescope fuzzy buffers" }
--- )
---
--- :lua require("telescope.builtin").current_buffer_fuzzy_find({ previewer = false })<CR>'
-
--- Neogit
-
--- Open Neogit
--- vim.api.nvim_set_keymap("n", "<leader>gg", ":Neogit<CR>", { noremap = true, silent = true, desc = "Open Neogit" })
-
--- GP.Nvim
--- vim.api.nvim_set_keymap("n", "<leader>gg", ":Neogit<CR>", { noremap = true, silent = "True", desc = "Open Neogit" })
-
--- Open Neogit for dotfiles
--- function OpenDotfilesInNeogit()
---   -- Ensure environment variables are set right before opening Neogit
---   local git_dir = vim.fn.expand("~/.dotfiles")
---   local work_tree = vim.fn.expand("~")
---
---   -- Use vim.cmd to ensure environment variables are set in the shell environment for the command
---   vim.cmd("let $GIT_DIR = '" .. git_dir .. "'")
---   vim.cmd("let $GIT_WORK_TREE = '" .. work_tree .. "'")
---
---   require("neogit").open()
--- end
-
--- Keybinding to open dotfiles with Neogit
--- vim.api.nvim_set_keymap("n", "<leader>d", ":lua OpenDotfilesInNeogit()<CR>", { noremap = true, silent = true })
--- vim.keymap.set(
---   "n",
---   "<leader>gd",
---   "<cmd>lua require('util.functions').OpenDotfilesInNeogit()<CR>",
---   { desc = "Open Neogit for dotfiles", noremap = true }
--- )
-
--- TODO only to remove lazygit, replace with something
--- vim.keymap.del("n", "<leader>gG")
--- vim.keymap.set("n", "<leader>gG", "", { desc = "", noremap = true })
-
--- Custom ripgrep with hidden files
+-- search ------------------------------------------------
+-- NOTE: custom ripgrep including hidden files (dotfiles, .env, etc.)
 vim.keymap.set("n", "<leader>rg", function()
   require("fzf-lua").live_grep({
     cmd = "rg --column --line-number --no-heading --color=always --smart-case --hidden --follow --iglob !.git/",
   })
 end, { desc = "Live grep (include hidden files)" })
 
--- Windows
--- only
+-- diff mode ---------------------------------------------
+vim.keymap.set("n", "<leader>gw", function()
+  vim.cmd("windo diffthis")
+end, { noremap = true, desc = "Git diff (w)indows" })
+vim.keymap.set("n", "<leader>gd", function()
+  vim.cmd("windo diffoff")
+end, { noremap = true, desc = "Git diff off" })
+
+-- ui toggles --------------------------------------------
+vim.keymap.set("n", "<leader>uH", function()
+  vim.g.gentle_hover_disabled = not vim.g.gentle_hover_disabled
+  vim.notify("GentleHover " .. (vim.g.gentle_hover_disabled and "disabled" or "enabled"), vim.log.levels.INFO)
+end, { desc = "Toggle GentleHover (session)" })
+
+-- windows -----------------------------------------------
 vim.keymap.set("n", "<leader>o", ":only<CR>", { desc = "Only window" })
+-- NOTE: <leader>aD removed, replaced by <leader>| in claudecode.nvim keys table (custom.lua)
 
--- NOTE: <leader>aD removed - replaced by <leader>| in claudecode.nvim keys table (custom.lua)
-
--- Window/tab picker via fzf-lua
 vim.keymap.set("n", "<leader>ww", function()
   require("fzf-lua").tabs()
-end, { desc = "Pick window/tab" })
+end, { desc = "Pick window/tab (fzf)" })
 
--- map("n", "<C-Q>", ":exit<CR>")
--- map("v", "<C-Q>", "<C-C>:exit<CR>")
--- map("i", "<C-Q>", "<C-O>:exit<CR>")
--- map("n", "<C-Q>", ":q<CR>")
--- map("v", "<C-Q>", "<C-C>:q<CR>")
--- map("i", "<C-Q>", "<C-O>:q<CR>")
-
--- Ctrl Arrow Buffer Navigation
--- map('n', '<C-Right>', '<c-w>l')
--- map('n', '<C-Left>', '<c-w>h')
--- map('n', '<C-Up>', '<c-w>k')
--- map('n', '<C-Down>', '<c-w>j')
-
--- Ctrl HJKL Split Navigation
--- map('n', '<C-H>', '<C-W><C-H>')
--- map('n', '<C-J>', '<C-W><C-J>')
--- map('n', '<C-K>', '<C-W><C-K>')
--- map('n', '<C-L>', '<C-W><C-L>')
-
--- Sort in Visual Mode
--- map("v", "<Leader>s", ":sort<CR>")
-
--- Fix for Vim on WSL
--- https://stackoverflow.com/questions/51388353/vim-changes-into-replace-mode-on-startup
--- map("n", "<esc>^[", "<esc>^[")
-
--- sW for sudo :w
--- TODO fix
--- vim.cmd("command sW execute ':silent w !sudo tee % > /dev/null' | edit!")
-
--- Yank selection with file path for Claude context (optional)
--- Uncomment to enable: Visual select code, press <leader>yp to copy with file:line info
+-- TODO: yank-with-path for Claude context (uncomment to enable)
+--       visual select code, press <leader>yp to copy with file:line info
 -- vim.keymap.set("v", "<leader>yp", function()
 --   local start_line = vim.fn.line("'<")
 --   local end_line = vim.fn.line("'>")

@@ -1,15 +1,37 @@
--- Options are automatically loaded before lazy.nvim startup
--- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
--- Add any additional options here
--- Testing: Immediate switch to window 3
+--  ╭────────────────────────────────────────────────────────────────────────╮
+--  │                                                                        │
+--  │                       ######                                           │
+--  │                     ######                                             │
+--  │                    #####                                               │
+--  │                    #####                                               │
+--  │                    #####                                               │
+--  │            ######  #####                                               │
+--  │          ######    #####         options.lua                           │
+--  │        #######     #####         Vim options, loaded before lazy.nvim  │
+--  │       ######        ####                                               │
+--  │        ######        ###         defaults → lazyvim.config.options     │
+--  │          #####        ##                                               │
+--  │           #####        #                                               │
+--  │            #####                                                       │
+--  │             #####                                                      │
+--  │              #####                                                     │
+--  │               #####                                                    │
+--  │                #####                                                   │
+--  │                 #####                                                  │
+--  │                                                                        │
+--  ╰────────────────────────────────────────────────────────────────────────╯
 
--- Only specify options that differ from LazyVim defaults
+-- global borders ----------------------------------------
+vim.o.winborder = "rounded" -- Rounded borders on all float windows (hover, cmdline, completion)
+
+-- indentation -------------------------------------------
 vim.opt.shiftwidth = 4 -- Use 4 spaces instead of default 2
 vim.opt.tabstop = 4 -- Display tabs as 4 spaces instead of default 2
+
+-- display -----------------------------------------------
 vim.opt.wrap = true -- Enable line wrapping (LazyVim default is false)
 -- vim.opt.scrolloff = 999 -- Moved to autocmds.lua for dynamic centering (better performance)
 vim.opt.showtabline = 0 -- Never show tab line (LazyVim default is 1)
--- Clean fillchars for better diff display - no unwanted characters
 vim.opt.fillchars = {
   vert = " ", -- Remove vertical separator completely
   horiz = " ", -- Remove horizontal separator completely
@@ -28,7 +50,7 @@ vim.opt.fillchars = {
 vim.opt.foldcolumn = "0" -- Remove fold column completely
 vim.opt.list = false -- Disable visual tab/space indicators (removes > symbols)
 
--- Best-in-class diffopt (research: vimways.org, neovim docs, community best practices)
+-- diff --------------------------------------------------
 vim.opt.diffopt = {
   "internal", -- Use internal xdiff library (same as git, faster)
   "filler", -- Show filler lines for alignment
@@ -41,7 +63,7 @@ vim.opt.diffopt = {
   "context:3", -- Show 3 lines of context around changes
 }
 
--- DISABLED: Diff colors now configured in TokyoNight theme (modify.lua)
+-- NOTE: diff colors configured in TokyoNight theme (modify.lua)
 -- vim.api.nvim_create_autocmd("ColorScheme", {
 --   callback = function()
 --     vim.api.nvim_set_hl(0, "DiffAdd", { bg = "#0d4a1a", fg = "#7fb069", bold = true })
@@ -51,55 +73,55 @@ vim.opt.diffopt = {
 --   end,
 -- })
 
--- NOTE: All diff-related autocmds have been moved to lua/config/autocmds.lua
--- This file should only contain global options (vim.opt, vim.g, etc.)
+-- NOTE: all diff-related autocmds have been moved to lua/config/autocmds.lua
 
--- Disable swapfiles - modern workflow with git + frequent saves makes them unnecessary
-vim.opt.swapfile = false
+-- swap files --------------------------------------------
+-- Primary crash protection (auto-save disabled, too aggressive)
+-- Stored in ~/.local/share/nvim/swap/ (XDG default), never in project dirs
+-- SwapExists autocmd in autocmds.lua auto-recovers unsaved changes silently
+vim.opt.swapfile = true
 
--- Performance optimizations beyond LazyVim defaults
+-- performance -------------------------------------------
 vim.opt.updatetime = 800 -- Good balance for gentle hover (was 50ms)
 vim.opt.timeoutlen = 300 -- Faster than default 500ms
 vim.opt.synmaxcol = 300 -- Limit syntax highlighting for performance
 
--- Search improvements - case-insensitive by default
+-- PERF: large diff performance (disabled, uncomment to enable)
+-- vim.api.nvim_create_autocmd("BufReadPost", {
+--   group = vim.api.nvim_create_augroup("DiffPerformance", { clear = true }),
+--   callback = function()
+--     local buf = vim.api.nvim_get_current_buf()
+--     local line_count = vim.api.nvim_buf_line_count(buf)
+--     if line_count > 1000 and vim.wo.diff then
+--       vim.opt_local.synmaxcol = 200        -- Further limit syntax highlighting
+--       vim.opt_local.foldmethod = "diff"    -- Use diff folding for large files
+--       vim.opt_local.lazyredraw = true      -- Delay redraws during diff operations
+--       vim.opt_local.regexpengine = 1       -- Use older, faster regex engine
+--     end
+--   end,
+-- })
+
+-- search ------------------------------------------------
 vim.opt.ignorecase = true -- Ignore case when searching
 vim.opt.smartcase = true -- Override ignorecase if search contains uppercase
 
--- Auto-reload files when changed externally
+-- file behavior -----------------------------------------
 vim.opt.autoread = true -- Automatically read files when changed outside
 
--- Disable concealing (show all markup characters like *, _, `, etc.)
+-- concealing --------------------------------------------
 vim.opt.conceallevel = 0 -- 0=show all, 1=hide one char, 2=hide or replace, 3=hide completely
 vim.opt.concealcursor = "" -- Show concealed text when cursor is on the line
 
--- Configure which-key to use helix preset
-vim.g.lazyvim_picker = "fzf"
-if vim.g.which_key_presets then
-  vim.g.which_key_presets = "helix"
-end
+-- picker and which-key ----------------------------------
+vim.g.lazyvim_picker = "fzf" -- Use fzf-lua instead of telescope (faster, native fzf)
+vim.g.which_key_presets = "helix" -- Helix-style key hints in which-key popup
 
--- ✨ LARGE FILE PERFORMANCE OPTIMIZATIONS (commented for easy testing):
---[[
--- Auto-optimize for large diffs
-vim.api.nvim_create_autocmd("BufReadPost", {
-  group = vim.api.nvim_create_augroup("DiffPerformance", { clear = true }),
-  callback = function()
-    local buf = vim.api.nvim_get_current_buf()
-    local line_count = vim.api.nvim_buf_line_count(buf)
-    
-    if line_count > 1000 and vim.wo.diff then
-      -- Large file optimizations for diff mode
-      vim.opt_local.synmaxcol = 200        -- Further limit syntax highlighting
-      vim.opt_local.foldmethod = "diff"    -- Use diff folding for large files
-      vim.opt_local.lazyredraw = true      -- Delay redraws during diff operations
-      vim.opt_local.regexpengine = 1       -- Use older, faster regex engine
-    end
-  end,
-})
---]]
+-- providers ---------------------------------------------
+-- NOTE: no modern neovim plugins use perl or ruby providers (vim legacy)
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
 
--- Shell file type associations for better LSP support
+-- filetypes ---------------------------------------------
 vim.filetype.add({
   extension = {
     zsh = "sh",
@@ -115,19 +137,3 @@ vim.filetype.add({
     [".functions"] = "sh",
   },
 })
-
--- Enhanced diff keymaps (research-based best practices)
--- ]c and [c are built-in for diff navigation
-vim.keymap.set("n", "<leader>gw", function()
-  vim.cmd("windo diffthis")
-end, { noremap = true, desc = "Git diff (w)indows" })
-
-vim.keymap.set("n", "<leader>gd", function()
-  vim.cmd("windo diffoff")
-end, { noremap = true, desc = "Git diff off" })
-
--- Commented keymaps for reference (research findings):
--- ]c             -- Jump to the next diff (built-in)
--- [c             -- Jump to the previous diff (built-in)
--- do             -- diffget: obtain change from other file (built-in)
--- dp             -- diffput: put change to other file (built-in)

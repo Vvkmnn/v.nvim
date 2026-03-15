@@ -1,8 +1,27 @@
--- functions
+--  ╭────────────────────────────────────────────────────────────────────────╮
+--  │                                                                        │
+--  │                       ######                                           │
+--  │                     ######                                             │
+--  │                    #####                                               │
+--  │                    #####                                               │
+--  │                    #####                                               │
+--  │            ######  #####                                               │
+--  │          ######    #####         functions.lua                         │
+--  │        #######     #####         Shared utility functions              │
+--  │       ######        ####                                               │
+--  │        ######        ###         usage: require("util.functions")      │
+--  │          #####        ##                                               │
+--  │           #####        #                                               │
+--  │            #####                                                       │
+--  │             #####                                                      │
+--  │              #####                                                     │
+--  │               #####                                                    │
+--  │                #####                                                   │
+--  │                 #####                                                  │
+--  │                                                                        │
+--  ╰────────────────────────────────────────────────────────────────────────╯
+
 local M = {}
-
-
--- 🔍 DEBUG TEST: Hook should show debug output and update left editor!
 
 function M.OpenDotfilesInNeogit()
   local git_dir = vim.fn.expand("~/.dotfiles")

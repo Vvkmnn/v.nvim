@@ -1,10 +1,27 @@
--- Autocmds are automatically loaded on the VeryLazy event
--- Default autocmds that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/autocmds.lua
--- Add any additional autocmds here
---
---
+--  ╭────────────────────────────────────────────────────────────────────────╮
+--  │                                                                        │
+--  │                       ######                                           │
+--  │                     ######                                             │
+--  │                    #####                                               │
+--  │                    #####                                               │
+--  │                    #####                                               │
+--  │            ######  #####                                               │
+--  │          ######    #####         autocmds.lua                          │
+--  │        #######     #####         Autocommands (VeryLazy)               │
+--  │       ######        ####                                               │
+--  │        ######        ###         defaults → lazyvim.config.autocmds    │
+--  │          #####        ##                                               │
+--  │           #####        #                                               │
+--  │            #####                                                       │
+--  │             #####                                                      │
+--  │              #####                                                     │
+--  │               #####                                                    │
+--  │                #####                                                   │
+--  │                 #####                                                  │
+--  │                                                                        │
+--  ╰────────────────────────────────────────────────────────────────────────╯
 
--- Example
+-- NOTE: autocmd template (LazyVim pattern with augroup)
 -- vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
 --   group = augroup("checktime"),
 --   callback = function()
@@ -13,73 +30,62 @@
 --     end
 --   end,
 -- })
---
 
--- Enhanced unified hover system - gentle popup on cursor hold
+-- gentle hover on cursor hold ---------------------------
+-- shows LSP hover after cursor pauses (updatetime=800ms)
+-- falls back to diagnostic float if no hover content
+-- uses buf_request_all callback to avoid async race condition
 vim.api.nvim_create_autocmd("CursorHold", {
   group = vim.api.nvim_create_augroup("GentleHover", { clear = true }),
   callback = function()
-    -- Skip if in insert mode, popup already exists, or in diff mode
-    if vim.fn.mode() == "i" or vim.fn.pumvisible() == 1 or vim.wo.diff then
+    if vim.g.gentle_hover_disabled or vim.fn.mode() ~= "n" or vim.fn.pumvisible() == 1 or vim.wo.diff then
       return
     end
-    
-    -- Check if there's already a floating window
+    -- skip if an LSP/diagnostic float already exists (ignore notification floats)
     for _, win in ipairs(vim.api.nvim_list_wins()) do
-      if vim.api.nvim_win_get_config(win).relative ~= "" then
-        return
+      local config = vim.api.nvim_win_get_config(win)
+      if config.relative ~= "" then
+        local buf = vim.api.nvim_win_get_buf(win)
+        local ft = vim.bo[buf].filetype
+        -- only block on hover/diagnostic floats, not notifications or other UI
+        if ft == "markdown" or ft == "lspinfo" or ft == "" then
+          return
+        end
       end
     end
-    
-    -- Priority 1: Try LSP hover first (most important for variables/symbols)
-    local clients = vim.lsp.get_active_clients({ bufnr = 0 })
-    local lsp_showed = false
-    
-    for _, client in ipairs(clients) do
-      if client.supports_method("textDocument/hover") then
-        -- Use a small delay to make it feel gentle
-        vim.defer_fn(function()
-          if vim.fn.mode() == "n" then -- Still in normal mode
+
+    local bufnr = vim.api.nvim_get_current_buf()
+    local clients = vim.lsp.get_clients({ bufnr = bufnr, method = "textDocument/hover" })
+
+    if #clients > 0 then
+      local params = vim.lsp.util.make_position_params(0, clients[1].offset_encoding)
+      vim.lsp.buf_request_all(bufnr, "textDocument/hover", params, function(results)
+        if vim.fn.mode() ~= "n" then return end
+        if not vim.api.nvim_buf_is_valid(bufnr) then return end
+        for _, resp in pairs(results) do
+          if not resp.error and resp.result and resp.result.contents then
             vim.lsp.buf.hover()
-            lsp_showed = true
-          end
-        end, 100)
-        break
-      end
-    end
-    
-    -- Priority 2: Show diagnostics if no LSP response after a moment
-    if not lsp_showed then
-      vim.defer_fn(function()
-        if vim.fn.mode() == "n" then
-          local line_diagnostics = vim.diagnostic.get(0, { lnum = vim.fn.line('.') - 1 })
-          if #line_diagnostics > 0 then
-            vim.diagnostic.open_float(nil, {
-              focusable = false,
-              close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-              border = "rounded",
-              source = "never",
-              prefix = "",
-              scope = "line",
-              header = "",
-              suffix = "",
-              format = function(diagnostic)
-                return string.format("%s %s", 
-                  diagnostic.severity == vim.diagnostic.severity.ERROR and "❌" or
-                  diagnostic.severity == vim.diagnostic.severity.WARN and "⚠️" or
-                  diagnostic.severity == vim.diagnostic.severity.HINT and "💡" or "ℹ️",
-                  diagnostic.message
-                )
-              end,
-            })
+            return
           end
         end
-      end, 200)
+        -- NOTE: no hover content, fall back to diagnostics
+        local diags = vim.diagnostic.get(bufnr, { lnum = vim.fn.line(".") - 1 })
+        if #diags > 0 then
+          vim.diagnostic.open_float({ scope = "line" })
+        end
+      end)
+    else
+      -- NOTE: no hover-capable LSP, show diagnostics directly
+      local diags = vim.diagnostic.get(bufnr, { lnum = vim.fn.line(".") - 1 })
+      if #diags > 0 then
+        vim.diagnostic.open_float({ scope = "line" })
+      end
     end
-  end
+  end,
 })
 
--- Dynamic centered cursor (better performance than fixed scrolloff = 999)
+-- dynamic centered cursor -------------------------------
+-- PERF: better performance than fixed scrolloff = 999
 vim.api.nvim_create_autocmd({ "VimResized", "WinEnter", "BufWinEnter" }, {
   group = vim.api.nvim_create_augroup("DynamicScrolloff", { clear = true }),
   callback = function()
@@ -88,12 +94,12 @@ vim.api.nvim_create_autocmd({ "VimResized", "WinEnter", "BufWinEnter" }, {
   desc = "Keep cursor centered dynamically (adapts to window height)",
 })
 
--- Commented out - was interfering with tokyonight theme
+-- NOTE: disabled, was interfering with tokyonight theme
 -- vim.api.nvim_create_autocmd("ColorScheme", {
 --   command = [[highlight CursorLine guibg=black ctermbg=115]],
 -- })
 
--- Macros with q dont show up (replacedf with plugin, moves up screen)
+-- NOTE: macros with q disabled (replaced with nvim-recorder plugin, moves up screen)
 -- vim.api.nvim_create_autocmd("RecordingEnter", {
 --   callback = function()
 --     vim.opt.cmdheight = 1
@@ -105,15 +111,15 @@ vim.api.nvim_create_autocmd({ "VimResized", "WinEnter", "BufWinEnter" }, {
 --   end,
 -- })
 
--- Auto-open neo-tree sidebar when opening files (not directories)
+-- neo-tree auto-open ------------------------------------
 vim.api.nvim_create_autocmd("VimEnter", {
   callback = function()
-    -- Only open neo-tree if we opened a file (not a directory)
+    -- NOTE: only open neo-tree if we opened a file (not a directory)
     local args = vim.fn.argv()
     if #args > 0 then
       local stat = vim.uv.fs_stat(args[1])
       if stat and stat.type == "file" then
-        -- Neo-tree auto-open disabled - only open manually with :Neotree
+        -- NOTE: neo-tree auto-open disabled, only open manually with :Neotree
         -- vim.schedule(function()
         --   vim.cmd("Neotree show")
         --   -- Focus back on the file buffer
@@ -125,9 +131,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
   desc = "Open neo-tree sidebar when opening files",
 })
 
--- 🎯 CTRL-H TEST: Should switch to left editor and show autocmds.lua here!
-
--- Create the ClaudeFeedback command
+-- claude commands ---------------------------------------
 vim.api.nvim_create_user_command("ClaudeFeedback", function(opts)
   require("util.functions").ClaudeFeedback(opts.range == 2 and { line1 = opts.line1, line2 = opts.line2 } or nil)
 end, {
@@ -135,35 +139,35 @@ end, {
   range = true,
 })
 
--- Create the ClaudeCleanup command
+-- NOTE: archive completed tasks and clean CLAUDE.md
 vim.api.nvim_create_user_command("ClaudeCleanup", function()
   require("util.functions").ClaudeCleanup()
 end, {
   desc = "Archive completed tasks and clean CLAUDE.md",
 })
 
--- Clean markdown editing experience - hide inline diagnostics but keep hover
+-- markdown editing --------------------------------------
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "markdown", "md" },
   callback = function(ev)
-    -- Hide all virtual text in markdown files, keep hover functionality
+    -- NOTE: hide all virtual text in markdown files, keep hover functionality
     vim.diagnostic.config({
       virtual_text = false,
     })
 
-    -- Optimize markdown display
-    vim.opt_local.conceallevel = 0 -- Show all markup characters (no hiding)
+    -- NOTE: optimize markdown display
+    -- vim.opt_local.conceallevel = 0 -- Disabled: blocks render-markdown.nvim tables/headings
     vim.opt_local.wrap = true      -- Wrap long lines
     vim.opt_local.linebreak = true -- Break at word boundaries
 
-    -- Enable spell checking with Australian English priority
+    -- NOTE: spell checking with Australian English priority
     vim.opt_local.spell = true
     vim.opt_local.spelllang = "en_au,en_us,en_ca"
   end,
   desc = "Clean markdown display - hide inline diagnostics, keep hover",
 })
 
--- Spell check for LaTeX files (en_au priority)
+-- latex spell check -------------------------------------
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "tex", "latex", "plaintex" },
   callback = function()
@@ -175,7 +179,7 @@ vim.api.nvim_create_autocmd("FileType", {
   desc = "Enable spell check for LaTeX files (en_au priority)",
 })
 
--- Diff window settings (claudecode.nvim and general diff)
+-- diff window settings ----------------------------------
 vim.api.nvim_create_autocmd("OptionSet", {
   pattern = "diff",
   callback = function()
@@ -183,15 +187,15 @@ vim.api.nvim_create_autocmd("OptionSet", {
     local bufname = vim.api.nvim_buf_get_name(buf)
 
     if vim.wo.diff then
-      -- Only apply to claudecode proposed buffers
+      -- NOTE: only apply to claudecode proposed buffers
       if not bufname:match("%(proposed%)") then
         return
       end
 
-      -- Disable diagnostics in diff view
+      -- NOTE: disable diagnostics in diff view
       vim.diagnostic.enable(false, { bufnr = 0 })
 
-      -- Window settings - minimal appearance with word wrap
+      -- NOTE: minimal appearance with word wrap
       vim.wo.cursorline = true
       vim.wo.number = false
       vim.wo.relativenumber = false
@@ -203,10 +207,10 @@ vim.api.nvim_create_autocmd("OptionSet", {
       vim.wo.list = false
       vim.wo.conceallevel = 0
 
-      -- DISABLED: Syntax dimming (2025-01-07)
-      -- winhighlight dimmed ALL syntax to gray, making diff hard to read
-      -- New approach: Keep syntax colors FULL, use subtle line backgrounds (modify.lua)
-      -- Intensity Scaling Design: line bg (whisper) → word bg (speak) → word text (shout)
+      -- NOTE: syntax dimming disabled (2025-01-07)
+      --       winhighlight dimmed ALL syntax to gray, making diff hard to read
+      --       new approach: keep syntax colors full, use subtle line backgrounds (modify.lua)
+      --       intensity scaling: line bg (whisper) > word bg (speak) > word text (shout)
       -- vim.wo.winhighlight = table.concat({
       --   "Comment:DiffDimmedComment",
       --   "@comment:DiffDimmedComment",
@@ -223,15 +227,15 @@ vim.api.nvim_create_autocmd("OptionSet", {
       --   "Normal:DiffDimmed",
       -- }, ",")
 
-      -- Lock buffer by default - requires explicit unlock with <leader>e
+      -- NOTE: lock buffer by default, requires explicit unlock with <leader>e
       vim.bo.modifiable = false
 
-      -- Helper: Show reminder when trying to edit
+      -- NOTE: show reminder when trying to edit
       local function show_unlock_reminder()
         vim.notify("Diff buffer locked. Press <leader>e to unlock editing", vim.log.levels.WARN)
       end
 
-      -- Map common edit keys to show reminder
+      -- NOTE: map common edit keys to show reminder
       local edit_keys = { "i", "I", "a", "A", "o", "O", "s", "S", "c", "C", "d", "x" }
       for _, key in ipairs(edit_keys) do
         vim.keymap.set("n", key, show_unlock_reminder, {
@@ -240,10 +244,10 @@ vim.api.nvim_create_autocmd("OptionSet", {
         })
       end
 
-      -- Add unlock keybind (buffer-local)
+      -- NOTE: unlock keybind (buffer-local)
       vim.keymap.set("n", "<leader>e", function()
         vim.bo.modifiable = true
-        -- Clear the reminder mappings so normal editing works
+        -- NOTE: clear the reminder mappings so normal editing works
         for _, key in ipairs(edit_keys) do
           pcall(vim.keymap.del, "n", key, { buffer = 0 })
         end
@@ -253,13 +257,13 @@ vim.api.nvim_create_autocmd("OptionSet", {
         desc = "Unlock diff buffer for editing",
       })
 
-      -- Add buffer-local diff control keymaps (ensures they work regardless of lazy loading)
-      -- These work from EITHER window in the diff view
+      -- NOTE: buffer-local diff control keymaps (ensures they work regardless of lazy loading)
+      --       these work from EITHER window in the diff view
       local function find_diff_tab_name()
-        -- First check current buffer
+        -- NOTE: first check current buffer
         local tab_name = vim.b[vim.api.nvim_get_current_buf()].claudecode_diff_tab_name
         if tab_name then return tab_name end
-        -- Search other windows in current tab for the proposed buffer
+        -- NOTE: search other windows in current tab for the proposed buffer
         for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
           local buf = vim.api.nvim_win_get_buf(win)
           tab_name = vim.b[buf].claudecode_diff_tab_name
@@ -287,7 +291,7 @@ vim.api.nvim_create_autocmd("OptionSet", {
       end, { buffer = 0, desc = "Accept diff (buffer-local)" })
 
       vim.keymap.set("n", "q", function()
-        -- Quick escape: reject diff and close
+        -- NOTE: quick escape, reject diff and close
         local tab_name = find_diff_tab_name()
         if tab_name then
           vim.cmd("ClaudeCodeDiffDeny")
@@ -296,24 +300,24 @@ vim.api.nvim_create_autocmd("OptionSet", {
         end
       end, { buffer = 0, desc = "Quick reject/close diff" })
 
-      -- Sync all diff windows after they're created (preserve window focus)
+      -- NOTE: sync all diff windows after they're created (preserve window focus)
       vim.defer_fn(function()
         local current_win = vim.api.nvim_get_current_win()
         vim.cmd("noautocmd windo if &diff | set scrollbind cursorbind wrap linebreak | endif")
         vim.cmd("noautocmd syncbind")
         vim.cmd("wincmd =")
-        -- Restore focus to original window
+        -- NOTE: restore focus to original window
         if vim.api.nvim_win_is_valid(current_win) then
           vim.api.nvim_set_current_win(current_win)
         end
       end, 50)
     else
-      -- Only cleanup claudecode buffers
+      -- NOTE: only cleanup claudecode buffers
       if not bufname:match("%(proposed%)") then
         return
       end
 
-      -- Clean up ALL keymaps we created
+      -- NOTE: clean up ALL keymaps we created
       local all_keymaps = { "<leader>[", "<leader>]", "<leader>e", "q",
                            "i", "I", "a", "A", "o", "O", "s", "S", "c", "C", "d", "x" }
       for _, key in ipairs(all_keymaps) do
@@ -325,10 +329,10 @@ vim.api.nvim_create_autocmd("OptionSet", {
   desc = "Diff window settings",
 })
 
--- Perfect scroll synchronization with multiple triggers
--- NOTE (2026-01-05): If j/k scrolling freezes in diff mode, this autocmd may be causing
--- a cascade of syncbind calls. CursorMoved fires on every keypress which can create
--- a feedback loop even with noautocmd. Disable this block if scrolling becomes laggy.
+-- diff scroll sync --------------------------------------
+-- WARN: if j/k scrolling freezes in diff mode, this autocmd may be causing
+--       a cascade of syncbind calls. CursorMoved fires on every keypress which can
+--       create a feedback loop even with noautocmd. Disable this block if laggy.
 vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI", "WinScrolled" }, {
   group = vim.api.nvim_create_augroup("DiffScrollSync", { clear = true }),
   callback = function()
@@ -339,8 +343,8 @@ vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI", "WinScrolled" }, {
   desc = "Keep diff windows synchronized when scrolling",
 })
 
--- DISABLED: mini.diff unified diff experiment (2025-11-25)
--- Issues discovered:
+-- NOTE: mini.diff unified diff experiment disabled (2025-11-25)
+-- issues discovered:
 --   1. BufEnter fires too early, before claudecode.nvim sets buffer variables
 --   2. Closing target_win can close entire editor if it's the last window
 --   3. mini.diff.enable() fails on claudecode's acwrite scratch buffers
@@ -381,9 +385,8 @@ vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI", "WinScrolled" }, {
 --   desc = "Claude Code single-window unified diff via mini.diff",
 -- })
 
--- ============================================================================
--- DISABLED: mini.diff unified single-pane approach (2025-11-25)
--- ============================================================================
+-- mini.diff unified single-pane --------------------------
+-- NOTE: disabled (2025-11-25), two-pane diff is more stable
 -- WHAT IT DOES:
 --   Converts claudecode.nvim two-pane diff into single-pane inline overlay
 --   using mini.diff. Shows deleted lines as virtual text, jumps to first hunk.
@@ -413,7 +416,6 @@ vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI", "WinScrolled" }, {
 --   - diffview.nvim: Git-only, won't work with claudecode buffers
 --
 -- DECISION: Use two-pane diff (stable, no buffer mod until accept)
--- ============================================================================
 -- vim.api.nvim_create_autocmd("OptionSet", {
 --   pattern = "diff",
 --   group = vim.api.nvim_create_augroup("ClaudeCodeUnifiedDiff", { clear = true }),
@@ -465,16 +467,18 @@ vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI", "WinScrolled" }, {
 --   desc = "Claude Code unified diff via mini.diff overlay",
 -- })
 
--- LSP hover window styling configured globally for unified system
-vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
-  border = "rounded",
-  focusable = false,
-  close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
-  max_width = 80,
-  max_height = 20,
-})
+-- NOTE: vim.lsp.handlers[] and vim.lsp.with() deprecated in Neovim 0.11
+--       replaced by vim.o.winborder = "rounded" in options.lua (global float borders)
+--       focusable/close_events are native defaults in 0.11
+-- vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+--   border = "rounded",
+--   focusable = false,
+--   close_events = { "BufLeave", "CursorMoved", "InsertEnter", "FocusLost" },
+--   max_width = 80,
+--   max_height = 20,
+-- })
 
--- COMMENTED OUT: Previous LSP hover system (replaced with unified hover above)
+-- NOTE: previous LSP hover system (replaced with unified hover above)
 -- vim.api.nvim_create_autocmd("LspAttach", {
 --   group = vim.api.nvim_create_augroup("lsp_hover_on_hold", { clear = true }),
 --   callback = function(args)
@@ -531,7 +535,7 @@ vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
 --   end,
 -- })
 
--- Claude Code terminal buffer optimization
+-- claude terminal optimization --------------------------
 vim.api.nvim_create_autocmd("TermOpen", {
   pattern = "*claudecode*",
   callback = function()
@@ -542,24 +546,24 @@ vim.api.nvim_create_autocmd("TermOpen", {
   desc = "Claude Code terminal buffer settings"
 })
 
--- Auto-focus Claude terminal when neovim regains focus (e.g., switching back from another app)
--- Skips auto-focus if diff view is open (claudecode diff approval pending)
+-- claude auto-focus -------------------------------------
+-- NOTE: skips auto-focus if diff view is open (claudecode diff approval pending)
 vim.api.nvim_create_autocmd("FocusGained", {
   group = vim.api.nvim_create_augroup("ClaudeAutoFocus", { clear = true }),
   callback = function()
     vim.schedule(function()
-      -- Skip auto-focus if any window is in diff mode (claudecode diff approval pending)
+      -- NOTE: skip auto-focus if any window is in diff mode (diff approval pending)
       for _, win in ipairs(vim.api.nvim_list_wins()) do
         if vim.wo[win].diff then
           return -- Don't switch focus, diff view is active
         end
       end
 
-      -- Find and focus Claude terminal
+      -- NOTE: find and focus Claude terminal
       for _, win in ipairs(vim.api.nvim_list_wins()) do
         local buf = vim.api.nvim_win_get_buf(win)
         local name = vim.api.nvim_buf_get_name(buf)
-        -- claudecode terminals are named "term://...claude..."
+        -- NOTE: claudecode terminals are named "term://...claude..."
         if vim.bo[buf].buftype == "terminal" and name:lower():match("claude") then
           vim.api.nvim_set_current_win(win)
           vim.cmd("startinsert")
@@ -571,14 +575,14 @@ vim.api.nvim_create_autocmd("FocusGained", {
   desc = "Auto-focus Claude terminal on FocusGained (skips if diff view open)"
 })
 
--- == Silent Auto-Reload with Three-Way Merge ==
--- Merges external changes while preserving your unsaved edits.
--- Your edits + Claude's edits = both preserved (if on different lines).
--- When both edit the same line: you win, conflict is notified.
+-- silent auto-reload with three-way merge ---------------
+-- NOTE: merges external changes while preserving unsaved edits
+--       your edits + Claude's edits = both preserved (if on different lines)
+--       when both edit the same line: you win, conflict is notified
 
 local reload_group = vim.api.nvim_create_augroup("SmartAutoReload", { clear = true })
 
--- Store base content and mtime when buffer is loaded
+-- NOTE: store base content and mtime when buffer is loaded
 vim.api.nvim_create_autocmd("BufReadPost", {
   group = reload_group,
   callback = function(ev)
@@ -588,7 +592,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
--- Update base when you save
+-- NOTE: update base when you save
 vim.api.nvim_create_autocmd("BufWritePost", {
   group = reload_group,
   callback = function(ev)
@@ -598,14 +602,14 @@ vim.api.nvim_create_autocmd("BufWritePost", {
   end,
 })
 
--- Check if two hunks overlap (conflict)
+-- NOTE: check if two hunks overlap (conflict)
 local function hunks_overlap(h1, h2)
   local s1, e1 = h1[1], h1[1] + math.max(h1[2] - 1, 0)
   local s2, e2 = h2[1], h2[1] + math.max(h2[2] - 1, 0)
   return s1 <= e2 and s2 <= e1
 end
 
--- Check for external changes and merge
+-- NOTE: check for external changes and merge
 vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
   group = reload_group,
   callback = function(ev)
@@ -618,7 +622,7 @@ vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHo
     local stat = vim.uv.fs_stat(fname)
     if not stat then return end
 
-    -- Check mtime
+    -- NOTE: check mtime
     local disk_mtime = stat.mtime.sec
     if vim.b[buf].last_mtime == disk_mtime then return end
     vim.b[buf].last_mtime = disk_mtime
@@ -631,16 +635,16 @@ vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHo
     local disk_text = table.concat(disk_lines, "\n")
     if base_text == disk_text then return end
 
-    -- Compute user's changes (base → buffer)
+    -- NOTE: compute user's changes (base > buffer)
     local buf_lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
     local buf_text = table.concat(buf_lines, "\n")
     local user_hunks = vim.diff(base_text, buf_text, { result_type = "indices" }) or {}
 
-    -- Compute Claude's changes (base → disk)
+    -- NOTE: compute Claude's changes (base > disk)
     local claude_hunks = vim.diff(base_text, disk_text, { result_type = "indices" }) or {}
     if #claude_hunks == 0 then return end
 
-    -- Apply Claude's changes, skipping conflicts (user wins)
+    -- NOTE: apply Claude's changes, skipping conflicts (user wins)
     local applied, skipped = 0, 0
     for i = #claude_hunks, 1, -1 do
       local ch = claude_hunks[i]
@@ -664,10 +668,10 @@ vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHo
       end
     end
 
-    -- Update base to new disk content
+    -- NOTE: update base to new disk content
     vim.b[buf].base_lines = disk_lines
 
-    -- Notify
+    -- NOTE: notify
     local msg = "Merged: " .. vim.fn.fnamemodify(fname, ":t")
     if skipped > 0 then
       msg = msg .. " (" .. skipped .. " conflict" .. (skipped > 1 and "s" or "") .. " - yours kept)"
@@ -677,9 +681,8 @@ vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHo
   desc = "Silent auto-reload with three-way merge (user wins conflicts)"
 })
 
--- ============================================================================
--- SMART AUTO-RELOAD WITH CONFLICT DETECTION (DISABLED - uncomment to enable)
--- ============================================================================
+-- smart auto-reload with conflict detection ----------------
+-- NOTE: disabled, uncomment to enable (replaces the three-way merge above)
 -- This version shows a merge dialog when you have unsaved changes AND the
 -- file was modified externally. Gives options to: reload, keep, diff, or backup.
 --
@@ -731,7 +734,7 @@ vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHo
 --         callback = function()
 --           -- Present merge/conflict resolution options
 --           local choice = vim.fn.confirm(
---             "⚠️  CONFLICT DETECTED ⚠️\n\n" ..
+--             "CONFLICT DETECTED\n\n" ..
 --             "File changed externally AND you have unsaved changes!\n" ..
 --             "File: " .. vim.fn.fnamemodify(fname, ":~:.") .. "\n\n" ..
 --             "What would you like to do?",
@@ -813,40 +816,38 @@ vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHo
 --   desc = "Update content hash after save (reset conflict detection baseline)"
 -- })
 
--- ============================================================================
--- OPTION 5: SMART SWAPFILE HANDLING (Currently disabled - swapfiles are off)
--- ============================================================================
--- If you re-enable swapfiles (vim.opt.swapfile = true in options.lua), uncomment
--- this autocmd to get the best of both worlds:
---   - Crash recovery preserved for active sessions
---   - Auto-deletes stale swaps from dead processes (no more W325 warnings)
---
--- Also add to options.lua:
---   vim.opt.swapfile = true
---   vim.opt.directory = vim.fn.stdpath("state") .. "/swap//"
---
+-- silent swap handling with auto-recover -------------------
+-- NOTE: never shows E325 prompt, never requires user decision
+--       dead process + swap newer than file > auto-recover (crash protection)
+--       dead process + swap older than file > delete stale swap
+--       alive process > just edit (another nvim has the file)
 -- v:swapchoice options: 'o'=readonly, 'e'=edit, 'r'=recover, 'd'=delete, 'q'=quit
---
--- vim.api.nvim_create_autocmd("SwapExists", {
---   group = vim.api.nvim_create_augroup("SmartSwapfile", { clear = true }),
---   callback = function()
---     local info = vim.fn.swapinfo(vim.v.swapname)
---     local pid = info.pid or 0
---
---     -- Check if the process that created the swap is still running
---     local process_running = false
---     if pid > 0 then
---       -- kill -0 doesn't kill, just checks if process exists
---       process_running = vim.fn.system("kill -0 " .. pid .. " 2>/dev/null; echo $?"):gsub("%s+", "") == "0"
---     end
---
---     if process_running then
---       -- Process alive: show prompt (you're editing same file in another nvim)
---       vim.v.swapchoice = ""
---     else
---       -- Process dead: auto-delete the stale swap silently
---       vim.v.swapchoice = "d"
---     end
---   end,
---   desc = "Auto-delete stale swap files from dead processes",
--- })
+vim.api.nvim_create_autocmd("SwapExists", {
+  group = vim.api.nvim_create_augroup("SmartSwapfile", { clear = true }),
+  callback = function()
+    local info = vim.fn.swapinfo(vim.v.swapname)
+    local pid = info.pid or 0
+
+    local process_running = false
+    if pid > 0 then
+      process_running = vim.fn.system("kill -0 " .. pid .. " 2>/dev/null; echo $?"):gsub("%s+", "") == "0"
+    end
+
+    if process_running then
+      vim.v.swapchoice = "e"
+    else
+      -- check if swap has unsaved changes worth recovering
+      local swap_mtime = vim.fn.getftime(vim.v.swapname)
+      local file_mtime = vim.fn.getftime(vim.fn.expand("<afile>"))
+      if swap_mtime > file_mtime then
+        vim.v.swapchoice = "r"
+        vim.schedule(function()
+          vim.notify("Recovered unsaved changes from swap file", vim.log.levels.WARN)
+        end)
+      else
+        vim.v.swapchoice = "d"
+      end
+    end
+  end,
+  desc = "Silent swap handling with auto-recover",
+})
