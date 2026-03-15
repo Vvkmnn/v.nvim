@@ -1,6 +1,29 @@
+--  ╭────────────────────────────────────────────────────────────────────────╮
+--  │                                                                        │
+--  │                       ######                                           │
+--  │                     ######                                             │
+--  │                    #####                                               │
+--  │                    #####                                               │
+--  │                    #####                                               │
+--  │            ######  #####                                               │
+--  │          ######    #####         modify.lua                            │
+--  │        #######     #####         Override LazyVim plugin defaults       │
+--  │       ######        ####                                               │
+--  │        ######        ###         new plugins → custom.lua              │
+--  │          #####        ##         disabled    → disable.lua             │
+--  │           #####        #                                               │
+--  │            #####                                                       │
+--  │             #####                                                      │
+--  │              #####                                                     │
+--  │               #####                                                    │
+--  │                #####                                                   │
+--  │                 #####                                                  │
+--  │                                                                        │
+--  ╰────────────────────────────────────────────────────────────────────────╯
+
 return {
-  -- Persistent error logging and enhanced notifications
-  --  TODO: Does not work
+  -- nvim-notify: persistent error logging and enhanced notifications
+  -- NOTE: disabled, using snacks.notifier instead
   -- {
   --   "rcarriga/nvim-notify",
   --   opts = {
@@ -65,8 +88,8 @@ return {
   --   },
   -- },
 
-  -- formatter
-  -- TODO shfmt doesn't work
+  -- conform.nvim: old formatter config
+  -- NOTE: disabled, replaced by active conform block in lazyvim extras section below
   -- {
   --   "stevearc/conform.nvim",
   --   -- lazy = false,
@@ -100,7 +123,8 @@ return {
   --   },
   -- },
 
-  -- No need to copy this inside `setup()`. Will be used automatically.
+  -- mini.animate: cursor and scroll animations
+  -- NOTE: disabled, smear-cursor.nvim replaces cursor animation
   -- {
   --   "nvim-mini/mini.animate",
   --   opts = {
@@ -183,7 +207,8 @@ return {
   -- },
   -- },
 
-  -- indentscope animation - DISABLED
+  -- mini.indentscope: animated indent scope lines
+  -- NOTE: disabled, snacks.nvim indent + scope replaces it
   -- {
   --   "nvim-mini/mini.indentscope",
   --   opts = {
@@ -211,9 +236,8 @@ return {
   --   },
   -- },
 
-  -- Kanagawa theme configuration moved to theme.lua for better organization
-
-  -- NOTE starter experiments
+  -- mini.starter: custom dashboard
+  -- NOTE: disabled, using LazyVim default dashboard
   -- {
   --   "nvim-mini/mini.starter",
   --   opts = function()
@@ -274,12 +298,7 @@ return {
   --     return config
   --   end,
 
-  -- AI:
-  -- AI
-  -- NOTE:
-  -- TODO:
-  -- AI:
-  -- CLAUDE:
+  -- todo-comments.nvim: highlight and search TODO/FIXME/HACK/AI comments (:TodoTrouble, <leader>st)
   {
     "folke/todo-comments.nvim",
     cmd = { "TodoTrouble", "TodoTelescope" },
@@ -297,7 +316,12 @@ return {
     },
   },
 
-  -- NOTE: Enhanced LSP configuration for better development experience
+  -- WARN: Mason v2 race condition (LazyVim #6039), if you add a new LSP server to the
+  -- servers table below, run :MasonInstall <server> BEFORE restarting nvim. The race occurs
+  -- when mason-lspconfig and LazyVim's ensure_installed both try to install the same
+  -- uninstalled package simultaneously. Pre-installing avoids the assert crash.
+
+  -- nvim-lspconfig: LSP server configs for lua_ls, ruff, ts_ls, tailwindcss, harper (auto on file open)
   {
     "neovim/nvim-lspconfig",
     dependencies = {
@@ -305,15 +329,16 @@ return {
       { "j-hui/fidget.nvim", opts = {} }, -- LSP progress indicators
     },
     opts = {
-      -- Configure diagnostics (LazyVim standard approach)
+      -- NOTE: configure diagnostics (LazyVim standard approach)
       diagnostics = {
         virtual_text = false, -- Completely disable inline diagnostic text
         signs = {
           text = {
-            [vim.diagnostic.severity.ERROR] = "❌",
-            [vim.diagnostic.severity.WARN] = "⚠️",
-            [vim.diagnostic.severity.HINT] = "💡",
-            [vim.diagnostic.severity.INFO] = "ℹ️",
+            -- NOTE: originals were ❌ ⚠️ 💡 ℹ️ (emoji versions)
+            [vim.diagnostic.severity.ERROR] = "󰅚",
+            [vim.diagnostic.severity.WARN] = "󰀪",
+            [vim.diagnostic.severity.HINT] = "󰌶",
+            [vim.diagnostic.severity.INFO] = "󰋽",
           },
         },
         underline = false, -- Disable underlines
@@ -329,22 +354,18 @@ return {
           header = "", -- Remove header
         },
       },
-      -- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0
-      -- Be aware that you also will need to properly configure your LSP server to
-      -- provide the inlay hints.
+      -- NOTE: builtin LSP inlay hints (requires server support)
       inlay_hints = {
         enabled = true,
         exclude = { "vue" }, -- filetypes for which you don't want to enable inlay hints
       },
-      -- Enable this to enable the builtin LSP code lenses on Neovim >= 0.10.0
-      -- Be aware that you also will need to properly configure your LSP server to
-      -- provide the code lenses.
+      -- NOTE: LSP code lenses (actionable annotations above functions: references, run test, etc.)
       codelens = {
-        enabled = false,
+        enabled = true,
       },
 
       servers = {
-        -- NOTE: Lua LSP optimized for Neovim development
+        -- NOTE: lua_ls optimized for Neovim development
         lua_ls = {
           settings = {
             Lua = {
@@ -373,7 +394,7 @@ return {
           },
         },
 
-        -- AI: Python linting with Ruff (modern, fast replacement for pylint/flake8)
+        -- NOTE: ruff, modern fast replacement for pylint/flake8
         ruff = {
           cmd = { "ruff", "server" },
           filetypes = { "python" },
@@ -386,7 +407,7 @@ return {
           },
         },
 
-        -- NOTE: TypeScript with enhanced inlay hints
+        -- NOTE: ts_ls with enhanced inlay hints
         ts_ls = {
           root_dir = function()
             return vim.fn.getcwd() -- Use current working directory
@@ -421,7 +442,7 @@ return {
           },
         },
 
-        -- NOTE: Enhanced TailwindCSS support for modern web development
+        -- NOTE: tailwindcss for modern web development
         tailwindcss = {
           filetypes = {
             "html",
@@ -447,96 +468,75 @@ return {
           },
         },
 
-        -- LTeX: Grammar and spell checking for prose (markdown, latex, etc.)
-        ltex = {
+        -- NOTE: harper-ls replaces ltex (~5MB Rust vs ~200MB Java), fixes Mason v2 install race
+        harper_ls = {
           filetypes = { "markdown", "tex", "latex", "plaintex", "gitcommit" },
           settings = {
-            ltex = {
-              language = "en-AU", -- Australian English
-              additionalRules = {
-                enablePickyRules = true, -- More thorough checking
-                motherTongue = "en-AU",
-              },
-              dictionary = {}, -- Custom words (will sync with zg)
-              disabledRules = {},
-              hiddenFalsePositives = {},
+            ["harper-ls"] = {
+              dialect = "Australian",
             },
           },
         },
       },
 
-      -- Enhanced LSP signature help handler (hover handled by autocmds.lua)
-      handlers = {
-        ["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
-          border = "rounded",
-          max_width = math.floor(vim.o.columns * 0.6),
-          max_height = math.floor(vim.o.lines * 0.4),
-          focusable = false,
-          close_events = { "CursorMoved", "BufHidden", "InsertCharPre" },
-        }),
-      },
+      -- NOTE: handlers table and vim.lsp.with() deprecated in Neovim 0.11
+      --       replaced by vim.o.winborder = "rounded" in options.lua (global float borders)
+      -- handlers = {
+      --   ["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
+      --     border = "rounded",
+      --     max_width = math.floor(vim.o.columns * 0.6),
+      --     max_height = math.floor(vim.o.lines * 0.4),
+      --     focusable = false,
+      --     close_events = { "CursorMoved", "BufHidden", "InsertCharPre" },
+      --   }),
+      -- },
 
-      -- AI: Enhanced LSP keymaps and functionality
-      on_attach = function(client, bufnr)
-        vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc" -- Enable LSP completion
-
-        local bufopts = { noremap = true, silent = true, buffer = bufnr }
-
-        -- NOTE: Essential LSP navigation keymaps
-        vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts) -- Go to declaration
-        vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts) -- Go to definition
-
-        -- Enhanced scrollable hover
-        vim.keymap.set("n", "K", function()
-          local winid = nil
-          for _, win in ipairs(vim.api.nvim_list_wins()) do
-            local config = vim.api.nvim_win_get_config(win)
-            if config.relative ~= "" then
-              winid = win
-              break
-            end
-          end
-
-          if winid then
-            -- Focus the existing hover window for scrolling
-            vim.api.nvim_set_current_win(winid)
-          else
-            -- Create new hover window
-            vim.lsp.buf.hover()
-          end
-        end, bufopts)
-
-        vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts) -- Go to implementation
-        vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, bufopts) -- Show signature
-        vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts) -- Show references
-
-        -- AI: Workspace and refactoring operations
-        vim.keymap.set("n", "<space>wa", vim.lsp.buf.add_workspace_folder, bufopts)
-        vim.keymap.set("n", "<space>wr", vim.lsp.buf.remove_workspace_folder, bufopts)
-        vim.keymap.set("n", "<space>wl", function()
-          print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-        end, bufopts)
-        vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, bufopts)
-        vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, bufopts) -- Rename symbol
-        vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, bufopts) -- Code actions
-        vim.keymap.set("n", "<space>f", function()
-          vim.lsp.buf.format({ async = true })
-        end, bufopts) -- Format code
-
-        -- NOTE: TypeScript specific enhancements
-        if client.name == "tsserver" or client.name == "ts_ls" then
-          vim.keymap.set("n", "<leader>co", function()
-            vim.lsp.buf.code_action({
-              apply = true,
-              context = { only = { "source.organizeImports.ts" } }, -- Organize imports
-            })
-          end, bufopts)
-        end
-      end,
+      -- NOTE: on_attach is silently ignored by LazyVim (uses vim.lsp.config() internally)
+      --       all keymaps below are now provided natively by Neovim 0.11:
+      --       gd, gD, gi, gr, K, KK (focus hover), grn, gra, grr
+      --       <leader>ca, <leader>cr, <leader>cf provided by LazyVim
+      --       <C-k> signature help conflicted with window navigation
+      -- on_attach = function(client, bufnr)
+      --   vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
+      --   local bufopts = { noremap = true, silent = true, buffer = bufnr }
+      --   vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts)
+      --   vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
+      --   vim.keymap.set("n", "K", function()
+      --     local winid = nil
+      --     for _, win in ipairs(vim.api.nvim_list_wins()) do
+      --       local config = vim.api.nvim_win_get_config(win)
+      --       if config.relative ~= "" then winid = win; break end
+      --     end
+      --     if winid then vim.api.nvim_set_current_win(winid)
+      --     else vim.lsp.buf.hover() end
+      --   end, bufopts)
+      --   vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)
+      --   vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, bufopts)
+      --   vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts)
+      --   vim.keymap.set("n", "<space>wa", vim.lsp.buf.add_workspace_folder, bufopts)
+      --   vim.keymap.set("n", "<space>wr", vim.lsp.buf.remove_workspace_folder, bufopts)
+      --   vim.keymap.set("n", "<space>wl", function()
+      --     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+      --   end, bufopts)
+      --   vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, bufopts)
+      --   vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, bufopts)
+      --   vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, bufopts)
+      --   vim.keymap.set("n", "<space>f", function()
+      --     vim.lsp.buf.format({ async = true })
+      --   end, bufopts)
+      --   if client.name == "tsserver" or client.name == "ts_ls" then
+      --     vim.keymap.set("n", "<leader>co", function()
+      --       vim.lsp.buf.code_action({
+      --         apply = true,
+      --         context = { only = { "source.organizeImports.ts" } },
+      --       })
+      --     end, bufopts)
+      --   end
+      -- end,
     },
   },
 
-  -- AI: Enhanced completion with blink.cmp supertab
+  -- blink.cmp: completion engine with super-tab behavior (<Tab> to accept/navigate)
   {
     "saghen/blink.cmp",
     opts = {
@@ -547,7 +547,7 @@ return {
     },
   },
 
-  -- AI: Enhanced fzf-lua with glob patterns and resume functionality
+  -- fzf-lua: fuzzy finder with glob patterns and resume (auto, extends LazyVim fzf)
   {
     "ibhagwan/fzf-lua",
     opts = {
@@ -561,7 +561,7 @@ return {
     },
   },
 
-  -- Disable LaTeX concealing - show all raw markup (\vspace, \alpha, etc.)
+  -- vimtex: LaTeX editing with concealing disabled (auto on .tex files)
   {
     "lervag/vimtex",
     opts = function()
@@ -569,11 +569,9 @@ return {
     end,
   },
 
-  -- ============================================================================
-  -- THEME CONFIGURATION - Let LazyVim handle tokyonight defaults
-  -- ============================================================================
+  -- theme ------------------------------------------------
 
-  -- Commented out custom theme configs - LazyVim handles tokyonight by default
+  -- LazyVim: base config, set tokyonight as default colorscheme
   {
     "LazyVim/LazyVim",
     opts = {
@@ -581,6 +579,7 @@ return {
     },
   },
 
+  -- tokyonight.nvim: theme with transparency, custom diff and cursor colors
   {
     "folke/tokyonight.nvim",
     lazy = false,
@@ -591,14 +590,17 @@ return {
       terminal_colors = true,
       styles = {
         sidebars = "transparent",
-        floats = "transparent",
+        floats = "transparent", -- consistent with editor, borders provide visual separation
       },
       on_highlights = function(hl, c)
-        -- Complete transparency configuration
+        -- NOTE: full transparency (terminal bg shows through everywhere)
         hl.Normal = { bg = "none" }
         hl.NormalFloat = { bg = "none" }
+        -- NOTE: visible border color on transparent floats
+        hl.FloatBorder = { fg = c.border_highlight, bg = "none" }
+        hl.FloatTitle = { fg = c.border_highlight, bg = "none" }
 
-        -- Orange cursorline customization matching line numbers
+        -- NOTE: orange cursorline customization matching line numbers
         hl.CursorLine = {
           bg = "#2A1F0A", -- Dark version of e0af68
           blend = 20,
@@ -608,62 +610,64 @@ return {
           bold = true,
         }
 
-        -- Telescope transparency
+        -- NOTE: telescope transparency
         hl.TelescopeNormal = { bg = "none" }
         hl.TelescopeBorder = { bg = "none" }
         hl.TelescopePromptNormal = { bg = "none" }
         hl.TelescopeResultsNormal = { bg = "none" }
         hl.TelescopePreviewNormal = { bg = "none" }
 
-        -- File tree transparency
+        -- NOTE: incline.nvim floating labels (raised surface on transparent bg)
+        hl.InclineNormal = { bg = c.bg_highlight, fg = c.fg }
+        hl.InclineNormalNC = { bg = c.bg_highlight, fg = c.dark5 }
+
+        -- NOTE: file tree transparency
         hl.NeoTreeNormal = { bg = "none" }
         hl.NeoTreeNormalNC = { bg = "none" }
 
-        -- Keep important UI elements visible
+        -- NOTE: keep important UI elements visible
         hl.Pmenu = { bg = c.bg_popup }
         hl.PmenuSel = { bg = c.bg_highlight }
 
-        -- Diff colors - TokyoNight Harmony (2025-01-07)
-        -- Colors derived from TokyoNight palette for beautiful, readable diffs
-        -- Syntax highlighting stays FULL COLOR (no dimming via winhighlight)
+        -- NOTE: diff colors derived from TokyoNight palette (2025-01-07)
+        --       syntax highlighting stays full color (no dimming via winhighlight)
+        --       DiffDimmed* groups removed (winhighlight disabled in autocmds.lua)
 
-        -- REMOVED: DiffDimmed* groups (winhighlight disabled in autocmds.lua:206-224)
-
-        -- Added lines: Soft forest green (derived from theme green #9ece6a)
+        -- NOTE: added lines, soft forest green (derived from theme green #9ece6a)
         hl.DiffAdd = { bg = "#1e2e1a" }
 
-        -- Deleted lines: Soft burgundy rose (derived from theme red #f7768e)
-        -- Rose is PINK-ish (not orange!) - clearly distinct from amber changes
+        -- NOTE: deleted lines, soft burgundy rose (derived from theme red #f7768e)
         hl.DiffDelete = { bg = "#2e1a1e" }
 
-        -- Changed lines: Warm amber glow (derived from theme yellow #e0af68)
-        -- Matches your cursorline! Clearly GOLD (not pink)
+        -- NOTE: changed lines, warm amber glow (derived from theme yellow #e0af68)
         hl.DiffChange = { bg = "#2e2618" }
 
-        -- Word-level changes: Theme yellow text (perfect harmony)
+        -- NOTE: word-level changes, theme yellow text
         hl.DiffText = { bg = "#3d3520", fg = "#e0af68" }
       end,
     },
   },
 
-  -- Snacks.nvim - minimal configuration to avoid conflicts
+  -- snacks.nvim: swiss-army-knife utilities (auto, merged from modify.lua + custom.lua)
   {
     "folke/snacks.nvim",
     opts = {
-      -- Keep only essential modules enabled
       bigfile = { enabled = true },
       quickfile = { enabled = true },
       scroll = { enabled = true },
       words = { enabled = true },
-
-      -- Disable potentially conflicting modules
+      notifier = { enabled = true },
+      input = { enabled = true },
+      dim = { enabled = true },
+      zen = { enabled = true },
+      gitbrowse = { enabled = true },
+      scratch = { enabled = true },
+      indent = { enabled = true },
+      scope = { enabled = true },
+      -- NOTE: disabled (using alternatives or not needed)
       dashboard = { enabled = false },
-      input = { enabled = false },
-      notifier = { enabled = false },
       terminal = { enabled = false },
       toggle = { enabled = false },
-      scope = { enabled = false },
-      indent = { enabled = false },
       explorer = { enabled = false },
       image = { enabled = false },
       picker = { enabled = false },
@@ -672,23 +676,11 @@ return {
     },
   },
 
-  -- Theme section cleaned - LazyVim handles tokyonight defaults automatically
-
-  -- ============================================================================
-  -- END THEME CONFIGURATION
-  -- ============================================================================
-
-  -- Removed duplicate LazyVim config - colorscheme set above
-  -- UI configuration moved to theme.lua
-
-  -- Native character-level diff is configured in options.lua with diffopt
-
-  -- Neo-tree sidebar for ClaudeCodeTreeAdd - minimal config (DISABLED), oil.nvim remains default
+  -- neo-tree.nvim: sidebar file explorer for ClaudeCodeTreeAdd (auto, oil.nvim is primary)
   {
     "nvim-neo-tree/neo-tree.nvim",
     opts = {
       close_if_last_window = true, -- Close if it's the last window
-      popup_border_style = "rounded",
       filesystem = {
         hijack_netrw_behavior = "disabled", -- Keep oil.nvim as default
         follow_current_file = { enabled = true },
@@ -709,65 +701,147 @@ return {
           with_markers = false, -- Remove indent markers
         },
       },
-      -- Remove all borders and separators for seamless look
+      -- NOTE: remove all borders and separators for seamless look
       popup_border_style = "none",
       use_default_mappings = false,
       window_border_style = "none",
     },
   },
 
+  -- nvim-notify: notification renderer (auto)
+  -- NOTE: disabled, snacks.notifier replaces it (enabled in snacks block above)
   {
     "rcarriga/nvim-notify",
-    opts = {
-      fps = 120,
-      -- render = "compact",
-      render = "minimal",
-      timeout = 10,
-      -- timeout = 10000,
-      -- stages = "fade",
-    },
+    enabled = false,
   },
+
+  -- noice.nvim: enhanced command line UI with icons for vim/shell/search (auto)
   {
     "folke/noice.nvim",
     opts = {
       cmdline = {
         format = {
           cmdline = { title = { "Vim" }, pattern = "^:", icon = ":", lang = "vim" },
-          filter = { tile = { "Shell" }, pattern = "^:%s*!", icon = "!", lang = "bash" },
+          filter = { title = { "Shell" }, pattern = "^:%s*!", icon = "!", lang = "bash" },
         },
       },
+      -- NOTE: override noice default borders to match winborder = "rounded"
+      views = {
+        cmdline_popup = { border = { style = "rounded", padding = { 0, 1 } } },
+        cmdline_input = { border = { style = "rounded", padding = { 0, 1 } } },
+        hover = { border = { style = "rounded", padding = { 0, 2 } } },
+        popup = { border = { style = "rounded" } },
+      },
+      -- NOTE: adds rounded borders to LSP hover docs and signature help
+      presets = { lsp_doc_border = true },
     },
   },
 
+  -- lualine.nvim: statusline with smart path, code context, and recorder (auto)
+  -- NOTE: navic code context added to lualine_c by lazyvim editor.navic extra
   {
-    "lualine.nvim",
-    opts = function()
-      return {
-        sections = {
-          lualine_y = {},
-          lualine_z = {
-            { require("recorder").recordingStatus },
-          },
+    "nvim-lualine/lualine.nvim",
+    opts = function(_, opts)
+      opts.sections = opts.sections or {}
+
+      -- smart path: shows tilde-relative path (~/.config/nvim/...), truncates on narrow windows
+      local function smart_path()
+        local path = vim.fn.expand("%:~")
+        if path == "" then
+          return "[No Name]"
+        end
+        local win_width = vim.api.nvim_win_get_width(0)
+        local max_len = math.max(20, math.floor(win_width * 0.4))
+        if #path <= max_len then
+          return path
+        end
+        local parts = vim.split(path, "/")
+        if #parts <= 1 then
+          return path
+        end
+        -- try: first/…/parent/file
+        if #parts >= 4 then
+          local try = parts[1] .. "/…/" .. parts[#parts - 1] .. "/" .. parts[#parts]
+          if #try <= max_len then
+            return try
+          end
+        end
+        -- try: …/parent/file
+        if #parts >= 3 then
+          local try = "…/" .. parts[#parts - 1] .. "/" .. parts[#parts]
+          if #try <= max_len then
+            return try
+          end
+        end
+        -- fallback: …/file
+        return "…/" .. parts[#parts]
+      end
+
+      -- replace LazyVim's pretty_path (4th component in lualine_c) with smart_path
+      -- move filetype icon from lualine_c into lualine_b (gets its own chevron section)
+      if opts.sections.lualine_c then
+        if opts.sections.lualine_c[4] then
+          opts.sections.lualine_c[4] = {
+            smart_path,
+            color = function()
+              if vim.bo.modified then
+                return { fg = Snacks.util.color("MatchParen"), gui = "italic,bold" }
+              end
+            end,
+          }
+        end
+        table.remove(opts.sections.lualine_c, 3)
+      end
+      opts.sections.lualine_b = opts.sections.lualine_b or {}
+      table.insert(opts.sections.lualine_b, { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } })
+
+      opts.sections.lualine_y = {}
+      opts.sections.lualine_z = {
+        {
+          function()
+            return require("recorder").recordingStatus()
+          end,
         },
       }
     end,
   },
-  -- Disable bufferline/tabs completely
+
+  -- bufferline.nvim: tab bar
+  -- NOTE: disabled, using showtabline=0 instead
   {
     "akinsho/bufferline.nvim",
     enabled = false,
   },
 
+  -- yanky.nvim: clipboard history ring (<C-p> prev, <C-n> next after paste)
   {
     "gbprod/yanky.nvim",
     keys = {
-      -- C-p/n to get kill-ring like emacs!
+      -- NOTE: C-p/n to get kill-ring like emacs
       { "<c-p>", "<Plug>(YankyPreviousEntry)", desc = "Yanky Previous Entry" },
       { "<c-n>", "<Plug>(YankyNextEntry)", desc = "Yanky Next Entry" },
     },
   },
+
+  -- render-markdown.nvim: markdown table/heading rendering (auto on markdown files)
+  {
+    "MeanderingProgrammer/render-markdown.nvim",
+    opts = {
+      pipe_table = {
+        preset = "round", -- Rounded corners (╭╮╰╯)
+        cell = "raw", -- Only replace pipes; avoids concealed text width bugs
+        style = "full", -- Top + bottom borders
+        padding = 2, -- More breathing room
+        min_width = 0,
+        border_virtual = true, -- Use virtual lines for borders (avoids empty line issues)
+      },
+      anti_conceal = { enabled = true }, -- Show raw syntax on cursor line
+    },
+  },
+
+  -- gitsigns.nvim: custom hunk navigation
+  -- NOTE: disabled, depended on treesitter textobjects, ]c/[c now freed for native diff
   -- {
-  --   NOTE depended on treesitter textobjects, in the end
   --   "lewis6991/gitsigns.nvim",
   --   event = { "LazyFile", "VeryLazy" },
   --   keys = {
@@ -775,19 +849,9 @@ return {
   --     { "[c", ":Gitsigns prev_hunk<CR>", desc = "Prev Hunk" },
   --   },
   -- },
-  -- {
-  --   "lewis6991/gitsigns.nvim",
-  --   event = { "LazyFile", "VeryLazy" },
-  --   keys = {
-  --     { "n", "]c", ":Gitsigns next_hunk<CR>", desc = "Next Hunk" },
-  --     { "n", "[c", ":Gitsigns prev_hunk<CR>", desc = "Prev Hunk" },
-  --   },
-  -- },
 
-  -- DISABLED: mini.diff override for claudecode unified inline diff
-  -- This was used with the single-pane mini.diff approach (see autocmds.lua)
-  -- gen_source.none() disables git source, allowing manual set_ref_text()
-  -- Disabled because: buffer modification before accept causes artifacts
+  -- mini.diff: override for claudecode unified inline diff
+  -- NOTE: disabled, buffer modification before accept causes artifacts (see autocmds.lua)
   -- {
   --   "echasnovski/mini.diff",
   --   opts = function()
@@ -796,4 +860,43 @@ return {
   --     }
   --   end,
   -- },
+
+  -- lazyvim extras ----------------------------------------
+  -- NOTE: extras imports (treesitter-context, inc-rename, dap.core, test.core) are in lazy.lua
+  -- to satisfy LazyVim's required load order: lazyvim.plugins -> extras -> user plugins
+
+  -- conform.nvim: auto-format on save with stylua, shfmt, prettier
+  -- NOTE: formatters installed via Mason
+  {
+    "stevearc/conform.nvim",
+    opts = {
+      formatters_by_ft = {
+        lua = { "stylua" },
+        sh = { "shfmt" },
+        javascript = { "prettierd", "prettier", stop_after_first = true },
+        typescript = { "prettierd", "prettier", stop_after_first = true },
+        json = { "prettierd", "prettier", stop_after_first = true },
+        css = { "prettierd", "prettier", stop_after_first = true },
+        html = { "prettierd", "prettier", stop_after_first = true },
+        markdown = { "prettierd", "prettier", stop_after_first = true },
+        yaml = { "prettierd", "prettier", stop_after_first = true },
+      },
+      formatters = {
+        shfmt = {
+          prepend_args = { "-i", "2", "-ci" },
+        },
+      },
+    },
+  },
+
+  -- persistence.nvim: LazyVim default session manager
+  -- NOTE: disabled, using persisted.nvim in custom.lua instead (has git branch awareness)
+  { "folke/persistence.nvim", enabled = false },
+
+  -- hawtkeys.nvim: one-time keymap audit tool (:Hawtkeys, :HawtkeysDupes)
+  {
+    "tris203/hawtkeys.nvim",
+    cmd = { "Hawtkeys", "HawtkeysAll", "HawtkeysDupes" },
+    opts = {},
+  },
 }

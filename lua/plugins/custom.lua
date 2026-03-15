@@ -1,7 +1,30 @@
-return {
-  -- 🎯 EDIT TRACKING: This change should appear instantly on the left!
-  -- Diff test: edited on 2025-11-25 to verify sidekick.nvim diff view.
+--  ╭────────────────────────────────────────────────────────────────────────╮
+--  │                                                                        │
+--  │                       ######                                           │
+--  │                     ######                                             │
+--  │                    #####                                               │
+--  │                    #####                                               │
+--  │                    #####                                               │
+--  │            ######  #####                                               │
+--  │          ######    #####         custom.lua                            │
+--  │        #######     #####         New plugins not part of LazyVim       │
+--  │       ######        ####                                               │
+--  │        ######        ###         overrides → modify.lua                │
+--  │          #####        ##         disabled  → disable.lua               │
+--  │           #####        #                                               │
+--  │            #####                                                       │
+--  │             #####                                                      │
+--  │              #####                                                     │
+--  │               #####                                                    │
+--  │                #####                                                   │
+--  │                 #####                                                  │
+--  │                                                                        │
+--  ╰────────────────────────────────────────────────────────────────────────╯
 
+return {
+
+  -- claude-code.nvim: alternative claude terminal integration
+  -- NOTE: disabled, using coder/claudecode.nvim instead
   -- {
   --   "greggh/claude-code.nvim",
   --   dependencies = {
@@ -30,7 +53,8 @@ return {
   --   end,
   -- },
 
-  -- Best unified single-view diff experience with proven plugin
+  -- vim-unified-diff: single-pane diff view
+  -- NOTE: disabled, does not work reliably with claudecode buffers
   -- {
   --   "lambdalisue/vim-unified-diff",
   --   event = "VeryLazy",
@@ -52,7 +76,8 @@ return {
   --   end,
   -- },
 
-  -- One diff view NOTE: Does not work
+  -- unified.nvim: single diff view
+  -- NOTE: does not work
   -- {
   --   "axkirillov/unified.nvim",
   --   opts = {
@@ -60,34 +85,38 @@ return {
   --   },
   -- },
 
-  -- 3 screens
+  -- diffview.nvim: 3-screen diff view
+  -- NOTE: disabled, git-only, does not work with claudecode buffers
   -- {
   --   "sindrets/diffview.nvim",
   -- },
 
+  -- nvim-recorder: macro recording with status display (q to record, Q to play)
   {
     "chrisgrieser/nvim-recorder",
-    dependencies = "rcarriga/nvim-notify", -- optional
-    opts = {}, -- required even with default settings, since it calls `setup()`
+    dependencies = "rcarriga/nvim-notify", -- NOTE: optional
+    opts = {}, -- NOTE: required even with default settings, calls setup()
   },
 
-  -- Character-level highlighting with native Neovim - WORKING!
+  -- gitsigns.nvim: git signs in gutter and hunk navigation (auto)
   {
     "lewis6991/gitsigns.nvim",
     event = "VeryLazy",
     opts = {
-      -- Minimal config to avoid claudecode.nvim conflicts
+      -- NOTE: minimal config to avoid claudecode.nvim conflicts
       signs = {
         add = { text = "+" },
         change = { text = "·" },
         delete = { text = "_" },
       },
-      -- Disable features that might conflict with claudecode.nvim
+      -- NOTE: disable features that might conflict with claudecode.nvim
       -- word_diff = false,
       -- attach_to_untracked = false,
     },
   },
 
+  -- gemini-cli.nvim: gemini terminal integration
+  -- NOTE: disabled, using claudecode.nvim instead
   -- {
   --   "jonroosevelt/gemini-cli.nvim",
   --   config = function()
@@ -95,22 +124,23 @@ return {
   --   end,
   -- },
 
-  -- diffchar.vim - Word-level diff highlighting with single color (maximum clarity)
+  -- diffchar.vim: word-level diff highlighting with single color (auto in diff mode)
   {
     "rickhowe/diffchar.vim",
     event = "VeryLazy",
     config = function()
-      vim.g.DiffUnit = "Word1" -- Word-level (easier to scan than char-by-char)
-      vim.g.DiffColors = 0 -- Single DiffText color (maximum clarity)
-      vim.g.DiffPairVisible = 0 -- No cursor highlighting on pairs
-      vim.g.DiffDelPosVisible = 0 -- Disabled: deletion indicators not helpful
+      vim.g.DiffUnit = "Word1" -- NOTE: word-level (easier to scan than char-by-char)
+      vim.g.DiffColors = 0 -- NOTE: single DiffText color (maximum clarity)
+      vim.g.DiffPairVisible = 0 -- NOTE: no cursor highlighting on pairs
+      vim.g.DiffDelPosVisible = 0 -- NOTE: deletion indicators not helpful
     end,
   },
 
+  -- claudecode.nvim: AI code editing with Claude terminal and diff view (<leader>aC toggle, <leader>\ start)
   {
     "coder/claudecode.nvim",
     dependencies = { "folke/snacks.nvim" },
-    -- enabled = false, -- Disabled for sidekick.nvim testing
+    -- NOTE: enabled = false, -- disabled for sidekick.nvim testing
     opts = {
       terminal = {
         split_width_percentage = 0.44,
@@ -129,61 +159,57 @@ return {
     keys = {
       { "<leader>a", nil, desc = "AI/Claude Code" },
       { "<leader>aC", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
-      -- Smart continue: tries --continue first, falls back to new session
+      -- NOTE: smart continue, tries --continue first, falls back to new session
       {
         "<leader>\\",
         function()
-          -- Try to continue existing session
+          -- NOTE: try to continue existing session
           local ok = pcall(vim.cmd, "ClaudeCode --continue")
           if not ok then
-            -- No session to continue, start new
+            -- NOTE: no session to continue, start new
             vim.cmd("ClaudeCode")
           end
         end,
         desc = "Continue/Start Claude",
         mode = { "n", "t" },
       },
-      --NOTE: Using \ now, unbound, this conflicts with LazyVim grep
+      -- NOTE: using \ now, <leader>/ conflicts with LazyVim grep
       -- { "<leader>/", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude", mode = { "n", "t" } },
-      -- Jump to Claude marker (toggle: first press = jump, second press = return) - claude-jump
-      -- Cross-ref: tmux version in ~/.config/tmux/claude_jump.sh (prefix b)
-      -- Searches for user prompts (^> ) OR Claude bullets (^⏺), skips markdown quote blocks
-      -- Smart visibility check: does nothing if marker already visible
-      -- claude-jump: Jump to previous Claude marker (user prompt or action bullet)
-      -- Cross-ref: tmux version in ~/.config/tmux/claude_jump.sh (prefix b)
-      -- Usage: Esc then gb (go back) to jump, gb again to return
+      -- NOTE: claude-jump, jump to previous Claude marker (toggle: first press = jump, second = return)
+      --       cross-ref: tmux version in ~/.config/tmux/claude_jump.sh (prefix b)
+      --       searches for user prompts (^> ) OR Claude bullets, skips markdown quote blocks
       {
         "gb",
         function()
-          vim.notify("gb triggered", vim.log.levels.INFO) -- DEBUG
+          vim.notify("gb triggered", vim.log.levels.INFO) -- TEST: debug trace
           local bufnr = vim.api.nvim_get_current_buf()
           local jumped = vim.b[bufnr].claude_jumped
 
           if jumped then
-            -- SECOND PRESS: Jump back to bottom and enter insert mode
-            vim.notify("gb: returning to bottom", vim.log.levels.INFO) -- DEBUG
+            -- NOTE: second press, jump back to bottom and enter insert mode
+            vim.notify("gb: returning to bottom", vim.log.levels.INFO) -- TEST: debug trace
             vim.cmd([[normal! G]])
             vim.cmd([[startinsert]])
             vim.b[bufnr].claude_jumped = false
             return
           end
 
-          -- Check if marker already visible in current window
+          -- NOTE: check if marker already visible in current window
           local first_visible = vim.fn.line("w0")
           local last_visible = vim.fn.line("w$")
           for lnum = first_visible, last_visible do
             local line = vim.fn.getline(lnum)
             if line:match("^> ") or line:match("^⏺") then
-              vim.notify("gb: marker visible at line " .. lnum .. ", skipping", vim.log.levels.INFO) -- DEBUG
+              vim.notify("gb: marker visible at line " .. lnum .. ", skipping", vim.log.levels.INFO) -- TEST: debug trace
               return
             end
           end
 
-          -- FIRST PRESS: Search for marker
+          -- NOTE: first press, search for marker
           local current_line = vim.fn.line(".")
 
           while true do
-            -- Search for user prompt OR Claude bullet
+            -- NOTE: search for user prompt OR Claude bullet
             local found = vim.fn.search([[^\(> \|⏺\)]], "bW")
             if found == 0 then
               vim.fn.cursor(current_line, 1)
@@ -192,17 +218,17 @@ return {
             end
 
             local line = vim.fn.getline(found)
-            -- If user prompt, check if isolated (not part of quote block)
+            -- NOTE: if user prompt, check if isolated (not part of quote block)
             if line:match("^> ") then
               local prev_line = vim.fn.getline(found - 1)
               if found == 1 or not prev_line:match("^>") then
-                vim.cmd("normal! zt") -- Position at top
+                vim.cmd("normal! zt") -- NOTE: position at top
                 vim.b[bufnr].claude_jumped = true
                 return
               end
             else
-              -- Claude bullet - always valid
-              vim.cmd("normal! zt") -- Position at top
+              -- NOTE: Claude bullet, always valid
+              vim.cmd("normal! zt") -- NOTE: position at top
               vim.b[bufnr].claude_jumped = true
               return
             end
@@ -224,13 +250,13 @@ return {
       },
       { "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
       { "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
-      -- Simple diff keybindings (claudecode.nvim handles the logic)
+      -- NOTE: simple diff keybindings (claudecode.nvim handles the logic)
       { "<leader>]", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
       { "<leader>[", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Reject diff" },
       {
         "<leader>|",
         function()
-          -- Search current tab first
+          -- NOTE: search current tab first
           for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
             local buf = vim.api.nvim_win_get_buf(win)
             if vim.b[buf].claudecode_diff_tab_name then
@@ -238,7 +264,7 @@ return {
               return
             end
           end
-          -- Search all tabs
+          -- NOTE: search all tabs
           for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
             for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
               local buf = vim.api.nvim_win_get_buf(win)
@@ -257,12 +283,8 @@ return {
     config = function(_, opts)
       require("claudecode").setup(opts)
 
-      -- DISABLED: Hardcoded diff colors (2025-01-07)
-      -- These highlight! commands were overriding tokyonight theme settings.
-      -- Problem: Used bold text + bright backgrounds (#1a2e1a) creating visual noise
-      -- Solution: Let tokyonight theme handle diff colors (modify.lua:626-638)
-      --           which provides subtle backgrounds + dimmed syntax via winhighlight
-      -- To restore old colors, uncomment this block and comment out modify.lua colors
+      -- NOTE: hardcoded diff colors disabled (2025-01-07)
+      --       tokyonight theme handles diff colors now (modify.lua on_highlights)
       -- vim.cmd([[
       --   highlight! DiffAdd guifg=#a7c957 guibg=#1a2e1a gui=bold
       --   highlight! DiffDelete guifg=#8a8a8a guibg=#2a1a1a gui=bold
@@ -272,9 +294,8 @@ return {
     end,
   },
 
-  -- sidekick.nvim - Alternative AI coding assistant with visual diffs
-  -- Shows diffs as extmarks/virtual text without modifying buffer
-  -- Hunk-by-hunk navigation, Tab to accept, Esc to clear
+  -- sidekick.nvim: alternative AI coding assistant with visual extmark diffs
+  -- NOTE: disabled, using claudecode.nvim instead
   -- {
   --   "folke/sidekick.nvim",
   --   enabled = true,
@@ -303,51 +324,23 @@ return {
   --   },
   -- },
 
-  -- TODO grapple,
-  -- Claude Code test: Auto-opening integration working!
-  -- Test 2: Updated hook configuration
-  -- Test 3: Jump to last edit location
-  -- Test 4: After restart - testing auto-open integration
-  -- Test 5: Fixed JSON parsing in hook
-  -- Test 6: Manual file opening - SUCCESS! 🎉
-  -- Test 7: Jump to last edit location
-  -- Test 8: Fixed buffer loading issue
-
+  -- marks.nvim: visual marks and bookmarks (mx set, m] next, m[ prev, dm= delete, m0-9 bookmarks)
   {
-    -- mx              Set mark x
-    -- m,              Set the next available alphabetical (lowercase) mark
-    -- m;              Toggle the next available mark at the current line
-    -- dmx             Delete mark x
-    -- dm-             Delete all marks on the current line
-    -- dm<space>       Delete all marks in the current buffer
-    -- m]              Move to next mark
-    -- m[              Move to previous mark
-    -- m:              Preview mark. This will prompt you for a specific mark to
-    --                 preview; press <cr> to preview the next mark.
-    --
-    -- m[0-9]          Add a bookmark from bookmark group[0-9].
-    -- dm[0-9]         Delete all bookmarks from bookmark group[0-9].
-    -- m}              Move to the next bookmark having the same type as the bookmark under
-    --                 the cursor. Works across buffers.
-    -- m{              Move to the previous bookmark having the same type as the bookmark under
-    --                 the cursor. Works across buffers.
-    -- dm=             Delete the bookmark under the cursor.
+    -- NOTE: mx set, m, next available, m; toggle, dmx delete, dm- line, dm<space> buffer
+    --       m] next, m[ prev, m: preview, m0-9 bookmarks, dm0-9 delete group, m}/m{ next/prev bookmark
     "chentoast/marks.nvim",
-    config = function()
-      require("marks").setup()
-    end,
     opts = {
       bookmark_0 = {
         sign = "⚑",
         virt_text = "hello world",
-        -- explicitly prompt for a virtual line annotation when setting a bookmark from this group.
-        -- defaults to false.
+        -- NOTE: set to true to prompt for virtual line annotation when setting a bookmark
         annotate = false,
       },
     },
   },
 
-  -- global marks
+  -- harpoon: global file marks with quick switching
+  -- NOTE: disabled, using marks.nvim instead
   -- {
   --   "theprimeagen/harpoon",
   --   branch = "harpoon2",
@@ -441,17 +434,14 @@ return {
   --   },
   -- },
 
-  -- jump to edits like buffers
+  -- before.nvim: jump to previous/next edit locations in session ([<leader> / ]<leader>)
   {
     "bloznelis/before.nvim",
     lazy = true,
-    config = function()
-      require("before").setup()
-    end,
     opts = {
-      -- How many edit locations to store in memory (default: 10)
+      -- NOTE: how many edit locations to store in memory (default: 10)
       history_size = 11,
-      -- Should it wrap around the ends of the edit history (default: false)
+      -- NOTE: wrap around the ends of the edit history (default: false)
       history_wrap_enabled = true,
     },
     keys = {
@@ -459,24 +449,27 @@ return {
       { "]<leader>", "<cmd>lua require('before').jump_to_next_edit()<CR>", desc = "Next edit this Session" },
     },
   },
+
+  -- undotree: visual undo history tree (<leader>t to toggle)
   {
     "jiaoshijie/undotree",
     dependencies = "nvim-lua/plenary.nvim",
     config = true,
-    keys = { -- load the plugin only when using it's keybinding:
-      { "<leader>t", "<cmd>lua require('undotree').toggle()<cr>" },
+    keys = {
+      { "<leader>t", "<cmd>lua require('undotree').toggle()<cr>", desc = "Toggle undotree" },
     },
     opts = {
       -- float_diff = false,
       -- layout = "left_left_bottom", -- "left_bottom", "left_left_bottom"
-      position = "right", -- "right", "bottom"
+      position = "right", -- NOTE: options: "right", "bottom"
       -- window = {
       --   winblend = 3000000,
       -- },
     },
   },
 
-  -- file operations (Rename duplicate, etc)
+  -- nvim-genghis: file operations (rename, duplicate, etc.)
+  -- NOTE: disabled, using vim-eunuch instead
   -- {
   --   "chrisgrieser/nvim-genghis",
   --   dependencies = "stevearc/dressing.nvim",
@@ -498,7 +491,8 @@ return {
   --   -- },
   -- },
 
-  -- jump only edits with (C-h/l)
+  -- before.nvim: old config with C-h/l binds
+  -- NOTE: disabled, replaced by version above with [<leader>/]<leader>
   -- {
   --   "bloznelis/before.nvim",
   --   config = function()
@@ -511,15 +505,11 @@ return {
   --   },
   -- },
 
-  -- jump list (C-i/o) with context
+  -- portal.nvim: enhanced jumplist with context preview (<leader><C-o> back, <leader><C-i> forward)
   {
     "cbochs/portal.nvim",
     lazy = true,
-    -- Optional dependencies
-    dependencies = {
-      "cbochs/grapple.nvim",
-      "ThePrimeagen/harpoon",
-    },
+    -- NOTE: dependencies removed,grapple.nvim and harpoon are both disabled
     opts = {
       max_results = 3,
       select_first = true,
@@ -545,22 +535,28 @@ return {
     },
   },
 
+  -- arena.nvim: buffer switcher popup
+  -- NOTE: disabled, using fzf-lua for buffer switching
   -- {
   --   "dzfrias/arena.nvim",
   --   event = "BufWinEnter",
-  --   -- Calls `.setup()` automatically
   --   config = true,
   --   keys = {
   --     { "<leader>`", ":ArenaToggle<CR>", desc = "Arena Buffer Switcher" },
   --   },
   -- },
 
+  -- wrapping.nvim: soft/hard wrap toggle
+  -- NOTE: disabled, using default vim wrap settings
   -- {
   --   "andrewferrier/wrapping.nvim",
   --   config = function()
   --     require("wrapping").setup()
   --   end,
   -- },
+
+  -- telescope.nvim: fuzzy finder
+  -- NOTE: disabled, using fzf-lua instead (faster, native fzf)
   -- {
   --   "nvim-telescope/telescope.nvim",
   --   cmd = "Telescope",
@@ -753,7 +749,8 @@ return {
   --   end,
   -- },
 
-  -- Obsidian notes
+  -- obsidian.nvim: note-taking with Obsidian vault integration
+  -- NOTE: disabled, not using Obsidian currently
   -- {
   --   "epwalsh/obsidian.nvim",
   --   version = "*", -- recommended, use latest release instead of latest commit
@@ -795,7 +792,8 @@ return {
   --   -- see below for full list of options 👇
   -- },
 
-  -- GPT in Neovim
+  -- gp.nvim: GPT chat and completion in Neovim
+  -- NOTE: disabled, using claudecode.nvim instead
   -- {
   --   "robitx/gp.nvim",
   --   lazy = true,
@@ -857,6 +855,8 @@ return {
   --   end,
   -- },
 
+  -- ChatGPT.nvim: OpenAI chat integration
+  -- NOTE: disabled, using claudecode.nvim instead
   -- {
   --   "jackMort/ChatGPT.nvim",
   --   lazy = true,
@@ -879,6 +879,8 @@ return {
   --   },
   -- },
 
+  -- format-on-save.nvim: auto-format on save with per-filetype formatters
+  -- NOTE: disabled, using conform.nvim instead (LazyVim default)
   -- {
   --   "elentok/format-on-save.nvim",
   --   lazy = true,
@@ -914,7 +916,8 @@ return {
   --   end,
   -- },
 
-  -- latex plugins
+  -- adoc-pdf-live.nvim: asciidoc live PDF preview
+  -- NOTE: disabled, using vimtex in modify.lua for LaTeX
   -- {
   --   "marioortizmanero/adoc-pdf-live.nvim",
   --   lazy = true,
@@ -924,7 +927,8 @@ return {
   --   end,
   -- },
 
-  -- tex in vim
+  -- vimtex: LaTeX editing and compilation
+  -- NOTE: disabled, using vimtex config in modify.lua instead
   -- {
   --   "lervag/vimtex",
   --   lazy = true,
@@ -946,58 +950,35 @@ return {
   --   end,
   -- },
 
-  -- hex color in vim
+  -- nvim-colorizer.lua: inline hex/rgb color preview (<leader>cc to toggle)
   {
-    "norcalli/nvim-colorizer.lua",
+    "catgoose/nvim-colorizer.lua",
+    -- NOTE: replaced norcalli/nvim-colorizer.lua (archived 2021) with maintained catgoose fork
     lazy = true,
-    config = function()
-      -- require("colorizer").setup({})
-      require("colorizer").setup()
-
-      --
-      -- surround_words             ysiw)           (surround_words)
-      -- *make strings               ys$"            "make strings"
-      -- [delete ar*ound me!]        ds]             delete around me!
-      -- remove <b>HTML t*ags</b>    dst             remove HTML tags
-      -- 'change quot*es'            cs'"            "change quotes"
-      -- <b>or tag* types</b>        csth1<CR>       <h1>or tag types</h1>
-      -- delete(functi*on calls)     dsf             function calls
-      --
-      --
-      -- Configuration here, or leave empty to use defaults
-    end,
+    opts = {},
     keys = { { "<leader>cc", "<cmd>ColorizerToggle<CR>", desc = "Colorizer Toggle" } },
   },
 
-  -- surround with cs
+  -- nvim-surround: surround text with brackets/quotes/tags (ys add, ds delete, cs change)
   {
     "kylechui/nvim-surround",
-    version = "*", -- Use for stability; omit to use `main` branch for the latest features
-    lazy = true,
-    config = function()
-      require("nvim-surround").setup({})
-      --
-      -- surround_words             ysiw)           (surround_words)
-      -- *make strings               ys$"            "make strings"
-      -- [delete ar*ound me!]        ds]             delete around me!
-      -- remove <b>HTML t*ags</b>    dst             remove HTML tags
-      -- 'change quot*es'            cs'"            "change quotes"
-      -- <b>or tag* types</b>        csth1<CR>       <h1>or tag types</h1>
-      -- delete(functi*on calls)     dsf             function calls
-      --
-      --
-      -- Configuration here, or leave empty to use defaults
-    end,
+    -- NOTE: version removed, LazyVim sets version=false globally (latest commit)
+    event = "VeryLazy",
+    opts = {},
+    -- NOTE: ysiw) = (word), ys$" = "to eol", ds] = remove [], dst = remove tags
+    --       cs'" = change quotes, csth1<CR> = change to <h1>, dsf = remove function call
   },
+
+  -- neogit: magit-like git interface (<leader>gg open, <leader>gD dotfiles)
   {
     "NeogitOrg/neogit",
     lazy = true,
     dependencies = {
-      "nvim-lua/plenary.nvim", -- required
-      "sindrets/diffview.nvim", -- optional - Diff integration
+      "nvim-lua/plenary.nvim", -- NOTE: required
+      "sindrets/diffview.nvim", -- NOTE: optional, diff integration
 
-      -- Only one of these is needed, not both.
-      "nvim-telescope/telescope.nvim", -- optional
+      -- NOTE: only one of these is needed, not both
+      "nvim-telescope/telescope.nvim", -- NOTE: optional
       -- "ibhagwan/fzf-lua", -- optional
     },
     opts = {
@@ -1009,21 +990,23 @@ return {
       { "<leader>gG", false },
       { "<leader>gg", ":Neogit<CR>", silent = true, desc = "Open Neogit" },
       {
-        "<leader>gd",
+        "<leader>gD",
         "<cmd>lua require('util.functions').OpenDotfilesInNeogit()<CR>",
-        desc = "Open Neogit for dotfiles",
+        desc = "Open Neogit for dotfiles (capital D, <leader>gd = diff-off)",
         silent = true,
       },
     },
   },
 
+  -- lazygit.nvim: lazygit integration
+  -- NOTE: disabled, using neogit instead
   -- {
   --   "kdheepak/lazygit.nvim",
-  --   -- optional for floating window border decoration
-  --   dependencies = {
-  --     "nvim-lua/plenary.nvim",
-  --   },
-  -- TODO does not do the ()text (t)ext behavior yet
+  --   dependencies = { "nvim-lua/plenary.nvim" },
+  -- },
+
+  -- nvim-autopairs: auto-close brackets and quotes
+  -- TODO: does not do the ()text (t)ext behavior yet
   -- {
   --   "windwp/nvim-autopairs",
   --   event = "InsertEnter",
@@ -1033,43 +1016,49 @@ return {
   --     },
   --   },
   -- },
+
+  -- scrollfix: vimscript to hold window at specific line (usually center)
+  -- NOTE: disabled, using dynamic scrolloff in autocmds.lua instead
   -- {
-  --   -- Vimscript to hold window at specific line - usually center
   --   "vim-scripts/scrollfix",
   --   config = function()
   --     vim.g["scrollfix"] = 50
   --   end,
   -- },
 
-  -- Basic file ops
-  { "tpope/vim-eunuch", lazy = true },
+  -- vim-eunuch: unix file commands (:Rename, :Delete, :Move, :Chmod, :Mkdir)
+  { "tpope/vim-eunuch", cmd = { "Rename", "Delete", "Move", "Chmod", "Mkdir", "SudoWrite" } },
 
-  -- Detect tabstop and shiftwidth automatically
-  { "tpope/vim-sleuth", lazy = true },
+  -- vim-sleuth: auto-detect indentation (tabstop/shiftwidth) on file open
+  { "tpope/vim-sleuth", event = "BufReadPre" },
 
+  -- close-buffers.nvim: better buffer closing actions
+  -- NOTE: disabled, using default LazyVim buffer management
   -- {
-  --   -- Better buffer closing actions. Available via the buffers helper.
   --   "kazhala/close-buffers.nvim",
   --   opts = {
   --     preserve_window_layout = { "this", "nameless" },
   --   },
   -- },
+
+  -- mini.move: move lines/selections with <M-j>/<M-k> in normal and visual mode
   {
-    -- Move stuff with <M-j> and <M-k> in both normal and visual mode
     "nvim-mini/mini.move",
     lazy = true,
     config = function()
       require("mini.move").setup()
     end,
   },
+
+  -- oil.nvim: file explorer as editable buffer (<leader>e open, - parent dir)
   {
     "stevearc/oil.nvim",
-    lazy = false, -- Load immediately to replace default file explorer
+    lazy = false, -- NOTE: load immediately to replace default file explorer
     dependencies = {
       "nvim-tree/nvim-web-devicons",
     },
     opts = {
-      default_file_explorer = true, -- Take over directory buffers (vim ., :e src/, etc)
+      default_file_explorer = true, -- NOTE: take over directory buffers (vim ., :e src/, etc)
       columns = {
         "icon",
         "permissions",
@@ -1078,11 +1067,11 @@ return {
       },
       keymaps = {
         ["?"] = "actions.show_help",
-        ["<C-h>"] = false, -- Disable default to avoid conflict with window navigation
-        ["<C-l>"] = false, -- Disable default to avoid conflict with window navigation
+        ["<C-h>"] = false, -- NOTE: disable default to avoid conflict with window navigation
+        ["<C-l>"] = false, -- NOTE: disable default to avoid conflict with window navigation
       },
       view_options = {
-        show_hidden = true, -- Show hidden files
+        show_hidden = true, -- NOTE: show dotfiles and hidden files
         is_always_hidden = function(name, bufnr)
           return name == ".."
         end,
@@ -1103,99 +1092,53 @@ return {
       { "-", "<cmd>Oil<cr>", desc = "Open parent directory" },
     },
   },
+
+  -- vim-repeat: extend . repeat to plugin mappings (auto)
+  { "tpope/vim-repeat", event = "VeryLazy" },
+
+  -- git-conflict.nvim: git merge conflict resolution (co ours, ct theirs, cb both, ]x next, [x prev)
   {
-    "tpope/vim-repeat",
-    lazy = true,
-  },
-  {
-    -- Resolve conflicts with cX, jump with ]x
     "akinsho/git-conflict.nvim",
-    lazy = true,
-    commit = "2957f74",
-    config = function()
-      require("git-conflict").setup({
-        -- default_mappings = {
-        -- 	ours = "co",
-        -- 	theirs = "ct",
-        -- 	none = "c0",
-        -- 	both = "cb",
-        -- 	next = "cn",
-        -- 	prev = "cp",
-        -- },
-      })
-    end,
+    -- NOTE: commit pin removed, was stale, using latest
+    event = "BufReadPre",
+    opts = {},
   },
+
+  -- bufresize.nvim: preserve window proportions on terminal resize (auto)
   {
     "kwkarlwang/bufresize.nvim",
-    lazy = true,
-    config = function()
-      require("bufresize").setup()
-    end,
+    event = "VimResized",
+    opts = {},
   },
 
+  -- markview.nvim: enhanced markdown rendering with treesitter (auto on markdown files)
+  -- NOTE: disabled, conflicts with render-markdown.nvim (modify.lua),
+  --       render-markdown works better with conceallevel=0 via anti_conceal
+  -- {
+  --   "OXY2DEV/markview.nvim",
+  --   lazy = false,
+  --   priority = 49,
+  --   dependencies = {
+  --     "saghen/blink.cmp",
+  --   },
+  -- },
+
+  -- beacon.nvim: cursor position flash on jump/search (n/N/*/# triggers)
+  -- NOTE: disabled, unmaintained since 2023, smear-cursor.nvim replaces it
+  -- { "danilamihailov/beacon.nvim" },
+
+  -- modicator.nvim: cursorline color changes with vim mode (auto, reflects insert/normal/visual)
   {
-    "OXY2DEV/markview.nvim",
-    lazy = false,
-
-    -- For `nvim-treesitter` users.
-    priority = 49,
-
-    -- For blink.cmp's completion
-    -- source
-    dependencies = {
-      "saghen/blink.cmp",
+    "mawkler/modicator.nvim",
+    event = "VeryLazy",
+    dependencies = "folke/tokyonight.nvim",
+    opts = {
+      show_warnings = true,
     },
   },
 
-  { "danilamihailov/beacon.nvim" }, -- lazy calls setup() by itself
-  -- TODO some error here
-  -- {
-  --   "danilamihailov/beacon.nvim",
-  --   lazy = true,
-  --   keys = {
-  --     { "n", "n:Beacon<cr>", desc = "Beacon Search Term Next" },
-  --     { "N", "N:Beacon<cr>", desc = "Beacon Search Term Prev" },
-  --     { "*", "*:Beacon<cr>", desc = "Beacon Cursor Term Next" },
-  --     { "#", "#:Beacon<cr>", desc = "Beacon Cursor Term Prev" },
-  --   },
-  --   config = function()
-  --     -- beacon_minimal_jump = 2,
-  --     vim.g.beacon_shrink = 0
-  --     vim.g.beacon_fade = 1
-  --     vim.g.beacon_size = 777
-  --
-  --     -- color
-  --     -- highlight Beacon guibg=white ctermbg=15
-  --     -- vim.api.nvim_set_hl(0, "Beacon", { guibg = "white", ctermbg = 15 })
-  --     -- vim.cmd([[highlight Beacon guibg=white ctermbg=15]])
-  --   end,
-  -- },
-
-  -- cursor line mode color
-  {
-    "mawkler/modicator.nvim",
-    lazy = true,
-    -- dependencies = "mawkler/onedark.nvim", -- Add your colorscheme plugin here
-    -- dependencies = "folke/tokyonight.nvim", -- Using tokyonight for consistency
-    dependencies = "folke/tokyonight.nvim",
-    config = function()
-      require("modicator").setup({
-        -- Warn if any required option above is missing. May emit false positives
-        -- if some other plugin modifies them, which in that case you can just
-        -- ignore. Feel free to remove this line after you've gotten Modicator to
-        -- work properly.
-        show_warnings = true,
-      })
-    end,
-  },
-  -- init = function()
-  --   -- These are required for Modicator to work
-  --   vim.o.cursorline = true
-  --   vim.o.number = true
-  --   vim.o.termguicolors = true
-  -- end,
-
-  -- customized lua bar
+  -- barbar.nvim: customized tab/buffer bar
+  -- NOTE: disabled, using showtabline=0 instead (no tab bar)
   -- {
   --   "romgrk/barbar.nvim",
   --   dependencies = {},
@@ -1210,13 +1153,9 @@ return {
   --     -- …etc.
   --   },
   -- },
-  --   --
-  --   -- {
-  --   --   "lewis6991/gitsigns.nvim",
-  --   -- },
   -- }
 
-  -- Smooth cursor animations (macOS optimized)
+  -- smear-cursor.nvim: smooth cursor animations (macOS optimized, auto)
   {
     "sphamba/smear-cursor.nvim",
     event = "VeryLazy",
@@ -1227,7 +1166,7 @@ return {
     },
   },
 
-  -- Beautiful inline diagnostics (replaces virtual text)
+  -- tiny-inline-diagnostic.nvim: beautiful inline diagnostics (replaces virtual text, auto on LspAttach)
   {
     "rachartier/tiny-inline-diagnostic.nvim",
     event = "LspAttach",
@@ -1235,7 +1174,7 @@ return {
     opts = { preset = "modern" },
   },
 
-  -- Split/join code blocks with Treesitter awareness
+  -- treesj: split/join code blocks with treesitter awareness (gJ to toggle)
   {
     "Wansmer/treesj",
     keys = {
@@ -1244,9 +1183,9 @@ return {
     opts = { use_default_keymaps = false },
   },
 
-  -- Interactive text alignment
+  -- mini.align: interactive text alignment (ga align, gA align with preview)
   {
-    "echasnovski/mini.align",
+    "nvim-mini/mini.align",
     keys = {
       { "ga", mode = { "n", "v" }, desc = "Align" },
       { "gA", mode = { "n", "v" }, desc = "Align with preview" },
@@ -1254,32 +1193,130 @@ return {
     opts = {},
   },
 
-  -- IDE-like breadcrumb navigation (clickable, Treesitter-powered)
-  {
-    "Bekaboo/dropbar.nvim",
-    event = "VeryLazy",
-    opts = {},
-  },
+  -- dropbar.nvim: IDE-like breadcrumb navigation (clickable, treesitter-powered)
+  -- NOTE: disabled, replaced by incline.nvim floating labels + navic in statusline
+  -- {
+  --   "Bekaboo/dropbar.nvim",
+  --   event = "VeryLazy",
+  --   opts = {},
+  -- },
 
-  -- Enable additional Snacks modules
+  -- incline.nvim: floating filename label per window (icon + filename only)
+  -- NOTE: always visible, highlights set in tokyonight on_highlights
+  -- NOTE: full path shown in statusline only, incline is just a quick label
   {
-    "folke/snacks.nvim",
+    "b0o/incline.nvim",
+    event = "VeryLazy",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
-      dim = { enabled = true },
-      zen = { enabled = true },
-      words = { enabled = true },
-      gitbrowse = { enabled = true },
-      scratch = { enabled = true },
+      hide = {
+        cursorline = "focused_win",
+        only_win = false,
+      },
+      ignore = {
+        filetypes = { "neo-tree", "dashboard", "alpha", "help", "noice" },
+      },
+      window = {
+        padding = { left = 1, right = 1 },
+        margin = { horizontal = 1, vertical = 1 },
+        placement = { horizontal = "right", vertical = "top" },
+      },
+      render = function(props)
+        local buf = props.buf
+        local fullname = vim.api.nvim_buf_get_name(buf)
+        local filename = vim.fn.fnamemodify(fullname, ":t")
+        if filename == "" then
+          filename = "[No Name]"
+        end
+        local ft_icon, ft_color = require("nvim-web-devicons").get_icon_color(filename)
+
+        -- diagnostics
+        local diag = {}
+        for _, d in ipairs({
+          { "Error", " " },
+          { "Warn", " " },
+          { "Info", " " },
+          { "Hint", " " },
+        }) do
+          local n = #vim.diagnostic.get(buf, { severity = vim.diagnostic.severity[d[1]:upper()] })
+          if n > 0 then
+            table.insert(diag, { d[2] .. n .. " ", group = "DiagnosticSign" .. d[1] })
+          end
+        end
+        if #diag > 0 then
+          table.insert(diag, { "┊ " })
+        end
+
+        -- git diff
+        local git = {}
+        local signs = vim.b[buf].gitsigns_status_dict
+        if signs then
+          for _, g in ipairs({
+            { "added", " ", "GitSignsAdd" },
+            { "changed", " ", "GitSignsChange" },
+            { "removed", " ", "GitSignsDelete" },
+          }) do
+            if tonumber(signs[g[1]]) and signs[g[1]] > 0 then
+              table.insert(git, { g[2] .. signs[g[1]] .. " ", group = g[3] })
+            end
+          end
+          if #git > 0 then
+            table.insert(git, { "┊ " })
+          end
+        end
+
+        return {
+          { diag },
+          { git },
+          { (ft_icon or "") .. " ", guifg = ft_color },
+          { filename .. " ", gui = "bold" },
+        }
+      end,
     },
   },
 
-  -- Session management with git branch awareness
+  -- snacks.nvim: additional modules (dim, zen, gitbrowse, scratch)
+  -- NOTE: disabled, merged into single snacks block in modify.lua
+  -- {
+  --   "folke/snacks.nvim",
+  --   opts = {
+  --     dim = { enabled = true },
+  --     zen = { enabled = true },
+  --     words = { enabled = true },
+  --     gitbrowse = { enabled = true },
+  --     scratch = { enabled = true },
+  --   },
+  -- },
+
+  -- persisted.nvim: session management with git branch awareness (auto on start)
   {
     "olimorris/persisted.nvim",
     lazy = false,
     opts = {
       autoload = true,
       use_git_branch = true,
+    },
+  },
+
+  -- auto-save.nvim: automatic buffer saving
+  -- NOTE: disabled, too aggressive (saves after every edit). Using swap files for crash
+  --       protection instead (swapfile=true in options.lua, auto-recover in autocmds.lua)
+  --       Manual save: Ctrl+S / Cmd+S / <leader>S
+  -- {
+  --   "okuuva/auto-save.nvim",
+  --   event = { "InsertLeave", "TextChanged" },
+  --   opts = {},
+  -- },
+
+  -- mason-tool-installer: auto-update all Mason packages daily on startup (silent)
+  {
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    dependencies = { "mason-org/mason.nvim" },
+    event = "VeryLazy",
+    opts = {
+      auto_update = true,
+      run_on_start = true,
+      debounce_hours = 24,
     },
   },
 }
