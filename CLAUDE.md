@@ -1,6 +1,6 @@
 # Neovim Configuration (LazyVim)
 
-Neovim 0.11+ with LazyVim on macOS. TokyoNight theme with transparency.
+Neovim 0.11+ with LazyVim on macOS. Kanagawa Wave theme with transparency and custom cursorline/diff overrides.
 
 ## Project Structure
 
@@ -33,13 +33,13 @@ Neovim 0.11+ with LazyVim on macOS. TokyoNight theme with transparency.
 
 ## Key Architecture Decisions
 
-- **Theme**: TokyoNight (not Kanagawa) with custom diff/cursor colors in modify.lua
+- **Theme**: Kanagawa Wave with custom cursorline, diff, float, and menu overrides in modify.lua
 - **File explorer**: oil.nvim is primary (`<leader>e`), neo-tree exists only for ClaudeCodeTreeAdd
 - **Notifications**: snacks.notifier (nvim-notify and persistence.nvim both disabled)
 - **Session**: persisted.nvim (persistence.nvim disabled), git branch aware
 - **Completion**: blink.cmp with super-tab behavior
 - **Picker**: fzf-lua (not telescope), set via `vim.g.lazyvim_picker = "fzf"`
-- **Formatting**: conform.nvim with stylua, shfmt, prettier
+- **Formatting**: conform.nvim with stylua, shfmt, prettier, clang-format, ocamlformat
 - **Diagnostics**: virtual text disabled, using tiny-inline-diagnostic.nvim instead
 - **Cursor animation**: smear-cursor.nvim (beacon.nvim disabled, unmaintained)
 - **Markdown**: render-markdown.nvim (markview.nvim disabled, conceallevel=0 conflict)
@@ -48,6 +48,9 @@ Neovim 0.11+ with LazyVim on macOS. TokyoNight theme with transparency.
 - **Statusline**: lualine with smart tilde-relative path + progressive truncation
 - **Swap files**: auto-recover from swap (no auto-save plugin, manual save only)
 - **Borders**: `vim.o.winborder = "rounded"` globally, noice views overridden to match
+- **C/C++**: clangd + clangd_extensions + codelldb DAP (LazyVim `lang.clangd` extra), clang-format via conform
+- **OCaml**: ocamllsp + ocaml.nvim (LazyVim `lang.ocaml` extra + tarides plugin), ocamlformat via conform
+- **CMake**: cmake-tools.nvim (LazyVim `lang.cmake` extra, already in lazyvim.json)
 - **Providers**: perl/ruby disabled, node/python3 kept
 
 ## Common Gotchas (lazy.nvim)
@@ -135,6 +138,7 @@ tmux -L claude-test kill-server
 | `<leader>t` | n | Toggle undotree |
 | `<C-S>` / `<D-s>` | n,v,i | Save file |
 | `]x` / `[x` | n | Next/prev change (edit list) |
+| `<leader>ch` | n | Switch source/header (C/C++) |
 
 ## Claude Code Integration
 

@@ -63,7 +63,7 @@ vim.opt.diffopt = {
   "context:3", -- Show 3 lines of context around changes
 }
 
--- NOTE: diff colors configured in TokyoNight theme (modify.lua)
+-- NOTE: diff colors configured in theme overrides (modify.lua)
 -- vim.api.nvim_create_autocmd("ColorScheme", {
 --   callback = function()
 --     vim.api.nvim_set_hl(0, "DiffAdd", { bg = "#0d4a1a", fg = "#7fb069", bold = true })

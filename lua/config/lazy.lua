@@ -43,6 +43,8 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.editor.inc-rename" },
     { import = "lazyvim.plugins.extras.dap.core" },
     { import = "lazyvim.plugins.extras.test.core" },
+    { import = "lazyvim.plugins.extras.lang.clangd" },
+    { import = "lazyvim.plugins.extras.lang.ocaml" },
     -- import/override with your plugins
     { import = "plugins" },
   },
@@ -55,7 +57,7 @@ require("lazy").setup({
     version = false, -- always use the latest git commit
     -- version = "*", -- try installing the latest stable version for plugins that support semver
   },
-  install = { colorscheme = { "tokyonight" } },
+  install = { colorscheme = { "kanagawa", "habamax" } },
 
   checker = { enabled = true, notify = false, frequency = 86400 }, -- Auto-check for plugin updates daily
 

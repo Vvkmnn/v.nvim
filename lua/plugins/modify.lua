@@ -316,10 +316,9 @@ return {
     },
   },
 
-  -- WARN: Mason v2 race condition (LazyVim #6039), if you add a new LSP server to the
-  -- servers table below, run :MasonInstall <server> BEFORE restarting nvim. The race occurs
-  -- when mason-lspconfig and LazyVim's ensure_installed both try to install the same
-  -- uninstalled package simultaneously. Pre-installing avoids the assert crash.
+  -- WARN: Mason v2 race — if adding a new LSP server, run :MasonInstall <server> first.
+  -- mason-lspconfig and LazyVim's ensure_installed can race on first install.
+  -- The codelldb DAP race is fixed below (mason-nvim-dap automatic_installation = false).
 
   -- nvim-lspconfig: LSP server configs for lua_ls, ruff, ts_ls, tailwindcss, harper (auto on file open)
   {
@@ -365,6 +364,15 @@ return {
       },
 
       servers = {
+        -- NOTE: bashls needs explicit node path (fnm doesn't add node to PATH for LSP subprocesses)
+        bashls = {
+          cmd = {
+            vim.fn.expand("~/.local/share/fnm/aliases/default/bin/node"),
+            vim.fn.expand("~/.local/share/nvim/mason/packages/bash-language-server/node_modules/bash-language-server/out/cli.js"),
+            "start",
+          },
+        },
+
         -- NOTE: lua_ls optimized for Neovim development
         lua_ls = {
           settings = {
@@ -466,6 +474,12 @@ return {
               vue = "vue",
             },
           },
+        },
+
+        -- NOTE: ocamllsp must come from opam, not Mason (Mason version is stale/broken)
+        --       install via: opam install ocaml-lsp-server
+        ocamllsp = {
+          mason = false,
         },
 
         -- NOTE: harper-ls replaces ltex (~5MB Rust vs ~200MB Java), fixes Mason v2 install race
@@ -571,79 +585,113 @@ return {
 
   -- theme ------------------------------------------------
 
-  -- LazyVim: base config, set tokyonight as default colorscheme
+  -- LazyVim: base config, set kanagawa as default colorscheme
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "tokyonight",
+      colorscheme = "kanagawa",
+      -- colorscheme = "kanagawa", -- theme = "dragon"
+      -- colorscheme = "kanagawa", -- theme = "lotus"
+      -- colorscheme = "tokyonight", -- previous default
     },
   },
 
-  -- tokyonight.nvim: theme with transparency, custom diff and cursor colors
+  -- kanagawa.nvim: theme with transparency, custom diff and cursor colors
   {
-    "folke/tokyonight.nvim",
+    "rebelot/kanagawa.nvim",
     lazy = false,
     priority = 1000,
     opts = {
-      style = "night",
+      theme = "wave",
+      -- theme = "dragon",
+      -- theme = "lotus",
       transparent = true,
+      dimInactive = false,
       terminal_colors = true,
-      styles = {
-        sidebars = "transparent",
-        floats = "transparent", -- consistent with editor, borders provide visual separation
+      colors = {
+        theme = {
+          all = {
+            ui = {
+              bg_gutter = "none",
+              float = {
+                bg = "none",
+              },
+            },
+          },
+        },
       },
-      on_highlights = function(hl, c)
+      overrides = function(colors)
+        local theme = colors.theme
+
         -- NOTE: full transparency (terminal bg shows through everywhere)
-        hl.Normal = { bg = "none" }
-        hl.NormalFloat = { bg = "none" }
-        -- NOTE: visible border color on transparent floats
-        hl.FloatBorder = { fg = c.border_highlight, bg = "none" }
-        hl.FloatTitle = { fg = c.border_highlight, bg = "none" }
+        return {
+          Normal = { bg = "none" },
+          NormalFloat = { bg = "none" },
+          -- NOTE: visible border color on transparent floats
+          FloatBorder = { fg = theme.ui.float.fg_border, bg = "none" },
+          FloatTitle = { fg = theme.ui.float.fg_border, bg = "none" },
 
-        -- NOTE: orange cursorline customization matching line numbers
-        hl.CursorLine = {
-          bg = "#2A1F0A", -- Dark version of e0af68
-          blend = 20,
-        }
-        hl.CursorLineNr = {
-          fg = "#e0af68", -- Tokyo Night yellow-orange (matches line numbers)
-          bold = true,
-        }
+          -- NOTE: active row uses a dark Kanagawa gold surface matching CursorLineNr.
+          --       Keep this paired with modicator's pinned gold mode highlights in custom.lua;
+          --       otherwise the line number can briefly turn gold, then get overwritten.
+          CursorLine = {
+            bg = "#322A20",
+          },
+          CursorLineNr = {
+            fg = colors.palette.carpYellow,
+            bold = true,
+          },
+          CursorLineSign = {
+            fg = colors.palette.carpYellow,
+            bg = "#322A20",
+          },
+          CursorLineFold = {
+            fg = colors.palette.fujiGray,
+            bg = "#322A20",
+          },
+          LineNr = {
+            fg = colors.palette.fujiGray,
+          },
+          SignColumn = {
+            fg = colors.palette.springBlue,
+            bg = "none",
+          },
 
-        -- NOTE: telescope transparency
-        hl.TelescopeNormal = { bg = "none" }
-        hl.TelescopeBorder = { bg = "none" }
-        hl.TelescopePromptNormal = { bg = "none" }
-        hl.TelescopeResultsNormal = { bg = "none" }
-        hl.TelescopePreviewNormal = { bg = "none" }
+          -- NOTE: telescope transparency
+          TelescopeNormal = { bg = "none" },
+          TelescopeBorder = { bg = "none" },
+          TelescopePromptNormal = { bg = "none" },
+          TelescopeResultsNormal = { bg = "none" },
+          TelescopePreviewNormal = { bg = "none" },
 
         -- NOTE: incline.nvim floating labels (raised surface on transparent bg)
-        hl.InclineNormal = { bg = c.bg_highlight, fg = c.fg }
-        hl.InclineNormalNC = { bg = c.bg_highlight, fg = c.dark5 }
+          InclineNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg },
+          InclineNormalNC = { bg = theme.ui.bg_m3, fg = theme.ui.special },
 
         -- NOTE: file tree transparency
-        hl.NeoTreeNormal = { bg = "none" }
-        hl.NeoTreeNormalNC = { bg = "none" }
+          NeoTreeNormal = { bg = "none" },
+          NeoTreeNormalNC = { bg = "none" },
 
         -- NOTE: keep important UI elements visible
-        hl.Pmenu = { bg = c.bg_popup }
-        hl.PmenuSel = { bg = c.bg_highlight }
+          Pmenu = { bg = theme.ui.bg_p1 },
+          PmenuSel = { bg = theme.ui.bg_p2 },
 
-        -- NOTE: diff colors derived from TokyoNight palette (2025-01-07)
-        --       syntax highlighting stays full color (no dimming via winhighlight)
-        --       DiffDimmed* groups removed (winhighlight disabled in autocmds.lua)
+          -- NOTE: diff colors tuned to Kanagawa's warmer palette
+          --       syntax highlighting stays full color (no dimming via winhighlight)
+          --       DiffDimmed* groups removed (winhighlight disabled in autocmds.lua)
 
-        -- NOTE: added lines, soft forest green (derived from theme green #9ece6a)
-        hl.DiffAdd = { bg = "#1e2e1a" }
+          -- NOTE: added lines, soft moss green
+          DiffAdd = { bg = "#1f2a1f" },
 
-        -- NOTE: deleted lines, soft burgundy rose (derived from theme red #f7768e)
-        hl.DiffDelete = { bg = "#2e1a1e" }
+          -- NOTE: deleted lines, muted crimson brown
+          DiffDelete = { bg = "#2d1f22" },
 
-        -- NOTE: changed lines, warm amber glow (derived from theme yellow #e0af68)
-        hl.DiffChange = { bg = "#2e2618" }
+          -- NOTE: changed lines, subdued ochre
+          DiffChange = { bg = "#2f281c" },
 
-        -- NOTE: word-level changes, theme yellow text
-        hl.DiffText = { bg = "#3d3520", fg = "#e0af68" }
+          -- NOTE: word-level changes, Kanagawa yellow text
+          DiffText = { bg = "#433621", fg = colors.palette.carpYellow },
+        }
       end,
     },
   },
@@ -865,7 +913,7 @@ return {
   -- NOTE: extras imports (treesitter-context, inc-rename, dap.core, test.core) are in lazy.lua
   -- to satisfy LazyVim's required load order: lazyvim.plugins -> extras -> user plugins
 
-  -- conform.nvim: auto-format on save with stylua, shfmt, prettier
+  -- conform.nvim: auto-format on save with stylua, shfmt, prettier, clang-format, ocamlformat
   -- NOTE: formatters installed via Mason
   {
     "stevearc/conform.nvim",
@@ -880,12 +928,56 @@ return {
         html = { "prettierd", "prettier", stop_after_first = true },
         markdown = { "prettierd", "prettier", stop_after_first = true },
         yaml = { "prettierd", "prettier", stop_after_first = true },
+        c = { "clang_format" },
+        cpp = { "clang_format" },
+        ocaml = { "ocamlformat" },
       },
       formatters = {
         shfmt = {
           prepend_args = { "-i", "2", "-ci" },
         },
       },
+    },
+  },
+
+  -- nvim-dap: OCaml earlybird debugger adapter (bytecode debugging)
+  -- NOTE: requires `opam install earlybird`, debug bytecode builds only (.bc)
+  --       run `dune build` with `(modes byte)` in dune file to produce .bc executables
+  {
+    "mfussenegger/nvim-dap",
+    optional = true,
+    opts = function()
+      local dap = require("dap")
+      if not dap.adapters["ocamlearlybird"] then
+        dap.adapters["ocamlearlybird"] = {
+          type = "executable",
+          command = "ocamlearlybird",
+          args = { "debug" },
+        }
+      end
+      if not dap.configurations["ocaml"] then
+        dap.configurations["ocaml"] = {
+          {
+            type = "ocamlearlybird",
+            request = "launch",
+            name = "Launch OCaml bytecode",
+            program = function()
+              return vim.fn.input("Path to .bc executable: ", vim.fn.getcwd() .. "/_build/default/", "file")
+            end,
+            cwd = "${workspaceFolder}",
+          },
+        }
+      end
+    end,
+  },
+
+  -- mason-nvim-dap: disable automatic_installation (codelldb race with lang.clangd)
+  -- NOTE: lang.clangd already ensures codelldb via mason.ensure_installed,
+  --       mason-nvim-dap's auto-install races with it causing "Package is already installing"
+  {
+    "jay-babu/mason-nvim-dap.nvim",
+    opts = {
+      automatic_installation = false,
     },
   },
 

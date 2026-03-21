@@ -94,7 +94,7 @@ vim.api.nvim_create_autocmd({ "VimResized", "WinEnter", "BufWinEnter" }, {
   desc = "Keep cursor centered dynamically (adapts to window height)",
 })
 
--- NOTE: disabled, was interfering with tokyonight theme
+-- NOTE: disabled, was interfering with theme overrides
 -- vim.api.nvim_create_autocmd("ColorScheme", {
 --   command = [[highlight CursorLine guibg=black ctermbg=115]],
 -- })
@@ -177,6 +177,29 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.linebreak = true
   end,
   desc = "Enable spell check for LaTeX files (en_au priority)",
+})
+
+-- c/c++ development ------------------------------------
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "c", "cpp" },
+  callback = function()
+    -- NOTE: clangd handles diagnostics, formatting via conform, DAP via codelldb
+    --       these are per-buffer comfort settings only
+    vim.opt_local.commentstring = "// %s" -- Modern C/C++ line comments (not /* */)
+  end,
+  desc = "C/C++ buffer settings",
+})
+
+-- ocaml development ------------------------------------
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "ocaml", "ocaml.interface", "ocaml.menhir", "ocaml.ocamllex" },
+  callback = function()
+    -- NOTE: OCaml convention is 2-space indent (global default is 4)
+    vim.opt_local.shiftwidth = 2
+    vim.opt_local.tabstop = 2
+    vim.opt_local.softtabstop = 2
+  end,
+  desc = "OCaml 2-space indent (community convention)",
 })
 
 -- diff window settings ----------------------------------

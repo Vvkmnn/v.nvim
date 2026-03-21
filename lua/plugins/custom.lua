@@ -284,7 +284,7 @@ return {
       require("claudecode").setup(opts)
 
       -- NOTE: hardcoded diff colors disabled (2025-01-07)
-      --       tokyonight theme handles diff colors now (modify.lua on_highlights)
+      --       active theme handles diff colors now (modify.lua overrides)
       -- vim.cmd([[
       --   highlight! DiffAdd guifg=#a7c957 guibg=#1a2e1a gui=bold
       --   highlight! DiffDelete guifg=#8a8a8a guibg=#2a1a1a gui=bold
@@ -1131,10 +1131,39 @@ return {
   {
     "mawkler/modicator.nvim",
     event = "VeryLazy",
-    dependencies = "folke/tokyonight.nvim",
-    opts = {
-      show_warnings = true,
-    },
+    config = function()
+      local colors = require("kanagawa.colors").setup({ theme = "wave" })
+      local cursorline = vim.api.nvim_get_hl(0, { name = "CursorLine", link = false })
+      local modicator = require("modicator")
+
+      -- NOTE: modicator rewrites CursorLineNr on every ModeChanged event.
+      --       With lualine integration enabled it was pulling non-Kanagawa mode colors,
+      --       so the active line number briefly turned gold and then snapped back to blue.
+      --       Pin all modes to one Kanagawa accent and reuse CursorLine's background.
+      modicator.setup({
+        show_warnings = true,
+        highlights = {
+          defaults = {
+            fg = colors.palette.carpYellow,
+            bold = true,
+          },
+          use_cursorline_background = true,
+        },
+        integration = {
+          lualine = {
+            enabled = false,
+          },
+        },
+      })
+
+      for _, mode in ipairs(modicator.modes) do
+        vim.api.nvim_set_hl(0, mode .. "Mode", {
+          fg = colors.palette.carpYellow,
+          bg = cursorline.bg,
+          bold = true,
+        })
+      end
+    end,
   },
 
   -- barbar.nvim: customized tab/buffer bar
@@ -1202,7 +1231,7 @@ return {
   -- },
 
   -- incline.nvim: floating filename label per window (icon + filename only)
-  -- NOTE: always visible, highlights set in tokyonight on_highlights
+  -- NOTE: always visible, highlights set in modify.lua theme overrides
   -- NOTE: full path shown in statusline only, incline is just a quick label
   {
     "b0o/incline.nvim",
@@ -1287,6 +1316,16 @@ return {
   --     scratch = { enabled = true },
   --   },
   -- },
+
+  -- ocaml.nvim: advanced OCaml beyond LSP (type search, .ml/.mli switch, interface gen)
+  -- NOTE: built by Tarides (ocaml-lsp maintainers), requires ocamllsp from opam
+  {
+    "tarides/ocaml.nvim",
+    ft = { "ocaml", "ocaml.interface", "ocaml.menhir", "ocaml.ocamllex" },
+    config = function()
+      require("ocaml").setup()
+    end,
+  },
 
   -- persisted.nvim: session management with git branch awareness (auto on start)
   {
